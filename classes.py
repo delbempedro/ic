@@ -111,23 +111,22 @@ class area(line):
         """
         super().__init__(point1, point2)
         self._points = [point1, point2]
+        self._area = 0 
 
     def add_point(self, point):
         """
         Add a point to the list of points.
+        
         Parameters:
             - point: The point to be added to the list.
+        
+        This method appends the given point to the list of points.
+        It then calculates the area of the polygon defined by the points.
+        The area is updated and stored in the `_area` attribute of the object.
+        
+        Note: This method assumes that the points are in a plane and that they form a closed polygon.
         """
         self._points.append(point)
-
-    def get_area(self):
-        """
-        Calculate the area of the polygon defined by the points.
-        
-        Returns:
-            float: The area of the polygon, or 0 if the points define a line or a point.
-        """
-        Area = 0
         number_of_points = len(self._points)
         if not number_of_points < 3:
    
@@ -144,19 +143,33 @@ class area(line):
                     x2 = self._points[0]._x
                     x1 = self._points[i]._x
 
-                Area += (y1 - y2)*(x1 + x2)/2
+                self._area += (y1 - y2)*(x1 + x2)/2
+        self._area = abs(self._area)
 
-        return abs(Area/2)
+    def area(self):
+        """
+        Calculate the area of the polygon defined by the points.
+        
+        Returns:
+            float: The area of the polygon, or 0 if the points define a line or a point.
+        """
+        return self._area
 
 class angle:
 
     def __init__(self, point1, point2, point3):
         """
         Initialize the Angle object with three points.
+        
         Parameters:
             point1 (tuple): Coordinates of the first point (x, y)
             point2 (tuple): Coordinates of the second point (x, y)
             vertex (tuple): Coordinates of the vertex (x, y)
+
+        This method calculate the angle between two vectors formed by the points self._point1, self._point2, and self._vertex. 
+        
+        Returns:
+            None.
         """
         if point1 is None or  point2 is None or point3 is None:
             raise ValueError("Point coordinates cannot be None")
@@ -165,16 +178,29 @@ class angle:
         self._point2 = point2
         self._vertex = point3
     
-    def get_angle(self):
-        """
-        Calculate the angle between two vectors formed by the points self._point1, self._point2, and self._vertex.
-        Returns the angle in radians.
-        """
         vector1 = [self._point1._x-self._vertex._x, self._point1._y-self._vertex._y]
         vector2 = [self._point2._x-self._vertex._x, self._point2._y-self._vertex._y]
 
-        return math.acos( ( vector1._x*vector2._x + vector1._y*vector2._y )/( math.sqrt(vector1._x**2 + vector1._y**2)*math.sqrt(vector2._x**2 + vector2._y**2) ) )
+        self._radangle = math.acos( ( vector1[0]*vector2[0] + vector1[1]*vector2[1] )/( math.sqrt(vector1[0]**2 + vector1[1]**2)*math.sqrt(vector2[0]**2 + vector2[1]**2) ) )
+        self._angle = math.degrees(self._radangle)
 
+    def angle(self):
+        """
+        Return the angle of the object.
+
+        Returns:
+            float: The angle of the object.
+        """
+        return self._angle
+    
+    def radangle(self):
+        """
+        Return the radian angle of the object.
+
+        Returns:
+            float: The radian angle of the object.
+        """
+        return self._radangle
 
 class box_text:
      
@@ -235,15 +261,8 @@ p4 = point(lado,r*lado)
 p5 = point(0,r*lado)
 p6 = point(-1/2*lado,r/2*lado)
 
-r1 = ruler(p1,p2)
-r2 = ruler(p1,p3)
-r3 = ruler(p1,p4)
-r4 = ruler(p1,p5)
-r5 = ruler(p1,p6)
-print(r1.length(),r2.length(),r3.length(),r4.length(),r5.length())
-a =  area(p1,p2)
-a.add_point(p3)
-a.add_point(p4)
-a.add_point(p5)
-a.add_point(p6)
-print(a.get_area())
+a1 = angle(p1,p3,p2)
+a2 = angle(p1,p3,p4)
+a3 = angle(p1,p3,p5)
+a4 = angle(p1,p3,p6)
+print(a1.angle(), a2.angle(), a3.angle(), a4.angle())
