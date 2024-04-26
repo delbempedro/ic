@@ -31,13 +31,21 @@ class selector:
             ValueError: If the mode is not supported.
         """
         if self._mode == "line":
+
             return line(x1, y1, x2, y2)
+        
         elif self._mode == "ruler":
+
             return ruler(x1, y1, x2, y2)
+        
         elif self._mode == "selector":
+
             return selector()
+        
         else:
+
             raise ValueError("Unsupported mode: {}".format(self._mode))
+        
 
 class point:
 
@@ -50,13 +58,26 @@ class point:
             y (int): y-coordinate of the point
         """
         if x is None or y is None:
+
             raise ValueError("Point coordinates cannot be None")
 
-        if not isinstance(x, int) or not isinstance(y, int):
-            raise TypeError("Point coordinates should be integers")
+        self.x = x
+        self.y = y
 
-        self._x = x
-        self._y = y
+
+    def get_x(self):
+        """
+        Return the x-coordinate of the point.
+        """
+        x = self.x
+        return x
+    
+    def get_y(self):
+        """
+        Return the y-coordinate of the point.
+        """
+        y = self.y
+        return y
 
 class line:
 
@@ -68,6 +89,7 @@ class line:
             point2 (tuple): Coordinates of the second point (x, y)
         """
         if point1 is None or point2 is None:
+
             raise ValueError("Point coordinates cannot be None")
 
         self._point1 = point1
@@ -96,23 +118,21 @@ class area(line):
      
     def __init__(self, point1, point2):
         """
-        Initialize the object with two points and set the points list and number of points.
+        Initialize the object with two points and set the points list.
          
         :param point1: The first point
         :param point2: The second point
         """
         super().__init__(point1, point2)
-        self.points = [point1, point2]
-        self.number_of_points = 2
+        self._points = [point1, point2]
 
     def add_point(self, point):
         """
-        Add a point to the list of points and increment the total number of points.
+        Add a point to the list of points.
         Parameters:
             - point: The point to be added to the list.
         """
-        self.points.append(point)
-        self.number_of_points += 1
+        self._points.append(point)
 
     def get_area(self):
         """
@@ -121,16 +141,26 @@ class area(line):
         Returns:
             float: The area of the polygon, or 0 if the points define a line or a point.
         """
-        if self.number_of_points < 3:
-           return 0
-         
         Area = 0
-        for i in range(self.number_of_points):
-            if i < self.number_of_points:
-               Area += (self.points[i+1][0] - self.points[i][1])*(self.points[i][0] + self.points[i+1][0]/2)/(self.points[i+1][0] - self.points[i][0])
-            else:
-                Area += (self.points[0][0] - self.points[i][1])*(self.points[i][0] + self.points[0][0]/2)/(self.points[0][0] - self.points[i][0])
-        return Area
+        number_of_points = len(self._points)
+        if not number_of_points < 3:
+   
+            for i in range(number_of_points):
+                if i+1 < number_of_points:
+                    y2 = self._points[i+1].y
+                    y1 = self._points[i].y
+                    x2 = self._points[i+1].x
+                    x1 = self._points[i].x
+                    
+                else:
+                    y2 = self._points[i].y
+                    y1 = self._points[0].y
+                    x2 = self._points[i].x
+                    x1 = self._points[0].x
+                    
+                Area += (y1 - y2)*(x1 + x2)/2
+
+        return abs(Area)
 
 class angle:
 
@@ -209,3 +239,18 @@ class box_text:
             size (int): The new size to set for the object.
         """
         self._size = size
+
+r = math.sqrt(3.0)
+p1 = point(0,0)
+p2 = point(r,0)
+"""p3 = point(3/2,r/2)
+p4 = point(1,r)
+p5 = point(0,r)
+p6 = point(-3/2,r/2)"""
+p3 = point(r/2,3/2)
+a =  area(p1,p2)
+a.add_point(p3)
+"""a.add_point(p4)
+a.add_point(p5)
+a.add_point(p6)"""
+print(a.get_area())
