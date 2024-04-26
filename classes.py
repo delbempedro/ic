@@ -106,7 +106,7 @@ class ruler(line):
                 point2: tuple, the coordinates of the second point
             """
             super().__init__(self, point1, point2)
-            self._length = math.sqrt((self.point1[0] - self.point2[0])**2 + (self.point1[1] - self.point2[1])**2)
+            self._length = math.sqrt((self.point1.x - self.point2.x)**2 + (self.point1.y - self.point2.y)**2)
 
     def get_length(self):
             """
