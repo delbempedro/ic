@@ -36,14 +36,20 @@ class selector:
         
     def create_object(self, point1, point2):
         """
-        Create an object based on the specified mode and coordinates.
-        
-        Args:
-            x1, y1, x2, y2: Coordinates of the points
-        
+        Create an object based on the current mode.
+
+        Parameters:
+            point1 (tuple): The coordinates of the first point.
+            point2 (tuple): The coordinates of the second point.
+
         Returns:
-            An object of the specified mode.
-        
+            selector: If the mode is "selector".
+            line: If the mode is "line".
+            ruler: If the mode is "ruler".
+            area: If the mode is "area".
+            angle: If the mode is "angle".
+            box_text: If the mode is "box_text".
+
         Raises:
             ValueError: If the mode is not supported.
         """
