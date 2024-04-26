@@ -1,5 +1,22 @@
 import math
 
+class point:
+
+    def __init__(self, x, y):
+        """
+        Initialize the Point object with x and y coordinates.
+        
+        Parameters:
+            x (int): x-coordinate of the point
+            y (int): y-coordinate of the point
+        """
+        if x is None or y is None:
+
+            raise ValueError("Point coordinates cannot be None")
+
+        self._x = x
+        self._y = y
+
 class selector:
 
     def __init__(self):
@@ -17,7 +34,7 @@ class selector:
         self._mode = mode
         self._aspect = mode
         
-    def create_object(self, x1, y1, x2, y2):
+    def create_object(self, point1, point2):
         """
         Create an object based on the specified mode and coordinates.
         
@@ -30,39 +47,33 @@ class selector:
         Raises:
             ValueError: If the mode is not supported.
         """
-        if self._mode == "line":
+        if self._mode == "selector":
 
-            return line(x1, y1, x2, y2)
+            return selector()
+        
+        elif self._mode == "line":
+
+            return line(point1, point2)
         
         elif self._mode == "ruler":
 
-            return ruler(x1, y1, x2, y2)
+            return ruler(point1, point2)
         
-        elif self._mode == "selector":
+        elif self._mode == "area":
 
-            return selector()
+            return area(point1, point2)
+        
+        elif self._mode == "angle":
+
+            return angle(point1, point2, point3)
+        
+        elif self._mode == "box_text":
+
+            return box_text(point1, point2)
         
         else:
 
             raise ValueError("Unsupported mode: {}".format(self._mode))
-        
-
-class point:
-
-    def __init__(self, x, y):
-        """
-        Initialize the Point object with x and y coordinates.
-        
-        Parameters:
-            x (int): x-coordinate of the point
-            y (int): y-coordinate of the point
-        """
-        if x is None or y is None:
-
-            raise ValueError("Point coordinates cannot be None")
-
-        self._x = x
-        self._y = y
 
 
 class line:
