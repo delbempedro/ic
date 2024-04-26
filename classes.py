@@ -61,23 +61,9 @@ class point:
 
             raise ValueError("Point coordinates cannot be None")
 
-        self.x = x
-        self.y = y
+        self._x = x
+        self._y = y
 
-
-    def get_x(self):
-        """
-        Return the x-coordinate of the point.
-        """
-        x = self.x
-        return x
-    
-    def get_y(self):
-        """
-        Return the y-coordinate of the point.
-        """
-        y = self.y
-        return y
 
 class line:
 
@@ -105,10 +91,10 @@ class ruler(line):
                 point1: tuple, the coordinates of the first point
                 point2: tuple, the coordinates of the second point
             """
-            super().__init__(self, point1, point2)
-            self._length = math.sqrt((self.point1.x - self.point2.x)**2 + (self.point1.y - self.point2.y)**2)
+            super().__init__(point1, point2)
+            self._length = math.sqrt((self._point1._x - self._point2._x)**2 + (self._point1._y - self._point2._y)**2)
 
-    def get_length(self):
+    def length(self):
             """
             Return the length of the line.
             """
@@ -147,16 +133,16 @@ class area(line):
    
             for i in range(0,number_of_points):
                 if i+1 < number_of_points:
-                    y2 = self._points[i+1].y
-                    y1 = self._points[i].y
-                    x2 = self._points[i+1].x
-                    x1 = self._points[i].x
+                    y2 = self._points[i+1]._y
+                    y1 = self._points[i]._y
+                    x2 = self._points[i+1]._x
+                    x1 = self._points[i]._x
                     
                 else:
-                    y2 = self._points[0].y
-                    y1 = self._points[i].y
-                    x2 = self._points[0].x
-                    x1 = self._points[i].x
+                    y2 = self._points[0]._y
+                    y1 = self._points[i]._y
+                    x2 = self._points[0]._x
+                    x1 = self._points[i]._x
 
                 Area += (y1 - y2)*(x1 + x2)/2
 
@@ -184,10 +170,10 @@ class angle:
         Calculate the angle between two vectors formed by the points self._point1, self._point2, and self._vertex.
         Returns the angle in radians.
         """
-        vector1 = [self._point1.x-self._vertex.x, self._point1.y-self._vertex.y]
-        vector2 = [self._point2.x-self._vertex.x, self._point2.y-self._vertex.y]
+        vector1 = [self._point1._x-self._vertex._x, self._point1._y-self._vertex._y]
+        vector2 = [self._point2._x-self._vertex._x, self._point2._y-self._vertex._y]
 
-        return math.acos( ( vector1.x*vector2.x + vector1.y*vector2.y )/( math.sqrt(vector1.x**2 + vector1.y**2)*math.sqrt(vector2.x**2 + vector2.y**2) ) )
+        return math.acos( ( vector1._x*vector2._x + vector1._y*vector2._y )/( math.sqrt(vector1._x**2 + vector1._y**2)*math.sqrt(vector2._x**2 + vector2._y**2) ) )
 
 
 class box_text:
@@ -240,8 +226,8 @@ class box_text:
         """
         self._size = size
 
-r = math.sqrt(3.0)
-lado = r
+r = math.sqrt(3)
+lado = 1
 p1 = point(0,0)
 p2 = point(lado,0)
 p3 = point(3/2*lado,r/2*lado)
@@ -249,6 +235,12 @@ p4 = point(lado,r*lado)
 p5 = point(0,r*lado)
 p6 = point(-1/2*lado,r/2*lado)
 
+r1 = ruler(p1,p2)
+r2 = ruler(p1,p3)
+r3 = ruler(p1,p4)
+r4 = ruler(p1,p5)
+r5 = ruler(p1,p6)
+print(r1.length(),r2.length(),r3.length(),r4.length(),r5.length())
 a =  area(p1,p2)
 a.add_point(p3)
 a.add_point(p4)
