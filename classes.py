@@ -145,7 +145,7 @@ class area(line):
         number_of_points = len(self._points)
         if not number_of_points < 3:
    
-            for i in range(number_of_points):
+            for i in range(0,number_of_points):
                 if i+1 < number_of_points:
                     y2 = self._points[i+1].y
                     y1 = self._points[i].y
@@ -153,14 +153,14 @@ class area(line):
                     x1 = self._points[i].x
                     
                 else:
-                    y2 = self._points[i].y
-                    y1 = self._points[0].y
-                    x2 = self._points[i].x
-                    x1 = self._points[0].x
-                    
+                    y2 = self._points[0].y
+                    y1 = self._points[i].y
+                    x2 = self._points[0].x
+                    x1 = self._points[i].x
+
                 Area += (y1 - y2)*(x1 + x2)/2
 
-        return abs(Area)
+        return abs(Area/2)
 
 class angle:
 
@@ -184,10 +184,10 @@ class angle:
         Calculate the angle between two vectors formed by the points self._point1, self._point2, and self._vertex.
         Returns the angle in radians.
         """
-        vector1 = [self._point1[0]-self._vertex[0], self._point1[1]-self._vertex[1]]
-        vector2 = [self._point2[0]-self._vertex[0], self._point2[1]-self._vertex[1]]
+        vector1 = [self._point1.x-self._vertex.x, self._point1.y-self._vertex.y]
+        vector2 = [self._point2.x-self._vertex.x, self._point2.y-self._vertex.y]
 
-        return math.acos( ( vector1[0]*vector2[0] + vector1[1]*vector2[1] )/( math.sqrt(vector1[0]**2 + vector1[1]**2)*math.sqrt(vector2[0]**2 + vector2[1]**2) ) )
+        return math.acos( ( vector1.x*vector2.x + vector1.y*vector2.y )/( math.sqrt(vector1.x**2 + vector1.y**2)*math.sqrt(vector2.x**2 + vector2.y**2) ) )
 
 
 class box_text:
@@ -241,16 +241,17 @@ class box_text:
         self._size = size
 
 r = math.sqrt(3.0)
+lado = r
 p1 = point(0,0)
-p2 = point(r,0)
-"""p3 = point(3/2,r/2)
-p4 = point(1,r)
-p5 = point(0,r)
-p6 = point(-3/2,r/2)"""
-p3 = point(r/2,3/2)
+p2 = point(lado,0)
+p3 = point(3/2*lado,r/2*lado)
+p4 = point(lado,r*lado)
+p5 = point(0,r*lado)
+p6 = point(-1/2*lado,r/2*lado)
+
 a =  area(p1,p2)
 a.add_point(p3)
-"""a.add_point(p4)
+a.add_point(p4)
 a.add_point(p5)
-a.add_point(p6)"""
+a.add_point(p6)
 print(a.get_area())
