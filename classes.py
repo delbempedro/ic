@@ -71,7 +71,7 @@ class selector:
         
         elif self._mode == "angle":
 
-            return angle(point1, point2, point3)
+            return angle(point1, point2)
         
         elif self._mode == "box_text":
 
@@ -174,7 +174,7 @@ class area(line):
 
 class angle:
 
-    def __init__(self, point1, point2, point3):
+    def __init__(self, point1, vertex):
         """
         Initialize the Angle object with three points.
         
@@ -188,12 +188,14 @@ class angle:
         Returns:
             None.
         """
-        if point1 is None or  point2 is None or point3 is None:
+        if point1 is None or  vertex is None:
             raise ValueError("Point coordinates cannot be None")
 
         self._point1 = point1
-        self._point2 = point2
-        self._vertex = point3
+        self._vertex = vertex
+
+        a,b = (float(i) for i in input().split(","))
+        self._point2 = point(a,b)#temporary solution to get the second point, in the future it should be a parameter defined by mouse click
     
         vector1 = [self._point1._x-self._vertex._x, self._point1._y-self._vertex._y]
         vector2 = [self._point2._x-self._vertex._x, self._point2._y-self._vertex._y]
@@ -269,17 +271,7 @@ class box_text:
         """
         self._size = size
 
-r = math.sqrt(3)
-lado = 1
-p1 = point(0,0)
-p2 = point(lado,0)
-p3 = point(3/2*lado,r/2*lado)
-p4 = point(lado,r*lado)
-p5 = point(0,r*lado)
-p6 = point(-1/2*lado,r/2*lado)
-
-a1 = angle(p1,p3,p2)
-a2 = angle(p1,p3,p4)
-a3 = angle(p1,p3,p5)
-a4 = angle(p1,p3,p6)
-print(a1.angle(), a2.angle(), a3.angle(), a4.angle())
+p1 = point(1,2)
+v = point(3,4)
+a1 = angle(p1,v)
+print(a1.angle())
