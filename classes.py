@@ -270,8 +270,3 @@ class box_text:
             size (int): The new size to set for the object.
         """
         self._size = size
-
-p1 = point(1,2)
-v = point(3,4)
-a1 = angle(p1,v)
-print(a1.angle())
