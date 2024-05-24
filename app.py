@@ -30,13 +30,10 @@ class MainWindow(QMainWindow):
             if selector._mode == "angle":
                 self.last_point = self.current_point
                 self.current_point = event.pos()
-                selector.create_object(self.last_point, self.current_point)
+                angle = selector.create_object(self.last_point, self.current_point)
+                a = pg.PolyLineROI([[0,0], [10,10], [10,30], [30,10]], closed=True)
 
-    def mouseMoveEvent(self, event):
-        if selector._mode == "angle":
-            self.current_point = event.pos()
-            selector.create_object(self.last_point, self.current_point)
-    
+
 app = pg.mkQApp("anglebutton")
 win = MainWindow()
 win.show()
