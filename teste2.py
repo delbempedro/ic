@@ -4,23 +4,6 @@ import pyqtgraph as pg
 
 pg.setConfigOptions(imageAxisOrder='row-major')
 
-## Create image to display
-arr = np.ones((100, 100), dtype=float)
-arr[45:55, 45:55] = 0
-arr[25, :] = 5
-arr[:, 25] = 5
-arr[75, :] = 5
-arr[:, 75] = 5
-arr[50, :] = 10
-arr[:, 50] = 10
-arr += np.sin(np.linspace(0, 20, 100)).reshape(1, 100)
-arr += np.random.normal(size=(100,100))
-
-# add an arrow for asymmetry
-arr[10, :50] = 10
-arr[9:12, 44:48] = 10
-arr[8:13, 44:46] = 10
-
 ## create GUI
 app = pg.mkQApp("ROI Examples")
 w = pg.GraphicsLayoutWidget(show=True, size=(1000,800), border=True)
