@@ -194,8 +194,9 @@ class angle:
         self._point1 = point1
         self._vertex = vertex
 
-        a,b = (float(i) for i in input().split(","))
-        self._point2 = point(a,b)#temporary solution to get the second point, in the future it should be a parameter defined by mouse click
+        #a,b = (float(i) for i in input().split(","))
+        #self._point2 = point(a,b)#temporary solution to get the second point, in the future it should be a parameter defined by mouse click
+        self._point2 = (0,0)
     
         vector1 = [self._point1._x-self._vertex._x, self._point1._y-self._vertex._y]
         vector2 = [self._point2._x-self._vertex._x, self._point2._y-self._vertex._y]
