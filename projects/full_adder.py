@@ -1,6 +1,5 @@
 #do the necessary imports
 import math
-import qiskit
 
 def half_adder(qc,first_qbit,first_classical_bit):
     """
@@ -77,6 +76,6 @@ def full_adder(qc,value1,value2,carry_in,first_qbit,first_classical_bit):
     if carry_in == 1:
         qc.x(first_qbit)
 
-    #call the half adder and carry out functions to do the full adderS
+    #call the half adder and carry out functions to do the full adder
     half_adder(qc,first_qbit,first_classical_bit)
     carry_out(qc,first_qbit,first_classical_bit)
