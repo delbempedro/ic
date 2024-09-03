@@ -23,9 +23,7 @@ def current_circuit():
     """
     Create a quantum circuit with 16 qubits and 10 classical bits.
     
-    The quantum circuit is composed of two full adders. The first full adder
-    adds the qubits 0, 1 and 2 and stores the result in the classical bits 0, 1 and 2.
-    The second full adder adds the qubits 7, 8 and 9 and stores the result in the classical bits 5, 6 and 7.
+    The quantum circuit is composed of two full adders.
     
     Parameters:
     
