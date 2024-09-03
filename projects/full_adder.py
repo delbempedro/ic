@@ -1,3 +1,18 @@
+"""
+  full_affer.py
+
+Module that create the struct full adder in a quantum circuit.
+
+This module is used by the current_circuit.py module to
+run some circuits with needs full adder operations.
+
+Since:
+- 08/2024
+
+Authors:
+- Pedro C. Delbem. <pedrodelbem@usp.br>
+"""
+
 #do the necessary imports
 import math
 
