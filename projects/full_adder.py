@@ -7,7 +7,7 @@ This module is used by the current_circuit.py module to
 run some circuits with needs full adder operations.
 
 Since:
-- 08/2024
+- 09/2024
 
 Authors:
 - Pedro C. Delbem. <pedrodelbem@usp.br>
