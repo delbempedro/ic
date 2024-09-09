@@ -28,8 +28,8 @@ class current_circuit():
         The first full adder is defined with qbits 0, 1 and 2 and classical bit 0 and 1.
         The second full adder is defined with qbits 7, 5 and 6 and classical bit 2 and 3.
         """
-        self._num_of_qbits = 4
-        self._num_of_classical_bits = 4
+        self._num_of_qbits = 8
+        self._num_of_classical_bits = 5
         self._qc = QuantumCircuit(self._num_of_qbits,self._num_of_classical_bits)
 
         #defines the circuit

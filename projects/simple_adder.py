@@ -13,12 +13,10 @@ Authors:
 - Pedro C. Delbem. <pedrodelbem@usp.br>
 """
 
-#do the necessary imports
-import math
 
-def simple_adder(qc,first_qbit_index,first_classical_bit_index):
+def adder(qc,first_qbit_index,first_classical_bit_index):
     """
-    Quantum circuit for a half adder.
+    Quantum circuit for a sum of simple adder.
     
     Parameters:
     qc (QuantumCircuit): The quantum circuit to be modified.
@@ -39,7 +37,7 @@ def simple_adder(qc,first_qbit_index,first_classical_bit_index):
 
 def simple_carry_out(qc,first_qbit_index,first_classical_bit_index):
     """
-    Quantum circuit for a carry out.
+    Quantum circuit for a carry out of a simple adder.
     
     Parameters:
     qc (QuantumCircuit): The quantum circuit to be modified.
@@ -72,5 +70,5 @@ def simple_adder(qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit
         qc.x(first_qbit_index+1)
 
     #call the simple adder and carry out functions to do the simple adder
-    simple_adder(qc,first_qbit_index,first_classical_bit_index)
+    adder(qc,first_qbit_index,first_classical_bit_index)
     simple_carry_out(qc,first_qbit_index,first_classical_bit_index)

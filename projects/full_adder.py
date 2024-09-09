@@ -79,8 +79,8 @@ def full_adder(qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_i
     qbit1_value (int): The value of the first qbit to be used in the full adder.
     qbit2_value (int): The value of the second qbit to be used in the full adder.
     carry_in (int): If the carry in is used in the full adder.
-    first_qbit_index (int): The first qubit of the eight qubits to be used in the carry out.
-    first_classical_bit_index (int): The first classical bit of the five classical bits to be used in the carry out.
+    first_qbit_index (int): The first qubit of the eight qubits to be used in the full adder.
+    first_classical_bit_index (int): The first classical bit of the five classical bits to be used in the full adder.
     
     """
     #invert the values of the qbits if the input is not 0 (as expected)
