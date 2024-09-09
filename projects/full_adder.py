@@ -27,7 +27,7 @@ def half_adder(qc,first_qbit_index,first_classical_bit_index):
     
     """
     #mesuare all qbits 0, 1 and 2
-    qc.measure(first_qbit_index,first_classical_bit_index+0)
+    qc.measure(first_qbit_index,first_classical_bit_index)
     qc.measure(first_qbit_index+1,first_classical_bit_index+1)
     qc.measure(first_qbit_index+2,first_classical_bit_index+2)
 
@@ -61,7 +61,7 @@ def carry_out(qc,first_qbit_index,first_classical_bit_index):
     qc.x(first_qbit_index+5)
     qc.x(first_qbit_index+6)
 
-    #apply CcNOT on qbits 5 and 6 with qbit 7 as control
+    #apply CCNOT on qbits 5 and 6 with qbit 7 as control
     qc.ccx(first_qbit_index+5,first_qbit_index+6,first_qbit_index+7)
 
     #reversible inversion of qbit 7
@@ -70,7 +70,7 @@ def carry_out(qc,first_qbit_index,first_classical_bit_index):
     #measure qbit 7 with contain the carry out of the sum of the qbits 0, 1 and 2
     qc.measure(first_qbit_index+7,first_classical_bit_index+4)
 
-def full_adder(qc,qbit1_value,qbit2_value,carry_in,first_qbit_index,first_classical_bit_index):
+def full_adder(qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_index,carry_in=False):
     """
     Quantum circuit for a full adder.
     
@@ -78,17 +78,17 @@ def full_adder(qc,qbit1_value,qbit2_value,carry_in,first_qbit_index,first_classi
     qc (QuantumCircuit): The quantum circuit to be modified.
     qbit1_value (int): The value of the first qbit to be used in the full adder.
     qbit2_value (int): The value of the second qbit to be used in the full adder.
-    carry_in (int): The value of the third qbit to be used in the full adder.
+    carry_in (int): If the carry in is used in the full adder.
     first_qbit_index (int): The first qubit of the eight qubits to be used in the carry out.
     first_classical_bit_index (int): The first classical bit of the five classical bits to be used in the carry out.
     
     """
     #invert the values of the qbits if the input is not 0 (as expected)
-    if qbit1_value == 1:
+    if qbit1_value:
         qc.x(first_qbit_index+1)
-    if qbit2_value == 1:
+    if qbit2_value:
         qc.x(first_qbit_index+2)
-    if carry_in == 1:
+    if carry_in:
         qc.x(first_qbit_index)
 
     #call the half adder and carry out functions to do the full adder
