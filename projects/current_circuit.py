@@ -22,21 +22,16 @@ class current_circuit():
     
     def __init__(self):
         """
-        Create a new quantum circuit with two full adders.
-
-        The circuit is built with 16 qubits and 10 classical bits.
-        The first full adder is defined with qbits 0, 1 and 2 and classical bit 0 and 1.
-        The second full adder is defined with qbits 7, 5 and 6 and classical bit 2 and 3.
+        Create a new quantum circuit.
         """
-        self._num_of_qbits = 8
-        self._num_of_classical_bits = 5
+        self._num_of_qbits = 24
+        self._num_of_classical_bits = 15
         self._qc = QuantumCircuit(self._num_of_qbits,self._num_of_classical_bits)
 
         #defines the circuit
-        simple_adder(self._qc,1,1,0,0)
-        #full_adder(self._qc,1,1,0,0,carry_in=True)
-        #full_adder(self._qc,1,1,7,5)
-        #full_adder(self._qc,1,1,14,10)
+        full_adder(self._qc,1,1,0,0,carry_in=True)
+        full_adder(self._qc,1,1,7,5)
+        full_adder(self._qc,1,1,14,10)
     
     def get_current_circuit(self):
         """
