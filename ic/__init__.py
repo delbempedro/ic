@@ -1,1 +1,1 @@
-from current_circuit import *
+from ic.current_circuit import *
