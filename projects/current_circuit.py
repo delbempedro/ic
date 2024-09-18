@@ -24,14 +24,15 @@ class current_circuit():
         """
         Create a new quantum circuit.
         """
-        self._num_of_qbits = 24
-        self._num_of_classical_bits = 15
+        self._num_of_qbits = 32
+        self._num_of_classical_bits = 20
         self._qc = QuantumCircuit(self._num_of_qbits,self._num_of_classical_bits)
 
         #defines the circuit
         full_adder(self._qc,1,1,0,0,carry_in=True)
         full_adder(self._qc,1,1,7,5)
         full_adder(self._qc,1,1,14,10)
+        full_adder(self._qc,1,1,21,15)
     
     def get_current_circuit(self):
         """
