@@ -15,8 +15,8 @@ Authors:
 
 #do the necessary imports
 from qiskit import QuantumCircuit # type: ignore
-from full_adder import *
-from simple_adder import *
+from ic.full_adder import *
+from ic.simple_adder import *
 
 class current_circuit():
     
