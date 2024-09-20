@@ -84,13 +84,13 @@ def full_adder(qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_i
     
     """
     #invert the values of the qbits if the input is not 0 (as expected)
+    if carry_in==True:
+        qc.x(first_qbit_index)
     if qbit1_value:
         qc.x(first_qbit_index+1)
     if qbit2_value:
         qc.x(first_qbit_index+2)
-    if carry_in==True:
-        qc.x(first_qbit_index)
-
+    
     #call the half adder and carry out functions to do the full adder
     half_adder(qc,first_qbit_index,first_classical_bit_index)
     carry_out(qc,first_qbit_index,first_classical_bit_index)
