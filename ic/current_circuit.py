@@ -13,8 +13,13 @@ Authors:
 - Pedro C. Delbem. <pedrodelbem@usp.br>
 """
 
-#do the necessary imports
+#do qiskit necessary imports
 from qiskit import QuantumCircuit # type: ignore
+from qiskit_aer import AerSimulator # type: ignore
+from qiskit_ibm_runtime import QiskitRuntimeService, Session, SamplerV2 as Sampler # type: ignore
+from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager # type: ignore
+
+#do other necessary imports
 from ic.full_adder import *
 from ic.simple_adder import *
 
@@ -83,5 +88,46 @@ class current_circuit():
         """
         full_adder(self._qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_index,carry_in=False)
 
+    def run_circuit(self,type_of_run,service):
+        
+        
+        if type_of_run == "1":#real run
 
-    
+            #transpile your circuit
+            backend = service.least_busy(operational=True, simulator=False)
+            pass_manager = generate_preset_pass_manager(backend=backend, optimization_level=1)
+            qc_transpiled = pass_manager.run(self._qc)
+            sampler = Sampler(backend)
+
+            #run your circuit with samples
+            job = sampler.run([qc_transpiled])
+            result = job.result()
+
+        elif type_of_run == "2":#simulation with noise
+            
+            #transpile your circuit
+            real_backend = service.backend("ibm_brisbane")
+            aer = AerSimulator.from_backend(real_backend) 
+            pass_manager = generate_preset_pass_manager(backend=aer, optimization_level=1)
+            qc_transpiled = pass_manager.run(self._qc)
+
+            #simulete your circuit
+            sampler = Sampler(mode=aer)
+            result = sampler.run([qc_transpiled]).result()
+
+        elif type_of_run == "3":#simulation without noise
+
+            #transpile your circuit
+            aer_sim = AerSimulator()
+            pass_manager = generate_preset_pass_manager(backend=aer_sim, optimization_level=1)
+            qc_transpiled = pass_manager.run(self._qc)
+
+            #simulete your circuit
+            with Session(backend=aer_sim) as session:
+                sampler = Sampler()
+                result = sampler.run([qc_transpiled]).result()
+        
+        #defines data as results counts
+        data = result[0].data.c.get_counts()
+
+        return data
