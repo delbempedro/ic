@@ -28,9 +28,9 @@ def adder(qc,first_qbit_index,first_classical_bit_index):
     qc.measure(first_qbit_index,first_classical_bit_index)
     qc.measure(first_qbit_index+1,first_classical_bit_index+1)
 
-    #apply CNOT on qbits 1 and 0 with qbit 2 as control
-    qc.cx(first_qbit_index+1,first_qbit_index+2)
+    #apply CNOT on qbits 0 and 1 with qbit 2 as control
     qc.cx(first_qbit_index,first_qbit_index+2)
+    qc.cx(first_qbit_index+1,first_qbit_index+2)
 
     #mesuare qbit 3 with contain the result of the sum of the qbits 0 and 1
     qc.measure(first_qbit_index+2,first_classical_bit_index+2)
@@ -45,8 +45,8 @@ def simple_carry_out(qc,first_qbit_index,first_classical_bit_index):
     first_classical_bit_index (int): The first classical bit of the four classical bits to be used in the carry out.
     
     """
-    #apply CCNOT on qbits 1 and 0 with qbit 4 as control
-    qc.ccx(first_qbit_index+1,first_qbit_index,first_qbit_index+4)
+    #apply CCNOT on qbits 0 and 1 with qbit 4 as control
+    qc.ccx(first_qbit_index,first_qbit_index+1,first_qbit_index+4)
 
     #measure qbit 4 with contain the carry out of the sum of the qbits 0 and 1
     qc.measure(first_qbit_index+4,first_classical_bit_index+3)

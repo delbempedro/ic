@@ -31,12 +31,12 @@ def half_adder(qc,first_qbit_index,first_classical_bit_index):
     qc.measure(first_qbit_index+1,first_classical_bit_index+1)
     qc.measure(first_qbit_index+2,first_classical_bit_index+2)
 
-    #apply CNOT on qbits 1 and 0 with qbit 3 as control
+    #apply CNOT on qbits 1 and 2 with qbit 3 as control
     qc.cx(first_qbit_index+1,first_qbit_index+3)
-    qc.cx(first_qbit_index,first_qbit_index+3)
+    qc.cx(first_qbit_index+2,first_qbit_index+3)
 
-    #apply CNOT on qbits 2 and 3 with qbit 4 as control
-    qc.cx(first_qbit_index+2,first_qbit_index+4)
+    #apply CNOT on qbits 0 and 3 with qbit 4 as control
+    qc.cx(first_qbit_index,first_qbit_index+4)
     qc.cx(first_qbit_index+3,first_qbit_index+4)
 
     #mesuare qbit 4 with contain the result of the sum of the qbits 0, 1 and 2
@@ -52,10 +52,10 @@ def carry_out(qc,first_qbit_index,first_classical_bit_index):
     first_classical_bit_index (int): The first classical bit of the five classical bits to be used in the carry out.
     
     """
-    #apply CCNOT on qbits 1 and 0 with qbit 5 as control
-    qc.ccx(first_qbit_index+1,first_qbit_index,first_qbit_index+5)
-    #apply CCNOT on qbits 2 and 3 with qbit 6 as control
-    qc.ccx(first_qbit_index+2,first_qbit_index+3,first_qbit_index+6)
+    #apply CCNOT on qbits 1 and 2 with qbit 5 as control
+    qc.ccx(first_qbit_index+1,first_qbit_index+2,first_qbit_index+5)
+    #apply CCNOT on qbits 0 and 3 with qbit 6 as control
+    qc.ccx(first_qbit_index,first_qbit_index+3,first_qbit_index+6)
 
     #invert qbits 5 and 6
     qc.x(first_qbit_index+5)
@@ -88,7 +88,7 @@ def full_adder(qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_i
         qc.x(first_qbit_index+1)
     if qbit2_value:
         qc.x(first_qbit_index+2)
-    if carry_in:
+    if carry_in==True:
         qc.x(first_qbit_index)
 
     #call the half adder and carry out functions to do the full adder
