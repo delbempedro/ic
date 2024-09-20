@@ -73,7 +73,7 @@ def carry_out(qc,first_qbit_index,first_classical_bit_index):
     #measure qbit 7 with contain the carry out of the sum of the qbits 0, 1 and 2
     qc.measure(first_qbit_index+7,first_classical_bit_index+4)
 
-def full_adder(qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_index,carry_in=False):
+def full_adder(qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_index,carry_in):
     """
     Quantum circuit for a full adder.
     
@@ -91,7 +91,7 @@ def full_adder(qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_i
         qc.x(first_qbit_index+1)
     if qbit2_value:
         qc.x(first_qbit_index+2)
-    if carry_in==True:
+    if carry_in:
         qc.x(first_qbit_index)
 
     #call the half adder and carry out functions to do the full adder

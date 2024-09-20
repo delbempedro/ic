@@ -74,7 +74,7 @@ class current_circuit():
         """
         simple_adder(self._qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_index)
 
-    def add_full_adder(self,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_index,carry_in):
+    def add_full_adder(self,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_index,carry_in=False):
         """
         Add full adder in quantum circuit.
         
