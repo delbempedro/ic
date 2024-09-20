@@ -16,7 +16,7 @@ Authors:
 #do the necessary imports
 import math
 
-def half_adder(qc,first_qbit_index,first_classical_bit_index):
+def half_adder(qc,first_qbit_index,first_classical_bit_index,carry_in):
     """
     Quantum circuit for a half adder.
     
@@ -24,10 +24,13 @@ def half_adder(qc,first_qbit_index,first_classical_bit_index):
     qc (QuantumCircuit): The quantum circuit to be modified.
     first_qbit_index (int): The first qubit of the three qubits to be used in the half adder.
     first_classical_bit_index (int): The first classical bit of the four classical bits to be used in the half adder.
+    carry_in (bool): If the carry in is used in the full adder.
     
     """
+    #mesuare all qbits 0 if carry in are used because that implies it is the first full adder
+    if carry_in: qc.measure(first_qbit_index,first_classical_bit_index)
+
     #mesuare all qbits 0, 1 and 2
-    qc.measure(first_qbit_index,first_classical_bit_index)
     qc.measure(first_qbit_index+1,first_classical_bit_index+1)
     qc.measure(first_qbit_index+2,first_classical_bit_index+2)
 
@@ -92,5 +95,5 @@ def full_adder(qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_i
         qc.x(first_qbit_index)
 
     #call the half adder and carry out functions to do the full adder
-    half_adder(qc,first_qbit_index,first_classical_bit_index)
+    half_adder(qc,first_qbit_index,first_classical_bit_index,carry_in)
     carry_out(qc,first_qbit_index,first_classical_bit_index)
