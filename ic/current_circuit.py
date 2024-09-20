@@ -74,7 +74,7 @@ class current_circuit():
         """
         simple_adder(self._qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_index)
 
-    def add_full_adder(self,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_index,carry_in=False):
+    def add_full_adder(self,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_index,carry_in):
         """
         Add full adder in quantum circuit.
         
@@ -86,7 +86,7 @@ class current_circuit():
         first_classical_bit_index (int): The first classical bit of the five classical bits to be used in the full adder.
         
         """
-        full_adder(self._qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_index,carry_in=False)
+        full_adder(self._qc,qbit1_value,qbit2_value,first_qbit_index,first_classical_bit_index,carry_in)
 
     def run_circuit(self,type_of_run,service):
         
