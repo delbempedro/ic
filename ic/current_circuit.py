@@ -106,7 +106,7 @@ class current_circuit():
         elif type_of_run == "2":#simulation with noise
             
             #transpile your circuit
-            real_backend = service.backend("ibm_brisbane")
+            real_backend = service.backend("ibm_sherbrooke")
             aer = AerSimulator.from_backend(real_backend) 
             pass_manager = generate_preset_pass_manager(backend=aer, optimization_level=1)
             qc_transpiled = pass_manager.run(self._qc)
