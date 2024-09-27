@@ -12,6 +12,8 @@
     cvfhcahw5350008x5hbg
     
 2 fulladders:
+    cvt2bfxx1h0g0082pmkg
+
     cvffnrzz17rg008da680
     cvfeektvawwg00898rg0
     cvfe6mt8w2g0008egbbg
@@ -26,4 +28,6 @@
     cv677n6qxmm00085ham0
 
 1 fulladders:
+    cvt2whtqgh400088m85g
+
     cvmtzqej1gcg008xpss0

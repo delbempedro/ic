@@ -129,5 +129,6 @@ class current_circuit():
         
         #defines data as results counts
         data = result[0].data.c.get_counts()
+        job_id = result.job_id
 
-        return data
+        return data, job_id
