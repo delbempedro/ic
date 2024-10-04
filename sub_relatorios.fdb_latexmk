@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1727466072.1012 "/home/pedro/Documentos/GitHub/ic/sub_relatorios.tex" "sub_relatorios.pdf" "sub_relatorios" 1727466074.87924 2
+["pdflatex"] 1728061526.72241 "/home/pedro/Documentos/GitHub/ic/sub_relatorios.tex" "sub_relatorios.pdf" "sub_relatorios" 1728061527.98351 2
   "/home/pedro/Documentos/GitHub/ic/sub_relatorios.tex" 1727466066.66979 12405 6d5946de1c4ecc6f5a8d66c7c453bd4c ""
   "/nix/store/fz74vjq7n2wiyasi94rjg41784vzccph-texlive-2023-env/share/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1 5467731 78c8b9f2119e03a5ad55f01dfbc3a0f3 ""
   "/nix/store/fz74vjq7n2wiyasi94rjg41784vzccph-texlive-2023-env/share/texmf-var/web2c/pdftex/pdflatex.fmt" 1 8221886 7f83a0c3ec6ec65ddd938527b2d66ad9 ""
@@ -95,10 +95,10 @@
   "imagens/select_quantum_computer.png" 0 -1 0 ""
   "imagens/simulation-with-noise.png" 0 -1 0 ""
   "imagens/simulation-without-noise.png" 0 -1 0 ""
-  "sub_relatorios.aux" 1727466074.54976 1507 029e7eafc52b8344734d4d874d847d7f "pdflatex"
-  "sub_relatorios.out" 1727466074.55176 1516 009a6125d5f5cfe091e2e7788feeb26c "pdflatex"
+  "sub_relatorios.aux" 1728061527.85283 1507 029e7eafc52b8344734d4d874d847d7f "pdflatex"
+  "sub_relatorios.out" 1728061527.85383 1516 009a6125d5f5cfe091e2e7788feeb26c "pdflatex"
   "sub_relatorios.tex" 1727466066.66979 12405 6d5946de1c4ecc6f5a8d66c7c453bd4c ""
-  "sub_relatorios.toc" 1727466074.55276 864 26700a55fa24d4b56e755ecdbe3d7c6e "pdflatex"
+  "sub_relatorios.toc" 1728061527.85483 864 26700a55fa24d4b56e755ecdbe3d7c6e "pdflatex"
   (generated)
   "sub_relatorios.aux"
   "sub_relatorios.log"
