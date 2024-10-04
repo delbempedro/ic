@@ -142,7 +142,7 @@ Orientador: Fillipo Ghiglieno\\
         
         \end{figure}
     
-        Note que o qubit \'e sempre inicializado em 0, assim para utilizar o valor 1, devemos invert\^e-lo. Al\'em disso \'e not\'orio que a opera\c{c}\~ao "medida" (\'icone cinza) apensar de n\~ao-revers\'ivel \'e necess\'aria para trazermos o resultado qu\^antico para o "mundo cl\'assico".
+        Note que o qubit \'e sempre inicializado em 0, assim para utilizar o valor 1, devemos invert\^e-lo. Al\'em disso \'e not\'orio que a opera\c{c}\~ao "medida" (\'icone cinza) apesar de n\~ao-revers\'ivel \'e necess\'aria para trazermos o resultado qu\^antico para o "mundo cl\'assico".
     
         Ademais, \'e importante perceber que o uso da porta "RX(pi)" \'e necess\'ario para manter e reversibilidade do "carry out" que poder\'a ser utilizado em outra soma de quibit's.
     
@@ -208,21 +208,25 @@ Orientador: Fillipo Ghiglieno\\
         
         \end{figure}
 
-        Simulando o circuito, com e sem ruído - respectivamente -, obtivemos a seguinte resposta
+%        Simulando o circuito, com e sem ruído - respectivamente -, obtivemos a seguinte resposta
 
-        \begin{figure}[H]
+%        \begin{figure}[H]
         
-        \centering
+%        \centering
         
-        \includegraphics[width=1.00\textwidth]{imagens/simulationresults.png}
+%        \includegraphics[width=1.00\textwidth]{imagens/simulationresults.png}
         
-        imagem 8: resultados da simula\c{c}\~ao utilizando a biblioteca Qiskit da IBM
+%        imagem 8: resultados da simula\c{c}\~ao utilizando a biblioteca Qiskit da IBM
         
-        \end{figure}
+%        \end{figure}
 
-        Percebe-se que o circuito realmente retorna o esperado, no caso sem ru\'ido e que majoritariamente retorna o esperado, no caso com ru\'ido. Contudo, o ru\'ido simulado est\'a mais pr\'oximo de uma situa\c{c}\~ao onde conseguimos utilizar um hardware que acabou de ser reinicializado e sem fila de espera - o que raramente acontecer\'a.
+%        Percebe-se que o circuito realmente retorna o esperado, no caso sem ru\'ido e que majoritariamente retorna o esperado, no caso com ru\'ido. Contudo, o ru\'ido simulado est\'a mais pr\'oximo de uma situa\c{c}\~ao onde conseguimos utilizar um hardware que acabou de ser reinicializado e sem fila de espera - o que raramente acontecer\'a.
 
-        Posteriormente, realizou-se ambas as simula\c{c}\~oes, al\'em de rodar no hardware real, o caso com dois e tr\^es full adders.
+        Posteriormente, - utilizando a biblioteca da IBM para o Python, Qiskit, - realizou-se ambas as simula\c{c}\~oes, para um e dois full adders, al\'em de rodar no hardware real.
+        
+        Para os casos com tr\^es e quatro full adders foi apenas simulado sem ru\'ido (pois a simula\c{c}\~ao com ru\'do desses casos tem o tempo de execu\c{c}\~ao maior at\'e que o tempo de espera para utilizar o hardware real) e rodados na hardware real.
+
+        As imagens 8, 9 e 10 representam a rotina de simula\c{c}\~ao sem ru\'ido, com ru\'ido e a rotina no hardware real - respectivamente
 
         Para dois full adders (onde o primeiro recebe 1 no carry in e soma 1 com 1 e o segundo recebe como carry in o carry out do primeiro e faz a mesma soma) obtivemos os seguintes resultados presentes dos gr\'aficos das imagens 9 a 11.
 
