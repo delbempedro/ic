@@ -1,0 +1,45 @@
+{
+  "id": "cvt2bfxx1h0g0082pmkg",
+  "hub": "ibm-q",
+  "group": "open",
+  "project": "main",
+  "backend": "ibm_brisbane",
+  "state": {
+    "status": "Completed"
+  },
+  "status": "Completed",
+  "params": {
+    "pubs": [
+      [
+        {
+          "__type__": "QuantumCircuit",
+          "__value__": "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"
+        },
+        {
+          "__type__": "ndarray",
+          "__value__": "eJyb7BfqGxDJyFDGUK2eklqcXKRupaBuk2ahrqOgnpZfVFKUmBefX5SSChJ3S8wpTgWKF2ckFqQC+RoGOpo6CrUKFAAuAFOzG1s="
+        },
+        null
+      ]
+    ],
+    "options": {},
+    "version": 2,
+    "support_qiskit": true
+  },
+  "program": {
+    "id": "sampler"
+  },
+  "created": "2024-09-25T15:01:19.213Z",
+  "ended": "2024-09-25T15:07:58.167Z",
+  "runtime": "",
+  "cost": 600,
+  "tags": null,
+  "session_id": null,
+  "estimated_running_time_seconds": 3.972811803584034,
+  "estimated_max_running_time_seconds": 19.86405901792017,
+  "usage": {
+    "seconds": 0
+  },
+  "private": false,
+  "user_id": "66b61e48b81351297596555d"
+}

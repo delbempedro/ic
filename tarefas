@@ -1,0 +1,6 @@
+0 - anotar como salvar cada informação FEITO
+1 - fazer as estatísticas com base no result.json (para 1,2,3,4 full adders) SEMI-FEITO (problema na leitura de muitos fulladders)
+2 - relacionar o código real rodado no computador quântico com o código fonte e a arquitetura do computador usado
+3 - investigar informações disponíveis sobre cada arquitetura do computador quântico
+4 - rodar 1,2,3,4 full adders 10(100) vezes em cada arquitetura
+5 - análise estatística e conceitual dos resultados

@@ -1,0 +1,14 @@
+- To save informations about some specific job
+    Acess https://quantum.ibm.com/workloads
+    You will can see your jobs
+    To save some job click on the three points in the right of interest job box
+    Select "download" option witch will gave your job results and job info (quantum computer, date, ...)
+
+- To save quantum computer info
+    Acess https://quantum.ibm.com/composer
+    Click on "Setup and Run" in up side right corner
+    You will can see the available quantum computers
+    Click on "See more details" in up side right corner of interest quantum computer box
+    In down side right corner you can see a download icon
+    Click in download icon and select your option (Download all calibration data (.csv); Download
+    map view (.svg); Download map view (.png))
