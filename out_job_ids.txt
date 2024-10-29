@@ -15,6 +15,30 @@ wrong run
     cw7wsb59ezk00080ym5g
     cw7wskpjzdhg008e9wh0
 
+1 full adder on ibm_sherbroker
+    cwcphzfggr6g008jewz0
+    cwcpk2mjzdhg0081fzc0
+    cwcpm389ezk0008ev4jg
+    cwf3x0w31we00087k2yg
+    cwf3x6440e000088fpzg
+    cwf3xb5543p00085zkp0
+    cwf538d543p00085zqk0
+    cwf53h6mptp00082ekh0
+    cwf53vq40e000088fv80
+    cwf8jxk31we00087krc0
+
+1 full adder on ibm_kyiv
+    cwf8k440r6b0008p9a50
+    cwf8k7w9r49g0085syag
+    cwfa05g543p000860f3g
+    cwfw1ky9r49g0085xek0
+    cwfw1py40e000088kvvg
+    cwfw1sfmptp00082jn80
+    cwg1hv70r6b0008pdsz0
+    cwg1hzf543p000864r6g
+    cwg1j1r40e000088mtg0
+    cwg1rja0r6b0008pdv2g
+
 2 full adder on ibm_brisbrane
     cw7xgntjyrs0008gse8g
     cw7xh2mbhxtg008wjsz0
@@ -29,6 +53,8 @@ wrong run
     cw8p10wggr6g0087ps20
     cw8p5jebhxtg008wnyvg
     cw8p5yfggr6g0087psvg
+    cwck2bsjzdhg0081fcf0
+    cwckr91ggr6g008wqzg0
 
 2 full adder on ibm_sherbroker
     cw8n289ggr6g0087pmxg
@@ -36,3 +62,29 @@ wrong run
     cw8p6a1ggr6g0087psyg
     cw8paybbhxtg008wnzmg
     cw8pesbjyrs0008gwm90
+    cwcjhtq2802g008fdpxg
+    cwg2cgt40e000088mymg
+    cwg2cktmptp00082krmg
+    cwg2d240r6b0008pdxt0
+    cwg2dcx0r6b0008pdxv0
+
+2 full adder on ibm_kyiv
+    cwg2e40543p000864weg
+    cwg2e6r40e000088mywg
+    cwg2e910r6b0008pdxzg
+    cwg2hf540e000088mzbg
+    cwg2hjymptp00082ks90
+    cwg2hpe0r6b0008pdykg
+    cwg2hyz31we00087rb1g
+    cwg2j1840e000088mzdg
+    cwg2jb931we00087rb20
+    cwg2je90r6b0008pdypg
+
+3 full adder on ibm_brisbrane
+    cwg2wbh40e000088n1ng
+    cwgd39x9r49g008607kg
+    cwgd3cx0r6b0008pfme0
+    cwgd3fn9r49g008607n0
+
+3 full adder on ibm_sherbroker
+    cwgbv9531we00087sv40
