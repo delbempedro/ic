@@ -1,6 +1,3 @@
-wrong run
-    cw7wdvzjzdhg008e9r30
-
 1 full adder on ibm_brisbrane
     cw7wnbxjyrs0008gs6h0
     cw7wnvz9ezk00080yjs0
@@ -85,6 +82,14 @@ wrong run
     cwgd39x9r49g008607kg
     cwgd3cx0r6b0008pfme0
     cwgd3fn9r49g008607n0
+    cwgn9vfmptp00082pt70
+    cwgnfdx40e000088r1j0
+    cwgnfge40e000088r1jg
+    cwgqmch0r6b0008phbgg
+    cwgqnm6mptp00082q68g
+    cwgqptk31we00087vrgg
 
 3 full adder on ibm_sherbroker
     cwgbv9531we00087sv40
+
+3 full adder on ibm_kyiv
