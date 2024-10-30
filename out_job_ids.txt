@@ -91,5 +91,23 @@
 
 3 full adder on ibm_sherbroker
     cwgbv9531we00087sv40
+    cwh2eka31we00087xcs0
+    cwh2f9d40e000088t4a0
+    cwh2fh6543p00086a1ag
+    cwh2gyv40e000088t4f0
+    cwh2h1w9r49g00863nbg
+    cwh2h64mptp00082rwy0
+    cwh2kcn543p00086a1wg
+    cwh2khe9r49g00863nq0
+    cwh2kn6mptp00082rx60
 
 3 full adder on ibm_kyiv
+    cwh2nxf543p00086a270
+    cwh2nzfmptp00082rxmg
+    cwh2p1g543p00086a280
+    cwh3f1440e000088t74g
+    cwh3f4w31we00087xfk0
+    cwh3f7440e000088t75g
+    cwh831w0r6b0008pkvgg
+    cwh834wmptp0008h6ffg
+    cwh83b5mptp0008h6fh0
