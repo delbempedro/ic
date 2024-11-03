@@ -12,28 +12,47 @@ Since:
 Authors:
 - Pedro C. Delbem. <pedrodelbem@usp.br>
 """
-def get_results(job_id="", service=service, save_txt_with_results=False, directory=""):
+def get_results(job_id="", service="", save_txt_with_results=False, directory=""):
     """
-    Gets the results of a job from the service.
+    Gets the results of a job in a service.
 
-    Parameters
-    ----------
-    job_id : str
-        The id of the job to get the results from.
-    service : QiskitRuntimeService
-        The service to get the job from.
-    save_txt_with_results : bool
-        Whether to save the results to a text file.
+    Parameters:
+    job_id (str): the id of the job to get the results from
+    service (QiskitRuntimeService): the service that contains the job
+    save_txt_with_results (bool): if True, the results will be saved in a txt file
+    directory (str): the directory where the file will be saved
 
-    Returns
-    -------
-    dict
-        The results of the job.
+    Returns:
+    The results of the job
     """
-    results = service.job(job_id).result()[0].data.c.get_counts()
+    results = service.job(job_id).result()
+
+    #performs the necessary processing for measurements coming from the
+    #IBM plataform instead of direct measurements made by qiskit code
+    statistics = {}
+    if type(results) == dict:
+        contains = results["results"][0]['data']
+        
+        #gruops the bits of each measurements
+        for measure in range(1024):
+            current_measure = ""
+            for qbit in contains:
+                bit = contains[qbit]["samples"][measure][-1]
+                current_measure = current_measure + bit
+
+            if current_measure in statistics:
+                statistics[current_measure] += 1
+            else:
+                statistics[current_measure] = 1
+
+    else:
+        statistics = results[0].data.c.get_counts()
+    
+    #saves the results in a txt file if save_txt_with_results is True
     if save_txt_with_results:
-        save_name = directory+"/"+str(job_id)+".txt"
+        save_name = str(job_id)+".txt"
         with open(save_name, "w") as file:
-            file.write(str(results))
+            for key in statistics:
+                file.write(key + " " + str(statistics[key]) + "\n")
  
-    return results
+    return statistics
