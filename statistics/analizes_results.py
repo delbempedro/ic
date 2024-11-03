@@ -1,14 +1,17 @@
-#installs necessary packages
-%pip install matplotlib
-%pip install qiskit_ibm_runtime
+"""
+  analizes_results.py
 
-#imports necessary packages
-import matplotlib.pyplot as plt
-import qiskit_ibm_runtime
+Module that defines analizes results in a quantum circuit.
 
-#connects to the service
-service = qiskit_ibm_runtime.QiskitRuntimeService()
+Dependencies:
+-
 
+Since:
+- 11/2024
+
+Authors:
+- Pedro C. Delbem. <pedrodelbem@usp.br>
+"""
 def get_results(job_id="", service=service, save_txt_with_results=False, directory=""):
     """
     Gets the results of a job from the service.
@@ -30,7 +33,7 @@ def get_results(job_id="", service=service, save_txt_with_results=False, directo
     results = service.job(job_id).result()[0].data.c.get_counts()
     if save_txt_with_results:
         save_name = directory+"/"+str(job_id)+".txt"
-        with open(save_name, "w") as f:
-            f.write(str(results))
+        with open(save_name, "w") as file:
+            file.write(str(results))
  
     return results
