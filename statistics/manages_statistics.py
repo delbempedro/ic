@@ -56,10 +56,33 @@ with open("job_ids_4_statistics.txt", "r") as file:
 
 #computes the results
 for num_of_full_adders in data_dict:
-    print(num_of_full_adders)
+    #print(num_of_full_adders)
     for ibm_hardware in data_dict[num_of_full_adders]:
-        print("    "+ibm_hardware)
+        #print("    "+ibm_hardware)
+        number_of_jobs = 0
+        general_results = {}
+        directory = num_of_full_adders+"/"+ibm_hardware+"/"
+
         for job_id in data_dict[num_of_full_adders][ibm_hardware]:
-            print("        "+job_id)
-            directory = num_of_full_adders+"/"+ibm_hardware+"/"+job_id+".txt"
-            get_results(job_id=job_id, service=service, directory=directory)
+            #print("        "+job_id)
+            job_directory = directory+job_id+".txt"
+            get_results(job_id=job_id, service=service, directory=job_directory)
+            
+            with open(job_directory, "r") as current_file:
+                for line in current_file:
+                    key, value = line.split()
+                    if key in general_results:
+                        general_results[key] += int(value)
+                    else:
+                        general_results[key] = int(value)
+
+            number_of_jobs += 1
+
+        corret_value = "1"*len(list(general_results.keys())[0])
+        per_cent_of_hits = general_results[corret_value]/(number_of_jobs*1024)
+        current_directory = directory+"general_results"+".txt"
+        with open(current_directory, "w") as current_file:
+            current_file.write("number of jobs: "+str(number_of_jobs)+"\n")
+            current_file.write("percentage of hits: "+str(per_cent_of_hits)+"\n")
+            for key, value in general_results.items():
+                current_file.write(key+" "+str(value)+"\n")

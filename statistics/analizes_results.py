@@ -28,32 +28,36 @@ def get_results(job_id="", service="", directory=""):
     Returns:
     The results of the job
     """
-    if not Path(directory).exists():
-        results = service.job(job_id).result()
+    #if Path(directory).exists() == False:
 
-        #performs the necessary processing for measurements coming from the
-        #IBM plataform instead of direct measurements made by qiskit code
-        statistics = {}
-        if type(results) == dict:
-            contains = results["results"][0]['data']
-            
-            #gruops the bits of each measurements
-            for measure in range(1024):
-                current_measure = ""
-                for qbit in contains:
-                    bit = contains[qbit]["samples"][measure][-1]
-                    current_measure = current_measure + bit
+    results = service.job(job_id).result()
 
-                if current_measure in statistics:
-                    statistics[current_measure] += 1
-                else:
-                    statistics[current_measure] = 1
+    #performs the necessary processing for measurements coming from the
+    #IBM plataform instead of direct measurements made by qiskit code
+    statistics = {}
+    if type(results) == dict:
+        contains = results["results"][0]['data']
+        number_of_shots = results["metadata"]["execution"]["execution_spans"][0][-1]["0"][0][0]
 
-        else:
-            statistics = results[0].data.c.get_counts()
+        #gruops the bits of each measurements
+        for measure in range(number_of_shots):
+            current_measure = ""
+            for qbit in contains:
+                bit = contains[qbit]["samples"][measure][-1]
+                current_measure = current_measure + bit
+
+            if current_measure in statistics:
+                statistics[current_measure] += 1
+            else:
+                statistics[current_measure] = 1
+
+    else:
+        statistics = results[0].data.c.get_counts()
+        number_of_shots = results[0].data.c.num_shots()
         
-        #saves the results in a txt file if save_txt_with_results is True
-        save_name = directory
-        with open(save_name, "w") as file:
-            for key in statistics:
-                file.write(key + " " + str(statistics[key]) + "\n")
+    #saves the results in a txt file if save_txt_with_results is True
+    save_name = directory
+    with open(save_name, "w") as file:
+        file.write("number of shots: " + str(number_of_shots) + "\n")
+        for key in statistics:
+            file.write(key + " " + str(statistics[key]) + "\n")
