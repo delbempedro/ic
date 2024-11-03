@@ -1,0 +1,158 @@
+1 full adder
+
+    on ibm_brisbrane
+        cw7wnbxjyrs0008gs6h0
+        cw7wnvz9ezk00080yjs0
+        cw7wp9sjyrs0008gs6zg
+        cw7wph22802g0081epw0
+        cw7wpvb2802g0081eq1g
+        cw7wq3m9ezk00080yk6g
+        cw7wqdx9ezk00080ykd0
+        cw7wqv7jzdhg008e9vmg
+        cw7wrrkbhxtg008wjkwg
+        cw7ws0cbhxtg008wjm00
+        cw7wsb59ezk00080ym5g
+        cw7wskpjzdhg008e9wh0
+
+    on ibm_sherbroker
+        cwcphzfggr6g008jewz0
+        cwcpk2mjzdhg0081fzc0
+        cwcpm389ezk0008ev4jg
+        cwf3x0w31we00087k2yg
+        cwf3x6440e000088fpzg
+        cwf3xb5543p00085zkp0
+        cwf538d543p00085zqk0
+        cwf53h6mptp00082ekh0
+        cwf53vq40e000088fv80
+        cwf8jxk31we00087krc0
+
+    on ibm_kyiv
+        cwf8k440r6b0008p9a50
+        cwf8k7w9r49g0085syag
+        cwfa05g543p000860f3g
+        cwfw1ky9r49g0085xek0
+        cwfw1py40e000088kvvg
+        cwfw1sfmptp00082jn80
+        cwg1hv70r6b0008pdsz0
+        cwg1hzf543p000864r6g
+        cwg1j1r40e000088mtg0
+        cwg1rja0r6b0008pdv2g
+
+2 full adder
+
+    on ibm_brisbrane
+        cw7xgntjyrs0008gse8g
+        cw7xh2mbhxtg008wjsz0
+        cw7xhe5jzdhg008ea27g
+        cw7xhw7bhxtg008wjt50
+        cw7xjkjjyrs0008gser0
+        cw7xkqejzdhg008ea2pg
+        cw7xmpa9ezk00080ythg
+        cw7xp602802g0081ezd0
+        cw7xpvk9ezk00080yv5g
+        cw7xq6cjzdhg008ea3fg
+        cw8p10wggr6g0087ps20
+        cw8p5jebhxtg008wnyvg
+        cw8p5yfggr6g0087psvg
+        cwck2bsjzdhg0081fcf0
+        cwckr91ggr6g008wqzg0
+
+    on ibm_sherbroker
+        cw8n289ggr6g0087pmxg
+        cw8n3ddjzdhg008ed530
+        cw8p6a1ggr6g0087psyg
+        cw8paybbhxtg008wnzmg
+        cw8pesbjyrs0008gwm90
+        cwcjhtq2802g008fdpxg
+        cwg2cgt40e000088mymg
+        cwg2cktmptp00082krmg
+        cwg2d240r6b0008pdxt0
+        cwg2dcx0r6b0008pdxv0
+
+    on ibm_kyiv
+        cwg2e40543p000864weg
+        cwg2e6r40e000088mywg
+        cwg2e910r6b0008pdxzg
+        cwg2hf540e000088mzbg
+        cwg2hjymptp00082ks90
+        cwg2hpe0r6b0008pdykg
+        cwg2hyz31we00087rb1g
+        cwg2j1840e000088mzdg
+        cwg2jb931we00087rb20
+        cwg2je90r6b0008pdypg
+
+3 full adder
+
+    on ibm_brisbrane
+        cwg2wbh40e000088n1ng
+        cwgd39x9r49g008607kg
+        cwgd3cx0r6b0008pfme0
+        cwgd3fn9r49g008607n0
+        cwgn9vfmptp00082pt70
+        cwgnfdx40e000088r1j0
+        cwgnfge40e000088r1jg
+        cwgqmch0r6b0008phbgg
+        cwgqnm6mptp00082q68g
+        cwgqptk31we00087vrgg
+
+    on ibm_sherbroker
+        cwgbv9531we00087sv40
+        cwh2eka31we00087xcs0
+        cwh2f9d40e000088t4a0
+        cwh2fh6543p00086a1ag
+        cwh2gyv40e000088t4f0
+        cwh2h1w9r49g00863nbg
+        cwh2h64mptp00082rwy0
+        cwh2kcn543p00086a1wg
+        cwh2khe9r49g00863nq0
+        cwh2kn6mptp00082rx60
+
+    on ibm_kyiv
+        cwh2nxf543p00086a270
+        cwh2nzfmptp00082rxmg
+        cwh2p1g543p00086a280
+        cwh3f1440e000088t74g
+        cwh3f4w31we00087xfk0
+        cwh3f7440e000088t75g
+        cwh831w0r6b0008pkvgg
+        cwh834wmptp0008h6ffg
+        cwh83b5mptp0008h6fh0
+        cwjdzad31we000884r3g
+
+4 full adder
+
+    on ibm_sherbroker
+        cwje47031we000884rtg
+        cwje4f1mptp00085sdr0
+        cwk4evb0r6b0008pzng0
+        cwk4exv543p00086pvp0
+        cwk4f540r6b0008pzngg
+        cwkrmxv543p00086s130
+        cwkrxje31we00088c740
+        cwkrxmpmptp00086100g
+        cwkrxr740e0000898y1g
+        cwkrxvzmptp000861030
+
+    on ibm_kyiv
+        cwk26na40e0000896f50
+        cwk26vb40e0000896f5g
+        cwk26zb9r49g0089959g
+        cwk27bd31we000889r0g
+        cwk27f531we000889r1g
+        cwk27he0r6b0008pze2g
+        cwk4bwq40e0000896ny0
+        cwk4c38543p00086pvc0
+        cwk4c6r543p00086pvcg
+        cwk4cr3mptp00085yqy0
+
+    on ibm_brisbrane
+        cwk4d14543p00086pvfg
+        cwk4d3w9r49g00899cj0
+        cwk4d8d40e0000896p00
+        cwk4ddx40e0000896p10
+        cwk4dgp543p00086pvgg
+        cwk4dvf31we000889yjg
+        cwk4dxz40e0000896p20
+        cwk4e48543p00086pvh0
+        cwk4e99543p00086pvhg
+        cwk4eg29r49g00899cpg
