@@ -1,6 +1,6 @@
-1 full adder
+1_full_adder
 
-    on ibm_brisbrane
+    ibm_brisbrane
         cw7wnbxjyrs0008gs6h0
         cw7wnvz9ezk00080yjs0
         cw7wp9sjyrs0008gs6zg
@@ -13,8 +13,11 @@
         cw7ws0cbhxtg008wjm00
         cw7wsb59ezk00080ym5g
         cw7wskpjzdhg008e9wh0
+        cwkyf649r49g0089cep0
+        cwkyffdmptp000861sg0
+        cwkyfhp31we00088czhg
 
-    on ibm_sherbroker
+    ibm_sherbroker
         cwcphzfggr6g008jewz0
         cwcpk2mjzdhg0081fzc0
         cwcpm389ezk0008ev4jg
@@ -26,7 +29,7 @@
         cwf53vq40e000088fv80
         cwf8jxk31we00087krc0
 
-    on ibm_kyiv
+    ibm_kyiv
         cwf8k440r6b0008p9a50
         cwf8k7w9r49g0085syag
         cwfa05g543p000860f3g
@@ -38,9 +41,9 @@
         cwg1j1r40e000088mtg0
         cwg1rja0r6b0008pdv2g
 
-2 full adder
+2_full_adder
 
-    on ibm_brisbrane
+    ibm_brisbrane
         cw7xgntjyrs0008gse8g
         cw7xh2mbhxtg008wjsz0
         cw7xhe5jzdhg008ea27g
@@ -57,7 +60,7 @@
         cwck2bsjzdhg0081fcf0
         cwckr91ggr6g008wqzg0
 
-    on ibm_sherbroker
+    ibm_sherbroker
         cw8n289ggr6g0087pmxg
         cw8n3ddjzdhg008ed530
         cw8p6a1ggr6g0087psyg
@@ -69,7 +72,7 @@
         cwg2d240r6b0008pdxt0
         cwg2dcx0r6b0008pdxv0
 
-    on ibm_kyiv
+    ibm_kyiv
         cwg2e40543p000864weg
         cwg2e6r40e000088mywg
         cwg2e910r6b0008pdxzg
@@ -81,9 +84,9 @@
         cwg2jb931we00087rb20
         cwg2je90r6b0008pdypg
 
-3 full adder
+3_full_adder
 
-    on ibm_brisbrane
+    ibm_brisbrane
         cwg2wbh40e000088n1ng
         cwgd39x9r49g008607kg
         cwgd3cx0r6b0008pfme0
@@ -95,7 +98,7 @@
         cwgqnm6mptp00082q68g
         cwgqptk31we00087vrgg
 
-    on ibm_sherbroker
+    ibm_sherbroker
         cwgbv9531we00087sv40
         cwh2eka31we00087xcs0
         cwh2f9d40e000088t4a0
@@ -107,7 +110,7 @@
         cwh2khe9r49g00863nq0
         cwh2kn6mptp00082rx60
 
-    on ibm_kyiv
+    ibm_kyiv
         cwh2nxf543p00086a270
         cwh2nzfmptp00082rxmg
         cwh2p1g543p00086a280
@@ -119,9 +122,9 @@
         cwh83b5mptp0008h6fh0
         cwjdzad31we000884r3g
 
-4 full adder
+4_full_adder
 
-    on ibm_sherbroker
+    ibm_sherbroker
         cwje47031we000884rtg
         cwje4f1mptp00085sdr0
         cwk4evb0r6b0008pzng0
@@ -133,7 +136,7 @@
         cwkrxr740e0000898y1g
         cwkrxvzmptp000861030
 
-    on ibm_kyiv
+    ibm_kyiv
         cwk26na40e0000896f50
         cwk26vb40e0000896f5g
         cwk26zb9r49g0089959g
@@ -145,7 +148,7 @@
         cwk4c6r543p00086pvcg
         cwk4cr3mptp00085yqy0
 
-    on ibm_brisbrane
+    ibm_brisbrane
         cwk4d14543p00086pvfg
         cwk4d3w9r49g00899cj0
         cwk4d8d40e0000896p00
