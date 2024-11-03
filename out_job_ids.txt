@@ -111,3 +111,40 @@
     cwh831w0r6b0008pkvgg
     cwh834wmptp0008h6ffg
     cwh83b5mptp0008h6fh0
+    cwjdzad31we000884r3g
+
+4 full adder on ibm_sherbroker
+    cwje47031we000884rtg
+    cwje4f1mptp00085sdr0
+    cwk4evb0r6b0008pzng0
+    cwk4exv543p00086pvp0
+    cwk4f540r6b0008pzngg
+    cwkrmxv543p00086s130
+    cwkrxje31we00088c740
+    cwkrxmpmptp00086100g
+    cwkrxr740e0000898y1g
+    cwkrxvzmptp000861030
+
+4 full adder on ibm_kyiv
+    cwk26na40e0000896f50
+    cwk26vb40e0000896f5g
+    cwk26zb9r49g0089959g
+    cwk27bd31we000889r0g
+    cwk27f531we000889r1g
+    cwk27he0r6b0008pze2g
+    cwk4bwq40e0000896ny0
+    cwk4c38543p00086pvc0
+    cwk4c6r543p00086pvcg
+    cwk4cr3mptp00085yqy0
+
+4 full adder on ibm_brisbrane
+    cwk4d14543p00086pvfg
+    cwk4d3w9r49g00899cj0
+    cwk4d8d40e0000896p00
+    cwk4ddx40e0000896p10
+    cwk4dgp543p00086pvgg
+    cwk4dvf31we000889yjg
+    cwk4dxz40e0000896p20
+    cwk4e48543p00086pvh0
+    cwk4e99543p00086pvhg
+    cwk4eg29r49g00899cpg
