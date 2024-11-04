@@ -1,5 +1,6 @@
 number of jobs: 15
-percentage of hits: 0.9112630208333333
+percentage of hits: 0.09795715555431139
+more frequency result: 01111
 10111 10179
 00111 9219
 01111 14578

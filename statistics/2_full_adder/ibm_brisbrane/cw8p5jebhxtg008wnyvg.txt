@@ -1,3 +1,5 @@
+number of shots: 4096
+more frequency result: 101101111
 001101111 499
 101101111 1039
 111111111 554

@@ -1,3 +1,5 @@
+number of shots: 1024
+more frequency result: 11111
 11101 355
 11111 414
 11110 123

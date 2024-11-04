@@ -60,6 +60,7 @@ for num_of_full_adders in data_dict:
     for ibm_hardware in data_dict[num_of_full_adders]:
         #print("    "+ibm_hardware)
         number_of_jobs = 0
+        number_of_shots = 0
         general_results = {}
         directory = num_of_full_adders+"/"+ibm_hardware+"/"
 
@@ -69,20 +70,29 @@ for num_of_full_adders in data_dict:
             get_results(job_id=job_id, service=service, directory=job_directory)
             
             with open(job_directory, "r") as current_file:
-                for line in current_file:
-                    key, value = line.split()
-                    if key in general_results:
-                        general_results[key] += int(value)
+                for line_index, line in enumerate(current_file):
+                    if line_index > 1: #ignore the first line
+                        key, value = line.split()
+                        if key in general_results:
+                            general_results[key] += int(value)
+                        else:
+                            general_results[key] = int(value)
                     else:
-                        general_results[key] = int(value)
+                        number_of_shots += int(line.split()[-1])
 
             number_of_jobs += 1
 
-        corret_value = "1"*len(list(general_results.keys())[0])
-        per_cent_of_hits = general_results[corret_value]/(number_of_jobs*1024)
-        current_directory = directory+"general_results"+".txt"
-        with open(current_directory, "w") as current_file:
-            current_file.write("number of jobs: "+str(number_of_jobs)+"\n")
-            current_file.write("percentage of hits: "+str(per_cent_of_hits)+"\n")
-            for key, value in general_results.items():
-                current_file.write(key+" "+str(value)+"\n")
+        if len(general_results): #only if there are results
+
+            corret_value = "1"*len(list(general_results.keys())[0])
+            per_cent_of_hits = general_results[corret_value]/number_of_shots
+            current_directory = directory+"general_results"+".txt"
+            more_frequency_result = max(general_results, key=general_results.get)
+
+            with open(current_directory, "w") as current_file:
+
+                current_file.write("number of jobs: "+str(number_of_jobs)+"\n")
+                current_file.write("percentage of hits: "+str(per_cent_of_hits)+"\n")
+                current_file.write("more frequency result: "+str(more_frequency_result)+"\n")
+                for key, value in general_results.items():
+                    current_file.write(key+" "+str(value)+"\n")
