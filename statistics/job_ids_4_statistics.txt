@@ -125,6 +125,8 @@
 4_full_adder
 
     ibm_sherbroker
+        cwn0a38543p00086y9h0
+        cwn0anj40e000089dypg
 
     ibm_kyiv
 
@@ -135,3 +137,7 @@
         cwm376w31we00088dd8g
         cwm37ad543p00086t9a0
         cwm37e50r6b0008q35eg
+        cwmc0zv31we00088epr0
+        cwmc134543p00086vjhg
+        cwmc16c9r49g0089e67g
+        cwn09qe40e000089dyhg

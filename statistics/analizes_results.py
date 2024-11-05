@@ -28,7 +28,7 @@ def get_results(job_id="", service="", directory=""):
     Returns:
     The results of the job
     """
-    if not Path(directory).exists() == False:
+    if not Path(directory).exists():
 
         results = service.job(job_id).result()
 
