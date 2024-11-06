@@ -28,6 +28,11 @@
         cwf53h6mptp00082ekh0
         cwf53vq40e000088fv80
         cwf8jxk31we00087krc0
+        cwnndr740e000089hp00
+        cwnndt731we00088mzp0
+        cwnndw731we00088mzpg
+        cwnnewv40e000089hp6g
+        cwnnf0440e000089hpa0
 
     ibm_kyiv
         cwf8k440r6b0008p9a50
@@ -40,6 +45,11 @@
         cwg1hzf543p000864r6g
         cwg1j1r40e000088mtg0
         cwg1rja0r6b0008pdv2g
+        cwnnfbn0r6b0008qb0pg
+        cwnnffn31we00088mzz0
+        cwnng5g40e000089hpj0
+        cwnng810r6b0008qb0sg
+        cwnngvk543p0008720a0
 
 2_full_adder
 
@@ -71,6 +81,11 @@
         cwg2cktmptp00082krmg
         cwg2d240r6b0008pdxt0
         cwg2dcx0r6b0008pdxv0
+        cwnnk2wehebg008hka1g
+        cwnnk8xehebg008hka30
+        cwnnkcd60bqg008nvkv0
+        cwnnkkp5v39g008gttt0
+        cwnnknp60bqg008nvkw0
 
     ibm_kyiv
         cwg2e40543p000864weg
@@ -83,6 +98,11 @@
         cwg2j1840e000088mzdg
         cwg2jb931we00087rb20
         cwg2je90r6b0008pdypg
+        cwnnj1040e000089hpsg
+        cwnnj3840e000089hptg
+        cwnnj6840e000089hpw0
+        cwnnj9s31we00088n09g
+        cwnnjd9997wg008x24b0
 
 3_full_adder
 
@@ -97,6 +117,11 @@
         cwgqmch0r6b0008phbgg
         cwgqnm6mptp00082q68g
         cwgqptk31we00087vrgg
+        cwnnpyk60bqg008nvmy0
+        cwnnq3m997wg008x25hg
+        cwnnq7w997wg008x25k0
+        cwnp3qp997wg008x27d0
+        cwnp3vf60bqg008nvq0g
 
     ibm_sherbroker
         cwgbv9531we00087sv40
@@ -109,6 +134,11 @@
         cwh2kcn543p00086a1wg
         cwh2khe9r49g00863nq0
         cwh2kn6mptp00082rx60
+        cwnqnvf5v39g008gv5q0
+        cwnqnzz60bqg008nvyng
+        cwnqp4g997wg008x2eqg
+        cwnqp7rtdtng0086h0d0
+        cwnqpa9ehebg008hkmdg
 
     ibm_kyiv
         cwh2nxf543p00086a270
@@ -121,14 +151,47 @@
         cwh834wmptp0008h6ffg
         cwh83b5mptp0008h6fh0
         cwjdzad31we000884r3g
+        cwnqqc5tdtng0086h0m0
+        cwnqqsfehebg008hkmn0
+        cwnqqxf5v39g008gv640
+        cwnqqzftdtng0086h0rg
+        cwnqrfs2ac5g008hhc0g
 
 4_full_adder
 
     ibm_sherbroker
         cwn0a38543p00086y9h0
         cwn0anj40e000089dypg
+        cwn0xny0r6b0008q7e8g
+        cwn0xsf0r6b0008q7eag
+        cwn1b7431we00088hqc0
+        cwn1bad543p00086yjg0
+        cwnbxad9r49g0089keb0
+        cwnbxexmptp000868p0g
+        cwnbxhe40e000089gg10
+        cwnmz5mmptp000869t80
+        cwnqs442ac5g008hhc4g
+        cwnqs7w997wg008x2f9g
+        cwnqsbdehebg008hkn00
+        cwnqsf5tdtng0086h150
+        cwnqt302ac5g008hhccg
 
     ibm_kyiv
+        cwnmza531we00088mxq0
+        cwnmzcd543p000871y00
+        cwnn04g9r49g0089mks0
+        cwnn0709r49g0089mkvg
+        cwnn0b10r6b0008qayhg
+        cwnn0kt31we00088mxyg
+        cwnn0p20r6b0008qaykg
+        cwnn0sk543p000871yc0
+        cwnn0vk543p000871yd0
+        cwnn195543p000871yg0
+        cwnqteh60bqg008nvzmg
+        cwnqtjaehebg008hknag
+        cwnqtma997wg008x2fk0
+        cwnqtpjehebg008hknb0
+        cwnqtrk60bqg008nvzqg
 
     ibm_brisbrane
         cwm2qvz543p00086t7g0
@@ -141,3 +204,8 @@
         cwmc134543p00086vjhg
         cwmc16c9r49g0089e67g
         cwn09qe40e000089dyhg
+        cwnqvdx2ac5g008hhcpg
+        cwnqvgy2ac5g008hhcr0
+        cwnqvkp2ac5g008hhcs0
+        cwnqzc560bqg008nw0tg
+        cwnqzed5v39g008gv880
