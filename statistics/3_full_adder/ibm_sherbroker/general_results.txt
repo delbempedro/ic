@@ -1,6 +1,7 @@
 number of jobs: 15
 percentage of hits: 2.10%
 more frequency result: 1111111011100
+bit a bit value most frequent result: 1111111111110
 0011001101111 31
 1111011111111 190
 0011111111111 118
