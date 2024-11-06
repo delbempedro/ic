@@ -18,6 +18,7 @@ from qiskit import QuantumCircuit # type: ignore
 from qiskit_aer import AerSimulator # type: ignore
 from qiskit_ibm_runtime import QiskitRuntimeService, Session, SamplerV2 as Sampler # type: ignore
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager # type: ignore
+from qiskit.circuit.library import RGate # type: ignore
 
 #do other necessary imports
 from ic.full_adder import *
