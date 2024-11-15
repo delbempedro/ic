@@ -4,8 +4,7 @@
 Module that defines a single quantum neuron
 
 Dependencies:
-- Uses the qiskit_ibm_runtime module to connect to the service.
-- Uses analizes_results.py to get results.
+-
 
 Since:
 - 11/2024
@@ -13,12 +12,33 @@ Since:
 Authors:
 - Pedro C. Delbem. <pedrodelbem@usp.br>
 """
-import importlib.util
-import os
 
+def neuron(qc,input1_value,input2_value,weight1,weight2,first_qbit_index,first_classical_bit_index):
+    """
+    Quantum circuit for a sum of simple adder.
+    
+    Parameters:
+    qc (QuantumCircuit): The quantum circuit to be modified.
+    first_qbit_index (int): The first qubit of the three qubits to be used in the simple adder.
+    first_classical_bit_index (int): The first classical bit of the three classical bits to be used in the simple adder.
+    
+    """
+    static_angle = 0
 
-module_path = os.path.join(os.path.dirname(__file__), '../ic/current_circuit.py')
-module_path = os.path.abspath(module_path)
-spec = importlib.util.spec_from_file_location("current_circuit", module_path)
-current_circuit = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(current_circuit)
+    qc.h(first_qbit_index)
+    qc.h(first_qbit_index+1)
+
+    qc.cu(input1_value,static_angle,static_angle,static_angle,[first_qbit_index],[first_qbit_index+1])
+    qc.x(first_qbit_index+1)
+    qc.cu(input2_value,static_angle,static_angle,static_angle,[first_qbit_index],[first_qbit_index+1])
+
+    qc.cu(weight1,static_angle,static_angle,static_angle,[first_qbit_index],[first_qbit_index+1]).inverse()
+    qc.x(first_qbit_index+1)
+    qc.cu(weight2,static_angle,static_angle,static_angle,[first_qbit_index],[first_qbit_index+1]).inverse()
+
+    qc.h(first_qbit_index)
+    qc.h(first_qbit_index+1)
+    qc.x(first_qbit_index)
+    qc.x(first_qbit_index+1)
+    qc.ccx(first_qbit_index,first_qbit_index+1,first_qbit_index+2)
+    qc.measure(first_qbit_index+2,first_classical_bit_index)
