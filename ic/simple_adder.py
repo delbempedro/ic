@@ -13,7 +13,6 @@ Authors:
 - Pedro C. Delbem. <pedrodelbem@usp.br>
 """
 
-
 def adder(qc,first_qbit_index,first_classical_bit_index):
     """
     Quantum circuit for a sum of simple adder.
