@@ -4,7 +4,11 @@
 Module that defines the quantum current quantum circuit.
 
 Dependencies:
--
+- Uses neuron.py module to define a single quantum neuron
+- Uses qiskit module to define a quantum circuit
+- Uses qiskit_ibm_runtime module to run the quantum circuit
+- Uses qiskit_aer module to simulate the quantum circuit
+- Uses qiskit.transpiler.preset_passmanagers module to transplie the quantum circuit
 
 Since:
 - 11/2024
@@ -18,7 +22,6 @@ from qiskit import QuantumCircuit # type: ignore
 from qiskit_aer import AerSimulator # type: ignore
 from qiskit_ibm_runtime import QiskitRuntimeService, Session, SamplerV2 as Sampler # type: ignore
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager # type: ignore
-
 from neuron import *
 
 class current_circuit():
@@ -59,20 +62,19 @@ class current_circuit():
         """
         return self._num_of_classical_bits
     
-    def add_neuron(self,input1_value,input2_value,weight1,weight2):
+    def add_neuron(self,input1_value,input2_value,weight1,weight2,first_qbit_index,first_classical_bit_index):
         """
-        Add a neuron to the quantum circuit.
-        
-        A neuron is a quantum gate that adds two qbits and returns the result
-        in a classical bit.
+        Add a neuron to the current quantum circuit.
         
         Parameters:
-        input1_value (int): The value of the first input qbit.
-        input2_value (int): The value of the second input qbit.
-        weight1 (float): The weight of the first input qbit.
-        weight2 (float): The weight of the second input qbit.
+        input1_value (int): The value of the first input to the neuron.
+        input2_value (int): The value of the second input to the neuron.
+        weight1 (float): The weight of the first input to the neuron.
+        weight2 (float): The weight of the second input to the neuron.
+        first_qbit_index (int): The index of the first qbit that the neuron will use.
+        first_classical_bit_index (int): The index of the first classical bit that the neuron will use.
         """
-        neuron(self._qc,input1_value,input2_value,weight1,weight2)
+        neuron(self._qc,input1_value,input2_value,weight1,weight2,first_qbit_index,first_classical_bit_index)
 
     
     def run_circuit(self,type_of_run,service):
