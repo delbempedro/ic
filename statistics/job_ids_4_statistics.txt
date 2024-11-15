@@ -29,7 +29,8 @@
         cwvkn9d997wg008xvsag
         cwvkv4w997wg008xvvag
         cwvkv7m2ac5g008jatm0
-        cwvkvbn5v39g008hmf6g 29
+        cwvkvbn5v39g008hmf6g
+        cwvqf1460bqg008pnsk0
 
     ibm_sherbroker
         cwcphzfggr6g008jewz0
@@ -64,6 +65,11 @@
         cwnng5g40e000089hpj0
         cwnng810r6b0008qb0sg
         cwnngvk543p0008720a0
+        cwvqf4w60bqg008pnsm0
+        cwvqf8d5v39g008hn3fg
+        cwvrkvztdtng0087av7g
+        cwvrkzzehebg008jdmw0
+        cwvrm48997wg008xwkfg
 
 2_full_adder
 
