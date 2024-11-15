@@ -1,7 +1,7 @@
 """
   current_circuit.py
 
-Module that defines the quantun current quantum circuit.
+Module that defines the quantum current quantum circuit.
 
 Dependencies:
 - Uses the full_adder.py module to create the class current_circuit which contains the struct full adder in a quantum circuit.
@@ -18,7 +18,6 @@ from qiskit import QuantumCircuit # type: ignore
 from qiskit_aer import AerSimulator # type: ignore
 from qiskit_ibm_runtime import QiskitRuntimeService, Session, SamplerV2 as Sampler # type: ignore
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager # type: ignore
-from qiskit.circuit.library import RGate # type: ignore
 
 #do other necessary imports
 from ic.full_adder import *
