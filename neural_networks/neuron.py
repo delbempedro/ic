@@ -49,15 +49,18 @@ def neuron(qc,input1_value,input2_value,weight1,weight2,first_qbit_index,first_c
 
 def bin_neuron(qc,input1_value,input2_value,weight1,weight2,first_qbit_index,first_classical_bit_index):
     """
-    Quantum circuit for a sum of simple adder.
+    Quantum circuit for a neuron.
     
     Parameters:
     qc (QuantumCircuit): The quantum circuit to be modified.
-    first_qbit_index (int): The first qubit of the three qubits to be used in the simple adder.
-    first_classical_bit_index (int): The first classical bit of the three classical bits to be used in the simple adder.
+    first_qbit_index (int): The first qubit of the three qubits to be used in the neuron.
+    first_classical_bit_index (int): The first classical bit of the three classical bits to be used in the neuron.
     
     """
-    static_angle = 0
+    if input1_value:
+        qc.x(first_qbit_index)
+    if input2_value:
+        qc.x(first_qbit_index+1)
 
     qc.h(first_qbit_index)
     qc.h(first_qbit_index+1)

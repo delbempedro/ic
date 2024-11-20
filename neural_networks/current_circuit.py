@@ -121,7 +121,7 @@ class current_circuit():
 
                 #transpile your circuit
                 aer_sim = AerSimulator()
-                pass_manager = generate_preset_pass_manager(backend=aer_sim, optimization_level=3)
+                pass_manager = generate_preset_pass_manager(backend=aer_sim, optimization_level=1)
                 qc_transpiled = pass_manager.run(self._qc)
 
                 #simulete your circuit

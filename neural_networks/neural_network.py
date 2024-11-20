@@ -20,74 +20,127 @@ from current_circuit import *
 from qiskit_ibm_runtime import QiskitRuntimeService # type: ignore
 import math
 
-#defines service
-service = QiskitRuntimeService()
+def main(service):
+    """
+    Main function of the program.
 
-#defines the inputs
-input1 = 1.0
-input2 = 1.0
+    This function is the main entry point of the program.
+    It will run the quantum circuit and compute the error
+    of the neuron for a given set of inputs and weights.
 
-#defines the weights
-weight1 = 0.5
-weight2 = 0.5
+    The function will also update the weights of the neuron
+    to the best weights that resulted in the lowest error.
 
-#defines the expected output
-expected_output = int(input1)^int(input2)
+    Parameters:
+    None
 
-#defines the threshold
-threshold = 0.5
+    Returns:
+    None
+    """
+    #defines the weights and delta
+    weight1 = 0.5
+    weight2 = 0.5
+    delta = 0.001
 
-#defines the learning rate
-learning_rate = 0.01
+    #defines the inputs
+    inputs = [(0,0),(1,0),(0,1),(1,1)]
 
-#initializes the error with infinity value
-error = math.inf
+    print("Weight1: ",weight1)
+    print("Weight2: ",weight2)
 
-#defines the bias and bias weight
-"""bias = 1
-bias_weight = 0.5"""
+    #run for the first time
+    error = compute_error(inputs,weight1,weight2,service)
 
-#defines the activation function
-def activation_function(neuron_output):
-    if neuron_output >= threshold:
-        return 1
-    else:
-        return 0
+    #controls with the weights are the same
+    change_weights = True
 
-iterations = 0
-while not error == 0:
-    iterations += 1
+    #controls with the delta is the same
+    change_delta = False
 
-    #initializes the quantum circuit
-    qc = current_circuit(3,1)
+    iterations = 0
+    while error >= 1:
+        iterations += 1
 
-    #adds the neuron to the circuit
-    qc.add_bin_neuron(input1,input2,weight1,weight2,0,0)
+        if not change_weights:
+            delta = delta*1.1
+            change_delta = True
 
-    #runs (simulates) the circuit and save the result
-    neuron_output = int(list(qc.run_circuit("3",service).keys())[0])
+        change_weights = False
 
-    output = activation_function(neuron_output)
+        for theta1 in (weight1-delta,weight1,weight1+delta):
+            for theta2 in (weight2-delta,weight2,weight2+delta):
 
-    error = expected_output - output
+                #compare the new weights with the old ones
+                if not theta1 == weight1 or not theta2 == weight2:
 
-    print(f"Output: {output}")
-    print(f"Error: {error}")
-    print(f"Neuron output: {neuron_output}")
-    print(f"Iterations: {iterations}")
+                    print("     Theta1: ",theta1)
+                    print("     Theta2: ",theta2)
+                    #compute the error
+                    current_error = compute_error(inputs,theta1,theta2,service)
+                    print("     Current Error: ",current_error)
+                    if current_error < 1:
+                        weight1 = theta1
+                        weight2 = theta2
+                        exit()
 
-    if not error == 0:
-        print(f"Old weight1: {weight1}")
-        print(f"Old weight2: {weight2}")
-        print(f"Old bias_weight: {bias_weight}")
-        weight1 += (learning_rate * input1 * error)
-        weight2 += (learning_rate * input2 * error)
-        bias_weight += (learning_rate * bias * error)
-        print("I'm learning")
-        print(f"New weight1: {weight1}")
-        print(f"New weight2: {weight2}")
-        print(f"New bias_weight: {bias_weight}")
+                    #update the weights if the new error is lower
+                    if current_error < error:
+                        weight1 = theta1
+                        weight2 = theta2
+                        error = current_error
+                        change_weights = True
 
-print(f"Expected output: {expected_output}")
-print(f"Output: {output}")
-print(f"Error: {error}")
+        #if delta update works, return delta to its original value
+        if change_delta and change_weights:
+            change_delta = False
+            delta = 0.1
+
+        print("Weight1: ",weight1)
+        print("Weight2: ",weight2)
+        print(f"Error: {error}")
+        print(f"Iterations: {iterations}")
+    
+
+def compute_error(inputs,weight1,weight2,service):
+    """
+    Compute the error of the quantum circuit for a given set of inputs and weights.
+
+    Parameters:
+    inputs (list): A list of tuples containing the input values.
+    weight1 (float): The weight of the first input to the neuron.
+    weight2 (float): The weight of the second input to the neuron.
+
+    Returns:
+    error (int): The total error of the quantum circuit for the given set of inputs and weights.
+    """
+    #initializes the error
+    error = 0
+
+    for input1,input2 in inputs:
+
+        #defines the expected output
+        expected_output = input1^input2
+
+        #initializes the quantum circuit
+        qc = current_circuit(3,1)
+
+        #adds the neuron to the circuit
+        qc.add_bin_neuron(input1,input2,weight1,weight2,0,0)
+
+        #runs (simulates) the circuit and save the result
+        run = qc.run_circuit("3",service)
+        output = int(max(run.keys(), key=run.get))
+
+        print("             ",abs(expected_output-output)," ",expected_output," ",output)
+        #sum current error in the total error
+        error += abs(expected_output - output)
+
+    return error
+
+if __name__ == "__main__":
+    
+    #connects to the service
+    service = QiskitRuntimeService()
+
+    main(service)
+    print("I already learned!")
