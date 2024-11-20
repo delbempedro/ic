@@ -48,6 +48,13 @@
         cwnndw731we00088mzpg
         cwnnewv40e000089hp6g
         cwnnf0440e000089hpa0
+        cwvt1yfehebg008jdw70
+        cwybrv3ehebg008jqw50
+        cwybrxb5v39g008hzdag
+        cwybs0mehebg008jqw5g
+        cwyzab1ehebg008jw8t0
+        cwyzaeh2ac5g008jt89g
+        cwyzam2ehebg008jw8x0
 
     ibm_kyiv
         cwf8k440r6b0008p9a50
@@ -72,7 +79,14 @@
         cwvrm48997wg008xwkfg
         cwvsfme60bqg008pp1n0
         cwvsfq62ac5g008jbp7g
-        cwvsfyz997wg008xwrk0 23
+        cwvsfyz997wg008xwrk0
+        cwvsgb12ac5g008jbphg
+        cwvsge160bqg008pp250
+        cwvsgv3tdtng0087b0gg
+        cwvsznetdtng0087b34g
+        cwvszx7ehebg008jdvyg
+        cwvt0vkehebg008jdw30
+        cwvt0z3997wg008xwvhg
 
 2_full_adder
 
