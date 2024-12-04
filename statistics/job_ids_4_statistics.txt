@@ -149,6 +149,9 @@
         cwnnkcd60bqg008nvkv0
         cwnnkkp5v39g008gttt0
         cwnnknp60bqg008nvkw0
+        cx84zyqrkac00089d9k0
+        cx85018tpsjg008c6xeg
+        cx85038px23g008bncyg
 
     ibm_kyiv
         cwg2e40543p000864weg
@@ -171,6 +174,16 @@
         cx84tahrkac00089d8cg
         cx84td1bqkhg0088tbe0
         cx84tf9bqkhg0088tbfg
+        cx84vhyztp30008fw16g
+        cx84vkptpsjg008c6wr0
+        cx84vnprkac00089d8r0
+        cx84vxzpjw30008gxeh0
+        cx84w00rkac00089d8v0
+        cx84w20tpsjg008c6wtg
+        cx84z74ztp30008fw2b0
+        cx84z8xpx23g008bncrg
+        cx84zanpjw30008gxfdg
+        cx84zmyztp30008fw2j0
 
 3_full_adder
 
