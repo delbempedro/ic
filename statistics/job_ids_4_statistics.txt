@@ -61,6 +61,8 @@
         cx0b691ztp30008entag
         cx0b6b1pjw300085sbgg
         cx0b6csbqkhg008j091g
+        cx0x43rztp30008erf2g
+        cx0x45rtpsjg0086cn1g
 
     ibm_kyiv
         cwf8k440r6b0008p9a50
@@ -112,6 +114,24 @@
         cw8p5yfggr6g0087psvg
         cwck2bsjzdhg0081fcf0
         cwckr91ggr6g008wqzg0
+        cx0y5q6bqkhg008j31yg
+        cx0y5s7px23g008jan80
+        cx0y5vztpsjg0086cqb0
+        cx3jgn2pjw30008jezr0
+        cx3jhdnrkac00083k100
+        cx3jhnpztp300082b5bg
+        cx3n9a5pjw30008kdd40
+        cx3n9fdtpsjg008v44yg
+        cx3n9r7rkac00085h4yg
+        cx3p3wfpx23g008e2b4g
+        cx3p3zzztp3000868e3g
+        cx3p420px23g008e2b5g
+        cx3qhsqbqkhg008x8wag
+        cx3qhx7pjw30008kdnk0
+        cx3qhzftpsjg008v4dg0
+        cx5k99xtpsjg008vcp00
+        cx5k9c5px23g008eax80
+        cx5k9qyrkac00085spsg
 
     ibm_sherbroker
         cw8n289ggr6g0087pmxg
@@ -146,6 +166,11 @@
         cwnnj6840e000089hpw0
         cwnnj9s31we00088n09g
         cwnnjd9997wg008x24b0
+        cx5ka5rpjw30008kp1v0
+        cx5kad1tpsjg008vcp4g
+        cx84tahrkac00089d8cg
+        cx84td1bqkhg0088tbe0
+        cx84tf9bqkhg0088tbfg
 
 3_full_adder
 
