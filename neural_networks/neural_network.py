@@ -19,6 +19,7 @@ Authors:
 from current_circuit import *
 from qiskit_ibm_runtime import QiskitRuntimeService # type: ignore
 import math
+import random
 
 def main(service):
     """
@@ -38,9 +39,9 @@ def main(service):
     None
     """
     #defines the weights and delta
-    weight1 = 0.5
-    weight2 = 0.5
-    delta = 0.001
+    weight1 = math.pi*random.random()
+    weight2 = math.pi*random.random()
+    delta = 0.1
 
     #defines the inputs
     inputs = [(0,0),(1,0),(0,1),(1,1)]
@@ -62,7 +63,7 @@ def main(service):
         iterations += 1
 
         if not change_weights:
-            delta = delta*1.1
+            delta = delta*2
             change_delta = True
 
         change_weights = False
@@ -73,11 +74,16 @@ def main(service):
                 #compare the new weights with the old ones
                 if not theta1 == weight1 or not theta2 == weight2:
 
+                    #make sure the weights are between 0 and 2pi
+                    theta1 = theta1%(2*math.pi)
+                    theta2 = theta2%(2*math.pi)
+
                     print("     Theta1: ",theta1)
                     print("     Theta2: ",theta2)
                     #compute the error
                     current_error = compute_error(inputs,theta1,theta2,service)
                     print("     Current Error: ",current_error)
+
                     if current_error < 1:
                         weight1 = theta1
                         weight2 = theta2
@@ -89,6 +95,22 @@ def main(service):
                         weight2 = theta2
                         error = current_error
                         change_weights = True
+                
+        #make sure the weights are between 0 and 2pi
+        weight1 = weight1%(2*math.pi)
+        weight2 = weight2%(2*math.pi)
+
+        #save the weights and the error in the file
+        if iterations == 1:
+            with open("analizes.txt", "w") as arquivo:
+                        arquivo.write(f"Weight1: {weight1}\n")
+                        arquivo.write(f"Weight2: {weight2}\n")
+                        arquivo.write(f"Current Error: {error}\n")
+        else:
+            with open("analizes.txt", "a") as arquivo:
+                            arquivo.write(f"Weight1: {weight1}\n")
+                            arquivo.write(f"Weight2: {weight2}\n")
+                            arquivo.write(f"Current Error: {error}\n")
 
         #if delta update works, return delta to its original value
         if change_delta and change_weights:
