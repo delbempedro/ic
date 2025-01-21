@@ -90,6 +90,39 @@ def xor_circuit_with_3_parameters(all_inputs_circuit, parameters_of_entanglement
   
     return qxor
 
+def bin_neuron(qc,weight1,weight2,first_qbit_index):
+    """
+    Quantum circuit for a neuron.
+    
+    Parameters:
+    qc (QuantumCircuit): The quantum circuit to be modified.
+    first_qbit_index (int): The first qubit of the three qubits to be used in the neuron.
+    
+    """
+
+    qc.h(first_qbit_index)
+    qc.h(first_qbit_index+1)
+
+    qc.z(first_qbit_index+1)
+    qc.cp(weight1,first_qbit_index,first_qbit_index+1)
+
+    qc.z(first_qbit_index+1)
+    qc.z(first_qbit_index)
+    qc.cp(weight2,first_qbit_index,first_qbit_index+1)
+
+    qc.h(first_qbit_index)
+    qc.h(first_qbit_index+1)
+
+    qc.x(first_qbit_index)
+    qc.x(first_qbit_index+1)
+    qc.ccx(first_qbit_index,first_qbit_index+1,first_qbit_index+2)
+
+def qNN(all_inputs_circuit, parameters_of_entanglement_circuit, position_of_qubit0, position_of_qubit1):
+    qxor = all_inputs_circuit.copy() #copy the all inputs circuit
+    qxor.barrier() #to visually separate circuit components
+    bin_neuron(qxor, parameters_of_entanglement_circuit[0], parameters_of_entanglement_circuit[1], 0)
+
+
 def evaluate_quantum_circuit(quantum_circuit, number_of_shots, number_of_runs):
   """
   Evaluate a quantum circuit (XOR candidate) and return the counts (histogram of the outputs).
@@ -169,7 +202,12 @@ def sq_error(counts, expected_density_matrix): #counts - with the raw results af
     a_density_matrix[inputs] = frequence
 
   #get the squared error
-  squared_error = abs(a_density_matrix[0][1]-expected_density_matrix[0][1]) + abs(a_density_matrix[1][1]-expected_density_matrix[1][1]) + abs(a_density_matrix[2][1]-expected_density_matrix[2][1]) + abs(a_density_matrix[3][1]-expected_density_matrix[3][1])
+  #squared_error = np.sum(np.abs(a_density_matrix - expected_density_matrix))
+  #squared_error = abs(a_density_matrix[0][1]-expected_density_matrix[0][1]) + abs(a_density_matrix[1][1]-expected_density_matrix[1][1]) + abs(a_density_matrix[2][1]-expected_density_matrix[2][1]) + abs(a_density_matrix[3][1]-expected_density_matrix[3][1])
+  squared_error = 0
+  for i in range(4):
+    for j in range(2):
+      squared_error += abs(a_density_matrix[i][j]-expected_density_matrix[i][j])
   
   #return the squared error
   return squared_error
@@ -237,7 +275,7 @@ def str_dictionary(dictionary):
   #returns the string
   return string
 
-def exaustive_grid_search(objective_function, grid_grain=20):
+def exaustive_grid_search(objective_function, grid_grain=5):
   """
   Perform an exhaustive grid search to find the parameters that minimize the squared error of the ``XOR`` candidate.
 
@@ -254,12 +292,20 @@ def exaustive_grid_search(objective_function, grid_grain=20):
   infos = dict()
   errors = []
 
+  file_name = "analize-"+str(grid_grain)+".txt"
+
   if objective_function == xor_circuit_with_3_parameters:
+
+    #computes the number of iterations
+    iterations = 0
 
     #runs the grid search
     for phi in np.linspace(0, np.pi, grid_grain):
       for theta in np.linspace(0, np.pi, grid_grain):
         for _lambda in np.linspace(0, np.pi, grid_grain):
+
+          #upgrade the iterations
+          iterations += 1
 
           #defines the initial coefficients
           initial_coefficients = [theta, phi, _lambda]
@@ -273,12 +319,26 @@ def exaustive_grid_search(objective_function, grid_grain=20):
 
           #prints the result
           #print(initial_coefficients, str_dictionary(infos[str(squared_error)]), squared_error)
-          print(str_dictionary(infos[str(squared_error)]))
+                  #save the weights and the error in the file
+      if iterations == 1:
+        with open(file_name, "w") as arquivo:
+          content = 'theta: ' + str(theta) + ' phi: ' + str(phi) + ' lambda: ' + str(_lambda) + ' error: ' + str(squared_error) + '\n'
+          arquivo.write(content)
+      else:
+        with open(file_name, "a") as arquivo:
+          content = 'theta: ' + str(theta) + ' phi: ' + str(phi) + ' lambda: ' + str(_lambda) + ' error: ' + str(squared_error) + '\n'
+          arquivo.write(content)
 
   elif objective_function == xor_circuit_with_1_parameter:
 
+    #computes the number of iterations
+    iterations = 0
+
     #runs the grid search
     for gamma in np.linspace(0, np.pi, grid_grain):
+
+      #upgrade the iterations
+      iterations += 1
 
       #defines the initial coefficients
       initial_coefficients = [gamma]
@@ -292,7 +352,47 @@ def exaustive_grid_search(objective_function, grid_grain=20):
 
       #prints the result
       #print(initial_coefficients, str_dictionary(infos[str(squared_error)]), squared_error)
-      print(str_dictionary(infos[str(squared_error)]))
+      if iterations == 1:
+        with open(file_name, "w") as arquivo:
+          content = 'gamma: ' + str(gamma) + ' error: ' + str(squared_error) + '\n'
+          arquivo.write(content)
+      else:
+        with open(file_name, "a") as arquivo:
+          content = 'gamma: ' + str(gamma) + ' error: ' + str(squared_error) + '\n'
+          arquivo.write(content)
+
+  elif objective_function == qNN:
+
+    #computes the number of iterations
+    iterations = 0
+
+    #runs the grid search
+    for gamma in np.linspace(0, np.pi, grid_grain):
+      for phi in np.linspace(0, np.pi, grid_grain):
+
+        #upgrade the iterations
+        iterations += 1
+
+        #defines the initial coefficients
+        initial_coefficients = [gamma, phi]
+
+        #evaluates the squared error
+        squared_error = complete_function(objective_function, initial_coefficients)
+        
+        #updates infos dictionary and errors list
+        infos[str(squared_error)] = {'gamma': gamma, 'phi': phi, 'error': squared_error}
+        errors.append(squared_error)
+
+        #prints the result
+        #print(initial_coefficients, str_dictionary(infos[str(squared_error)]), squared_error)
+        if iterations == 1:
+          with open(file_name, "w") as arquivo:
+            content = 'gamma: ' + str(gamma) + ' phi' + str(phi) + ' error: ' + str(squared_error) + '\n'
+            #arquivo.write(content)
+        else:
+          with open(file_name, "a") as arquivo:
+            content = 'gamma: ' + str(gamma) + ' phi' + str(phi) + ' error: ' + str(squared_error) + '\n'
+            #arquivo.write(content)
 
   #gets the minimum squared error and the final coefficients
   minimum_error = min(errors)
@@ -303,9 +403,26 @@ def exaustive_grid_search(objective_function, grid_grain=20):
   #returns the final coefficients and the final squared error
   return final_coefficients, final_squared_error
 
+grid_grain = 10
+file_name = "analize-"+str(grid_grain)+".txt"
+
 print("MORE SIMPLE")
-parameter, squared_error = exaustive_grid_search(xor_circuit_with_1_parameter)
+parameter, squared_error = exaustive_grid_search(xor_circuit_with_1_parameter, grid_grain)
+with open(file_name, "a") as arquivo:
+  content = 'gamma: ' + str(parameter[0]) + ' error: ' + str(squared_error)  + '\n'
+  arquivo.write(content)
 print("GAMMA: ", str(parameter[0]), "ERROR: ", squared_error,"\n")
+
 print("MORE COMPLEX")
-parameters, squared_error = exaustive_grid_search(xor_circuit_with_3_parameters)
+parameters, squared_error = exaustive_grid_search(xor_circuit_with_3_parameters, grid_grain)
 print("THETA: ", str(parameters[0]), "PHI: ", str(parameters[1]), "LAMBDA: ", str(parameters[2]), "ERROR: ", squared_error,"\n")
+with open(file_name, "a") as arquivo:
+  content = 'theta: ' + str(parameters[0]) + ' phi: ' + str(parameters[1]) + ' lambda: ' + str(parameters[2]) + ' error: ' + str(squared_error) + '\n'
+  arquivo.write(content)
+
+"""print("qNN")
+parameters, squared_error = exaustive_grid_search(qNN, grid_grain)
+print("THETA: ", str(parameters[0]), "PHI: ", str(parameters[1]), "ERROR: ", squared_error,"\n")
+with open(file_name, "a") as arquivo:
+  content = 'theta: ' + str(parameters[0]) + ' phi: ' + str(parameters[1]) + ' error: ' + str(squared_error) + '\n'
+  arquivo.write(content)"""

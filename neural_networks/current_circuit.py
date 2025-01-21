@@ -89,6 +89,37 @@ class current_circuit():
         first_classical_bit_index (int): The index of the first classical bit that the neuron will use.
         """
         bin_neuron(self._qc,input1_value,input2_value,weight1,weight2,first_qbit_index,first_classical_bit_index)
+
+    def add_bin_neuron2(self,input1_value,input2_value,weight1,weight2,weight3,first_qbit_index,first_classical_bit_index):
+        """
+        Add a neuron to the current quantum circuit.
+        
+        Parameters:
+        input1_value (int): The value of the first input to the neuron.
+        input2_value (int): The value of the second input to the neuron.
+        weight1 (float): The weight of the first input to the neuron.
+        weight2 (float): The weight of the second input to the neuron.
+        weight3 (float): The weight of the third input to the neuron.
+        first_qbit_index (int): The index of the first qbit that the neuron will use.
+        first_classical_bit_index (int): The index of the first classical bit that the neuron will use.
+        """
+        bin_neuron2(self._qc,input1_value,input2_value,weight1,weight2,weight3,first_qbit_index,first_classical_bit_index)
+
+    def add_bin_neuron3(self,input1_value,input2_value,weight1,weight2,weight3,weight4,first_qbit_index,first_classical_bit_index):
+        """
+        Add a neuron to the current quantum circuit.
+        
+        Parameters:
+        input1_value (int): The value of the first input to the neuron.
+        input2_value (int): The value of the second input to the neuron.
+        weight1 (float): The weight of the first input to the neuron.
+        weight2 (float): The weight of the second input to the neuron.
+        weight3 (float): The weight of the third input to the neuron.
+        weight4 (float): The weight of the fourth input to the neuron.
+        first_qbit_index (int): The index of the first qbit that the neuron will use.
+        first_classical_bit_index (int): The index of the first classical bit that the neuron will use.
+        """
+        bin_neuron3(self._qc,input1_value,input2_value,weight1,weight2,weight3,weight4,first_qbit_index,first_classical_bit_index)
     
     def run_circuit(self,type_of_run,service):
         
@@ -121,7 +152,7 @@ class current_circuit():
 
                 #transpile your circuit
                 aer_sim = AerSimulator()
-                pass_manager = generate_preset_pass_manager(backend=aer_sim, optimization_level=3)
+                pass_manager = generate_preset_pass_manager(backend=aer_sim, optimization_level=1)
                 qc_transpiled = pass_manager.run(self._qc)
 
                 #simulete your circuit

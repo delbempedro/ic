@@ -41,6 +41,8 @@ def main(service):
     #defines the weights and delta
     weight1 = math.pi*random.random()
     weight2 = math.pi*random.random()
+    weight3 = math.pi*random.random()
+    weight4 = math.pi*random.random()
     delta = 0.1
 
     #defines the inputs
@@ -48,9 +50,11 @@ def main(service):
 
     print("Weight1: ",weight1)
     print("Weight2: ",weight2)
+    print("Weight3: ",weight3)
+    print("Weight4: ",weight4)
 
     #run for the first time
-    error = compute_error(inputs,weight1,weight2,service)
+    error = compute_error(inputs,weight1,weight2,weight3,weight4,service)
 
     #controls with the weights are the same
     change_weights = True
@@ -70,60 +74,76 @@ def main(service):
 
         for theta1 in (weight1-delta,weight1,weight1+delta):
             for theta2 in (weight2-delta,weight2,weight2+delta):
+                for theta3 in (weight3-delta,weight3,weight3+delta):
+                    for theta4 in (weight4-delta,weight4,weight4+delta):
 
-                #compare the new weights with the old ones
-                if not theta1 == weight1 or not theta2 == weight2:
+                        #compare the new weights with the old ones
+                        if not theta1 == weight1 or not theta2 == weight2 or not theta3 == weight3 or not theta4 == weight4:
 
-                    #make sure the weights are between 0 and 2pi
-                    theta1 = theta1%(2*math.pi)
-                    theta2 = theta2%(2*math.pi)
+                            #make sure the weights are between 0 and 2pi
+                            theta1 = theta1%(2*math.pi)
+                            theta2 = theta2%(2*math.pi)
+                            theta3 = theta3%(2*math.pi)
+                            theta4 = theta4%(2*math.pi)
 
-                    print("     Theta1: ",theta1)
-                    print("     Theta2: ",theta2)
-                    #compute the error
-                    current_error = compute_error(inputs,theta1,theta2,service)
-                    print("     Current Error: ",current_error)
+                            print("     Theta1: ",theta1)
+                            print("     Theta2: ",theta2)
+                            print("     Theta3: ",theta3)
+                            print("     Theta4: ",theta4)
+                            #compute the error
+                            current_error = compute_error(inputs,theta1,theta2,theta3,theta4,service)
+                            print("     Current Error: ",current_error)
 
-                    if current_error < 1:
-                        weight1 = theta1
-                        weight2 = theta2
-                        exit()
+                            if current_error < 1:
+                                weight1 = theta1
+                                weight2 = theta2
+                                weight3 = theta3
+                                weight4 = theta4
+                                exit()
 
-                    #update the weights if the new error is lower
-                    if current_error < error:
-                        weight1 = theta1
-                        weight2 = theta2
-                        error = current_error
-                        change_weights = True
-                
-        #make sure the weights are between 0 and 2pi
+                            #update the weights if the new error is lower
+                            if current_error < error:
+                                weight1 = theta1
+                                weight2 = theta2
+                                weight3 = theta3
+                                weight4 = theta4
+                                error = current_error
+                                change_weights = True
+
+        #make sure the weights are between 0 and 2pi    
         weight1 = weight1%(2*math.pi)
         weight2 = weight2%(2*math.pi)
+        weight3 = weight3%(2*math.pi)
+        weight4 = weight4%(2*math.pi)
 
         #save the weights and the error in the file
         if iterations == 1:
-            with open("analizes.txt", "w") as arquivo:
-                        arquivo.write(f"Weight1: {weight1}\n")
-                        arquivo.write(f"Weight2: {weight2}\n")
-                        arquivo.write(f"Current Error: {error}\n")
+            file = open("analize.txt","w")
+            file.write("Weight1: "+str(weight1)+"\n")
+            file.write("Weight2: "+str(weight2)+"\n")
+            file.write("Weight3: "+str(weight3)+"\n")
+            file.write("Weight4: "+str(weight4)+"\n")
+            file.write("Current Error: "+str(error)+"\n")
         else:
-            with open("analizes.txt", "a") as arquivo:
-                            arquivo.write(f"Weight1: {weight1}\n")
-                            arquivo.write(f"Weight2: {weight2}\n")
-                            arquivo.write(f"Current Error: {error}\n")
+            file = open("analize.txt","a")
+            file.write("Weight1: "+str(weight1)+"\n")
+            file.write("Weight2: "+str(weight2)+"\n")
+            file.write("Weight3: "+str(weight3)+"\n")
+            file.write("Weight4: "+str(weight4)+"\n")
+            file.write("Current Error: "+str(error)+"\n")
+        file.close()
 
-        #if delta update works, return delta to its original value
-        if change_delta and change_weights:
+        if change_delta:
             change_delta = False
-            delta = 0.1
+            delta = delta/2
 
-        print("Weight1: ",weight1)
-        print("Weight2: ",weight2)
-        print(f"Error: {error}")
-        print(f"Iterations: {iterations}")
-    
+    print("Weight1: ",weight1)
+    print("Weight2: ",weight2)
+    print("Weight3: ",weight3)
+    print("Weight4: ",weight4)
+    print("Error: ",error)
 
-def compute_error(inputs,weight1,weight2,service):
+def compute_error(inputs,weight1,weight2,weight3,weight4,service):
     """
     Compute the error of the quantum circuit for a given set of inputs and weights.
 
@@ -147,7 +167,7 @@ def compute_error(inputs,weight1,weight2,service):
         qc = current_circuit(3,1)
 
         #adds the neuron to the circuit
-        qc.add_bin_neuron(input1,input2,weight1,weight2,0,0)
+        qc.add_bin_neuron3(input1,input2,weight1,weight2,weight3,weight4,0,0)
 
         #runs (simulates) the circuit and save the result
         run = qc.run_circuit("3",service)
