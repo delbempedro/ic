@@ -6,9 +6,15 @@ Module that defines the quantum current quantum circuit.
 Dependencies:
 - Uses qiskit module to define a quantum circuit
 - Uses qiskit_ibm_runtime module to defines service of the quantum circuit
+- Uses math module to get the infinity value
+- Uses numpy module to get the infinity value
+- Uses qiskit.circuit.library module to generate a circuit with all the possible inputs
+- Uses qiskit.primitives module to run the circuit
+- Uses qiskit.result module to get the result
+- Uses qiskit.result.QuasiDistribution module to get the result
 
 Since:
-- 11/2024
+- 01/2025
 
 Authors:
 - Pedro C. Delbem. <pedrodelbem@usp.br>
@@ -158,7 +164,7 @@ def evaluate_quantum_circuit(quantum_circuit, number_of_shots, number_of_runs):
     data_pub = job.result()[0].data
     #print("HI",job.result()[0].data.meas)
     job_counts = data_pub.meas.get_counts()
-
+    print(job_counts, type(job_counts))
     #append the counts to the counts list
     counts.append(job_counts)
 
@@ -190,7 +196,7 @@ def sq_error(counts, expected_density_matrix): #counts - with the raw results af
   frequencies = {state: count / total_tests for state, count in statistics.items()}
 
   #a density matrix of inputs from all the raw data collected (quantum circuit outputs)
-  a_density_matrix = np.zeros((4, 2))
+  a_density_matrix = np.zeros((2, 2))
 
   #fill the density matrix
   for state, frequence in frequencies.items(): 
@@ -205,7 +211,7 @@ def sq_error(counts, expected_density_matrix): #counts - with the raw results af
   #squared_error = np.sum(np.abs(a_density_matrix - expected_density_matrix))
   #squared_error = abs(a_density_matrix[0][1]-expected_density_matrix[0][1]) + abs(a_density_matrix[1][1]-expected_density_matrix[1][1]) + abs(a_density_matrix[2][1]-expected_density_matrix[2][1]) + abs(a_density_matrix[3][1]-expected_density_matrix[3][1])
   squared_error = 0
-  for i in range(4):
+  for i in range(2):
     for j in range(2):
       squared_error += abs(a_density_matrix[i][j]-expected_density_matrix[i][j])
   
@@ -213,11 +219,14 @@ def sq_error(counts, expected_density_matrix): #counts - with the raw results af
   return squared_error
 
 #gets the expected density matrix
-expected_density_matrix = np.zeros((4, 2))
+"""expected_density_matrix = np.zeros((4, 2))
 expected_density_matrix[0][0] = 0.25
 expected_density_matrix[1][1] = 0.25
 expected_density_matrix[2][1] = 0.25
-expected_density_matrix[3][0] = 0.25
+expected_density_matrix[3][0] = 0.25"""
+expected_density_matrix = np.zeros((4, 2))
+expected_density_matrix[0][1] = 0.5
+expected_density_matrix[1][0] = 0.5
 
 def complete_function(objective_function, entanglement_circuit_paramameters):
   """
@@ -406,7 +415,18 @@ def exaustive_grid_search(objective_function, grid_grain=5):
 grid_grain = 10
 file_name = "analize-"+str(grid_grain)+".txt"
 
-print("MORE SIMPLE")
+entanglement_circuit_paramameters = [np.pi, np.pi/2, np.pi/2]
+objective_function = xor_circuit_with_3_parameters
+
+#generates a circuit that is a candidate to XOR
+qc_all_inputs = all_inputs_circuit() #generates a circuit that generates all the possible inputs
+candidate_to_xor = objective_function(qc_all_inputs, entanglement_circuit_paramameters, 0, 1) #generates a circuit that is a candidate to XOR
+candidate_to_xor.measure_all() #add measurements
+
+#evaluates the candidate
+counts = evaluate_quantum_circuit(candidate_to_xor, number_of_shots = 100, number_of_runs = 100)
+
+"""print("MORE SIMPLE")
 parameter, squared_error = exaustive_grid_search(xor_circuit_with_1_parameter, grid_grain)
 with open(file_name, "a") as arquivo:
   content = 'gamma: ' + str(parameter[0]) + ' error: ' + str(squared_error)  + '\n'
@@ -418,7 +438,7 @@ parameters, squared_error = exaustive_grid_search(xor_circuit_with_3_parameters,
 print("THETA: ", str(parameters[0]), "PHI: ", str(parameters[1]), "LAMBDA: ", str(parameters[2]), "ERROR: ", squared_error,"\n")
 with open(file_name, "a") as arquivo:
   content = 'theta: ' + str(parameters[0]) + ' phi: ' + str(parameters[1]) + ' lambda: ' + str(parameters[2]) + ' error: ' + str(squared_error) + '\n'
-  arquivo.write(content)
+  arquivo.write(content)"""
 
 """print("qNN")
 parameters, squared_error = exaustive_grid_search(qNN, grid_grain)

@@ -102,7 +102,7 @@ def compute_error(inputs,weight1,weight2,weight3,weight4,service):
         expected_output = input1^input2
 
         #initializes the quantum circuit
-        qc = current_circuit(3,1)
+        qc = current_circuit(2,1)
 
         #adds the neuron to the circuit
         qc.add_bin_neuron3(input1,input2,weight1,weight2,weight3,weight4,0,0)
