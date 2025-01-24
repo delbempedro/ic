@@ -59,3 +59,36 @@ def get_vector_from_int(data: int, num_qubits: int) -> np.ndarray:
 
     #returning data vector
     return data_vector
+
+def get_int_from_vector(data_vector: np.ndarray, number_of_qubits: int) -> int:
+    """
+    Converts a vector representation of a binary number back to its integer form.
+
+    Parameters:
+    data_vector (np.ndarray): The vector containing binary information, where each element is either -1 or 1.
+    number_of_qubits (int): The number of qubits that define the size of the vector.
+
+    Returns:
+    int: The integer representation of the binary number derived from the vector.
+
+    Raises:
+    ValueError: If the length of the data_vector is not equal to 2 raised to the power of number_of_qubits.
+    """
+    
+    #validating vector
+    if len(data_vector) != np.power(2, number_of_qubits):
+        raise ValueError("The vector length is not equal to 2^number_of_qubits")
+
+    #creating data binary vector
+    data_bin_vec = []
+
+    #filling data binary vector
+    for i, val in enumerate(data_vector):
+        if val == -1:
+            data_bin_vec.append('1')
+        elif val == 1:
+            data_bin_vec.append('0')
+    data_bin = ''.join(data_bin_vec)
+    
+    #returning integer from binary
+    return int(data_bin, 2)
