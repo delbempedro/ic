@@ -126,7 +126,22 @@ class current_circuit():
         first_classical_bit_index (int): The index of the first classical bit that the neuron will use.
         """
         bin_neuron3(self._qc,input1_value,input2_value,weight1,weight2,weight3,weight4,first_qbit_index,first_classical_bit_index)
-    
+
+    def add_four_angle_neuron(self,weight1,weight2,weight3,weight4,first_qbit_index,first_classical_bit_index): 
+        """
+        Add a neuron to the current quantum circuit.
+        
+        Parameters:
+        weight1 (float): The weight of the first input to the neuron.
+        weight2 (float): The weight of the second input to the neuron.
+        weight3 (float): The weight of the third input to the neuron.
+        weight4 (float): The weight of the fourth input to the neuron.
+        first_qbit_index (int): The index of the first qbit that the neuron will use.
+        first_classical_bit_index (int): The index of the first classical bit that the neuron will use.
+        """
+
+        four_angle_neuron(self._qc,weight1,weight2,weight3,weight4,first_qbit_index,first_classical_bit_index)
+        
     def run_circuit(self,type_of_run,service):
         
         def results():

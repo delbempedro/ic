@@ -43,6 +43,37 @@ def all_inputs_circuit():
     #return the circuit
     return initial_states_circuit
 
+def circuit_copy(initial_circuit, number_of_qubits):
+    """
+    Creates a quantum circuit that duplicates the given initial circuit with additional qubits.
+
+    This function constructs a new quantum circuit by duplicating the specified number of qubits 
+    from the initial circuit and adding two additional qubits to the circuit. The resulting circuit 
+    reproduces the input values using controlled-NOT operations to copy the state of the first two 
+    qubits to the additional qubits.
+
+    Parameters:
+    initial_circuit (QuantumCircuit): The initial quantum circuit to be copied.
+    number_of_qubits (int): The number of qubits in the initial circuit.
+
+    Returns:
+    QuantumCircuit: A new quantum circuit with duplicated qubits and additional operations to copy the input.
+    """
+
+    circuit_copy = QuantumCircuit(number_of_qubits+2) #duplicate the number of qubits
+    circuit_copy = circuit_copy .compose(initial_circuit, qubits=list(range(0,number_of_qubits))) #first half with the initial_states_2b_circ
+    circuit_copy.barrier() #to visually separate circuit components
+
+    #a layer to copy/reproduce the generated inputs in qubits 0 and 1
+    circuit_copy.x(2)    #change value of qubit 2 from 0 to 1
+    circuit_copy.x(3)    #change value of qubit 3 from 0 to 1
+    circuit_copy.cx(0,2) #qb0 ''AND'' 1 (or NOT qb0) to copy qubit 0 to qubit 2
+    circuit_copy.cx(1,3) #qb1 ''AND'' 1 (or NOT qb1) to copy qubit 1 to qubit 3
+    circuit_copy.x(2)    #NOT of qubit 2 => qubit 2 equal to equal qubit 0
+    circuit_copy.x(3)    #NOT of qubit 3 => qubit 3 equal to equal qubit 1
+
+    return circuit_copy 
+
 def qNN_circuit(all_inputs_circuit, parameters_of_entanglement_circuit):
     """
     Generates a quantum circuit that produces all the possible inputs and a quantum neural network with two neurons.
@@ -60,13 +91,14 @@ def qNN_circuit(all_inputs_circuit, parameters_of_entanglement_circuit):
     quantum_circuit (QuantumCircuit): The quantum circuit with all the possible inputs and a quantum neural network with two neurons.
     """
 
-    qNN = current_circuit(3,1) #create the qNN circuit
+    qNN = current_circuit(5,1) #create the qNN circuit
     auxiliary_circuit = all_inputs_circuit.copy() #copy the all inputs circuit
-    auxiliary_circuit.measure_all() #add the measurement
-    qNN.get_current_circuit().append(all_inputs_circuit, [0, 1]) #add the all inputs circuit
-    qNN.add_bin_neuron3(0, 0, *parameters_of_entanglement_circuit, 0, 0) #add the neuron
+    duplicate_circuit = circuit_copy(auxiliary_circuit, 2) #duplicate the all inputs circuit
+    qNN.get_current_circuit().append(duplicate_circuit, [0, 1, 2, 3]) #add the all inputs circuit
+    qNN.add_four_angle_neuron(*parameters_of_entanglement_circuit, 2, 0) #add the neuron
+    qNN.get_current_circuit().measure_all()
 
-    return qNN, auxiliary_circuit
+    return qNN
 
 def evaluate_quantum_circuit(quantum_circuit, number_of_shots = 1024, number_of_runs = 100):
   """
@@ -101,7 +133,8 @@ def evaluate_quantum_circuit(quantum_circuit, number_of_shots = 1024, number_of_
   for job in jobs:
 
     #get the data
-    job_counts = job.result()[0].data.c.get_counts()
+    data_pub = job.result()[0].data # 'pub' refers to Primitive Unified Bloc
+    job_counts = data_pub.meas.get_counts()
 
     #append the counts to the counts list
     counts.append(job_counts)
@@ -153,8 +186,6 @@ def evaluate_auxiliary_quantum_circuit(quantum_circuit, number_of_shots=1024, nu
 
 parameters = [pi, pi, pi/2, pi/2]
 all_inputs_circuit = all_inputs_circuit()
-qNN_circuit, auxiliary_circuit = qNN_circuit(all_inputs_circuit, parameters)
-#qNN_circuit.print_circuit()
-auxiliary_counts = evaluate_auxiliary_quantum_circuit(auxiliary_circuit)
-counts = evaluate_quantum_circuit(qNN_circuit.get_current_circuit())
-print(auxiliary_counts)#,counts
+qNN_circuit = qNN_circuit(all_inputs_circuit, parameters)
+counts = evaluate_quantum_circuit(qNN_circuit.get_current_circuit(), number_of_runs=1)
+print(counts)
