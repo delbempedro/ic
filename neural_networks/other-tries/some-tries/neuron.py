@@ -130,16 +130,17 @@ def bin_neuron3(qc,input1_value,input2_value,weight1,weight2,weight3,weight4,fir
     if input2_value:
         qc.x(first_qbit_index+1)
 
-    qc.rz(weight1,first_qbit_index)
-    qc.rz(weight2,first_qbit_index+1)
+    qc.ry(weight1,first_qbit_index)
+    qc.ry(weight2,first_qbit_index+1)
     qc.cx(first_qbit_index,first_qbit_index+1)
 
-    qc.rz(weight3,first_qbit_index)
-    qc.rz(weight4,first_qbit_index+1)
+    qc.ry(weight3,first_qbit_index)
+    qc.ry(weight4,first_qbit_index+1)
     qc.cx(first_qbit_index,first_qbit_index+1)
 
-    """qc.x(first_qbit_index)
+    qc.x(first_qbit_index)
     qc.x(first_qbit_index+1)
     qc.ccx(first_qbit_index,first_qbit_index+1,first_qbit_index+2)
-    qc.measure(first_qbit_index+2,first_classical_bit_index)"""
-    qc.measure(first_qbit_index+1,first_classical_bit_index)
+    qc.measure(first_qbit_index+2,first_classical_bit_index)
+    
+    #qc.measure(first_qbit_index+1,first_classical_bit_index)

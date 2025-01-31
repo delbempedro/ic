@@ -22,6 +22,7 @@ from qiskit.primitives import StatevectorSampler #type: ignore
 from current_circuit import *
 
 #Do necesary other imports
+import numpy as np #type: ignore
 from math import pi
 
 #Generates a circuit with all the possible inputs
@@ -142,50 +143,70 @@ def evaluate_quantum_circuit(quantum_circuit, number_of_shots = 1024, number_of_
   #return the counts list
   return counts
 
-def evaluate_auxiliary_quantum_circuit(quantum_circuit, number_of_shots=1024, number_of_runs=100):
-  """
-  Evaluate a quantum circuit (XOR candidate) and return the counts (histogram of the outputs).
+def error(counts):
+    """
+    Compute the error of the given quantum circuit.
 
-  Parameters:
-  quantum_circuit (QuantumCircuit): The quantum circuit to be evaluated.
-  number_of_shots (int): The number of shots to be used in the evaluation.
-  number_of_runs (int): The number of times the quantum circuit is run.
+    The error is computed by counting the number of mistakes in the outputs of the quantum circuit.
+    The output of the quantum circuit is in the form of a string of length 5, where the first two
+    characters are the inputs and the last character is the output. The error is the sum of the
+    number of mistakes in the outputs of the quantum circuit divided by the total number of tests.
 
-  Returns:
-  list: A list of dictionaries, where each dictionary represents the counts of the outputs of the quantum circuit.
-  """
+    Parameters:
+    counts (list): A list of dictionaries, where each dictionary represents the counts of the outputs of the quantum circuit.
 
-  #sample results with severals runs, each with several shots
-  sampler = StatevectorSampler()
-  #create jobs list
-  jobs = []
-  
-  #run the circuit several times
-  for arun in range(0,number_of_runs):
-    #run the circuit
-    job = sampler.run([(quantum_circuit)], shots = number_of_shots)
-    #append the job to the jobs list
-    jobs.append(job)
+    Returns:
+    float: The error of the quantum circuit.
+    """
 
-  #create the counts list
-  counts = []
+    #define the statistics dictionary
+    statistics = {"00": [0,0], "01": [0,0], "10": [0,0], "11": [0,0]} #defines the statistics dictionary
+    
+    #get the total number of tests
+    total_tests = 0
 
-  #get and show raw results - counts
-  for job in jobs:
+    for count in counts: #for each count
+        for key,value in count.items(): #extract the key and value
+            inputs = str(key[2])+str(key[3])
+            output = int(key[4])
+            statistics[inputs][output] = statistics[inputs][output] + value
+            total_tests = total_tests + value
 
-    #get the data
-    data_pub = job.result()[0].data
-    #print("HI",job.result()[0].data.values())
-    job_counts = data_pub.meas.get_counts()
-    #print(job_counts, type(job_counts))
-    #append the counts to the counts list
-    counts.append(job_counts)
+    #compute the error
+    error = statistics["00"][0] + statistics["01"][1] + statistics["10"][1] + statistics["11"][0]
+    error = error / total_tests
 
-  #return the counts list
-  return counts
+    #return the error
+    return error
 
-parameters = [pi, pi, pi/2, pi/2]
+def exaustive_grid_search(grid_grain=4):
+   
+    final_parameters = []
+    final_error = 1
+    
+    for i in np.linspace(0, np.pi, grid_grain):
+        for j in np.linspace(0, np.pi, grid_grain):
+            for k in np.linspace(0, np.pi, grid_grain):
+                for l in np.linspace(0, np.pi, grid_grain):
+                    
+                    counts = evaluate_quantum_circuit(qNN_circuit(all_inputs_circuit(), [i, j, k, l]).get_current_circuit(), number_of_runs=1)
+                    current_error = error(counts)
+
+                    if current_error < final_error:
+                        final_error = current_error
+                        final_parameters = [i, j, k, l]
+                    
+                    print(i, j, k, l, current_error)
+
+    return final_parameters, final_error
+
+final_parameters, final_error = exaustive_grid_search(grid_grain=10)
+print(final_error)
+print(final_parameters)
 all_inputs_circuit = all_inputs_circuit()
-qNN_circuit = qNN_circuit(all_inputs_circuit, parameters)
-counts = evaluate_quantum_circuit(qNN_circuit.get_current_circuit(), number_of_runs=1)
-print(counts)
+#final_parameters = [1.3963, 1.3963, 1.7453, 1.7453]
+qNN_circuit = qNN_circuit(all_inputs_circuit, final_parameters)
+qNN_circuit.print_circuit()
+counts = evaluate_quantum_circuit(qNN_circuit.get_current_circuit(), number_of_runs=10)
+error_counts = error(counts)
+print(error_counts)
