@@ -73,23 +73,43 @@ def circuit_copy(initial_circuit, number_of_qubits):
     circuit_copy.x(2)    #NOT of qubit 2 => qubit 2 equal to equal qubit 0
     circuit_copy.x(3)    #NOT of qubit 3 => qubit 3 equal to equal qubit 1
 
-    return circuit_copy 
+    return circuit_copy
 
-def qNN_circuit(all_inputs_circuit, parameters_of_entanglement_circuit):
+def generate_one_qubit_qNN_circuit(inputs,parameters):
     """
-    Generates a quantum circuit that produces all the possible inputs and a quantum neural network with two neurons.
+    Generates a quantum neural network circuit with a single qubit.
 
-    The circuit is constructed by using the TwoLocal method. The parameters are set to the previously chosen/learned parameters to generate all the possible inputs.
-    The TwoLocal method generates a circuit that mixture two qubits - an entanglement circuit.
-    A quantum neural network with two neurons is added to the circuit, by using the add_bin_neuron3 method of the current_circuit class.
-    The parameters of the quantum neural network are set to the previously chosen/learned parameters.
+    This function creates a quantum circuit with a single qubit and applies a neuron 
+    operation to it using the specified parameters.
+
+    Parameters:
+    inputs (list of floats): The input values to the neuron.
+    parameters (list of floats): The parameters of the neuron, including weights and bias.
+
+    Returns:
+    current_circuit: The quantum neural network circuit with the neuron operations.
+    """
+    
+    qNN = current_circuit(1,1) #create the qNN circuit
+    qNN.add_neuron(*inputs, *parameters, 0, 0) #add the neuron
+    qNN.get_current_circuit().measure_all()
+
+    return qNN
+
+def generate_two_qubit_qNN_circuit(all_inputs_circuit, parameters_of_entanglement_circuit):
+    """
+    Generates a quantum neural network circuit without additional qubits.
+
+    This function creates a quantum circuit by first duplicating the provided input circuit 
+    and then appending it to the main quantum neural network circuit. It adds a neuron 
+    operation to the circuit using the specified entanglement parameters.
 
     Parameters:
     all_inputs_circuit (QuantumCircuit): The quantum circuit that generates all the possible inputs.
-    parameters_of_entanglement_circuit (list): A list of parameters for the U and controlled-phase (cp) gates.
+    parameters_of_entanglement_circuit (list): A list of parameters for the neuron's entanglement operations.
 
     Returns:
-    quantum_circuit (QuantumCircuit): The quantum circuit with all the possible inputs and a quantum neural network with two neurons.
+    current_circuit: The quantum neural network circuit with the appended duplicated circuit and neuron operations.
     """
 
     qNN = current_circuit(5,1) #create the qNN circuit
@@ -101,49 +121,67 @@ def qNN_circuit(all_inputs_circuit, parameters_of_entanglement_circuit):
 
     return qNN
 
-def evaluate_quantum_circuit(quantum_circuit, number_of_shots = 1024, number_of_runs = 100):
-  """
-  Evaluate a quantum circuit (XOR candidate) and return the counts (histogram of the outputs).
+def compute_error_to_one_qubit_qNN(counts,expected_output):
+    """
+    Compute the error between the actual outputs and the expected outputs.
 
-  Parameters:
-  quantum_circuit (QuantumCircuit): The quantum circuit to be evaluated.
-  number_of_shots (int): The number of shots to be used in the evaluation.
-  number_of_runs (int): The number of times the quantum circuit is run.
+    Parameters:
+    counts (list of dictionaries): The counts of the outputs of the quantum circuit.
+    expected_outputs (list of floats): The expected outputs of the quantum circuit.
 
-  Returns:
-  list: A list of dictionaries, where each dictionary represents the counts of the outputs of the quantum circuit.
-  """
+    Returns:
+    The error (float).
+    """
 
-  #sample results with severals runs, each with several shots
-  sampler = StatevectorSampler()
-  #create jobs list
-  jobs = []
-  
-  #run the circuit several times
-  for _ in range(number_of_runs):
+    #compute number of shots
+    number_of_shots = sum(counts[0].values())
 
-    #run the circuit
-    job = sampler.run([(quantum_circuit)], shots = number_of_shots)
-    #append the job to the jobs list
-    jobs.append(job)
+    #initialize error with 0
+    error = 0
 
-  #create the counts list
-  counts = []
+    #compute error for each count
+    for count in counts:
+        if expected_output in count:
+            error = number_of_shots - count[expected_output]
+        else:
+            error = number_of_shots
 
-  #get and show raw results - counts
-  for job in jobs:
+    #normalize error
+    error = error/number_of_shots
 
-    #get the data
-    data_pub = job.result()[0].data # 'pub' refers to Primitive Unified Bloc
-    job_counts = data_pub.meas.get_counts()
+    #return error
+    return error
 
-    #append the counts to the counts list
-    counts.append(job_counts)
+def compute_total_error_to_one_qubit_qNN(inputs,expected_outputs,parameters):
+    """
+    Compute the total error for a set of inputs and expected outputs.
 
-  #return the counts list
-  return counts
+    Parameters:
+    inputs (list of lists): A list containing pairs of input values for the neuron.
+    expected_outputs (list of floats): A list of expected output values for each input pair.
+    parameters (list of floats): The parameters of the neuron, including weights and bias.
 
-def error(counts):
+    Returns:
+    The total error (float) across all input pairs.
+    """
+
+    #initialize total error
+    total_error = 0
+
+    #apply qNN circuit to each input
+    for interation in range(len(inputs)):
+
+        qNN_circuit = generate_one_qubit_qNN_circuit(inputs[interation],parameters) #generate circuit
+        counts = qNN_circuit.evaluate(number_of_runs = 1) #run circuit
+        total_error += compute_error_to_one_qubit_qNN(counts,expected_outputs[interation]) #add error
+
+    #normalize total error
+    total_error = total_error/len(inputs)
+
+    #return total error
+    return total_error
+
+def compute_error_to_two_qubit_qNN(counts):
     """
     Compute the error of the given quantum circuit.
 
@@ -173,13 +211,41 @@ def error(counts):
             total_tests = total_tests + value
 
     #compute the error
-    error = statistics["00"][1] + statistics["01"][0] + statistics["10"][0] + statistics["11"][1]
+    error = statistics["00"][0] + statistics["01"][1] + statistics["10"][1] + statistics["11"][0]
     error = error / total_tests
 
     #return the error
     return error
 
-def exaustive_grid_search(grid_grain=4):
+def exaustive_search_to_one_qubit_qNN(inputs,expected_outputs,grid_grain=5):
+    
+    #initialize final error
+    final_error = 1
+
+    #initialize final parameters
+    final_parameters = [0,0,0]
+
+    #exaustive search
+    for weight1 in np.linspace(-np.pi, np.pi, grid_grain):
+        for weight2 in np.linspace(-np.pi, np.pi, grid_grain):
+            for weight3 in np.linspace(-np.pi, np.pi, grid_grain):
+
+                #compute total error
+                parameters = [weight1, weight2, weight3]
+                current_error = compute_total_error_to_one_qubit_qNN(inputs,expected_outputs,parameters)
+
+                print(weight1/np.pi,weight2/np.pi,weight3/np.pi,current_error)
+
+                #update final error
+                if current_error < final_error:
+                    final_error = current_error
+                    final_parameters = parameters
+
+    #return final parameters
+    return final_parameters, final_error
+
+
+def exaustive_search_to_two_qubit_qNN(grid_grain=4):
    
     final_parameters = []
     final_error = 1
@@ -189,8 +255,8 @@ def exaustive_grid_search(grid_grain=4):
             for k in np.linspace(0, np.pi, grid_grain):
                 for l in np.linspace(0, np.pi, grid_grain):
                     
-                    counts = evaluate_quantum_circuit(qNN_circuit(all_inputs_circuit(), [i, j, k, l]).get_current_circuit(), number_of_runs=1)
-                    current_error = error(counts)
+                    counts = generate_two_qubit_qNN_circuit(all_inputs_circuit(), [i, j, k, l]).evaluate(number_of_runs=1)
+                    current_error = compute_error_to_two_qubit_qNN(counts)
 
                     if current_error < final_error:
                         final_error = current_error
@@ -205,8 +271,8 @@ print(final_error)
 print(final_parameters)
 all_inputs_circuit = all_inputs_circuit()
 #final_parameters = [1.3963, 1.3963, 1.7453, 1.7453]
-qNN_circuit = qNN_circuit(all_inputs_circuit, final_parameters)
-qNN_circuit.print_circuit()
-counts = evaluate_quantum_circuit(qNN_circuit.get_current_circuit(), number_of_runs=10)
+two_qubit_qNN_circuit = generate_two_qubit_qNN_circuit(all_inputs_circuit, final_parameters)
+two_qubit_qNN_circuit.print_circuit()
+counts = two_qubit_qNN_circuit.evaluate(number_of_runs=10)
 error_counts = error(counts)
 print(error_counts)
