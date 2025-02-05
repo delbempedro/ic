@@ -125,7 +125,7 @@ def exaustive_search(inputs,expected_outputs,grid_grain=5):
     #return final parameters
     return final_parameters, final_error
 
-print("Insert grid grain: ")
+"""print("Insert grid grain: ")
 grid_grain = int(input())
 inputs = [[0,0],[0,1],[1,0],[1,1]]
 expected_outputs = [str(input1*input2) for input1,input2 in inputs]
@@ -133,4 +133,4 @@ final_parameters, final_error = exaustive_search(inputs,expected_outputs,grid_gr
 
 print(final_parameters[0], final_parameters[1], final_parameters[2], final_error)
 print(compute_total_error(inputs,expected_outputs,final_parameters))
-print(compute_total_error(inputs,expected_outputs,[np.pi,np.pi,-np.pi/2]))
+print(compute_total_error(inputs,expected_outputs,[np.pi,np.pi,-np.pi/2]))"""

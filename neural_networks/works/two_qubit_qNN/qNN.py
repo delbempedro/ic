@@ -200,7 +200,7 @@ def exaustive_grid_search(grid_grain=4):
 
     return final_parameters, final_error
 
-final_parameters, final_error = exaustive_grid_search(grid_grain=10)
+"""final_parameters, final_error = exaustive_grid_search(grid_grain=10)
 print(final_error)
 print(final_parameters)
 all_inputs_circuit = all_inputs_circuit()
@@ -209,4 +209,4 @@ qNN_circuit = qNN_circuit(all_inputs_circuit, final_parameters)
 qNN_circuit.print_circuit()
 counts = evaluate_quantum_circuit(qNN_circuit.get_current_circuit(), number_of_runs=10)
 error_counts = error(counts)
-print(error_counts)
+print(error_counts)"""
