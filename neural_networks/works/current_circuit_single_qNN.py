@@ -1,7 +1,7 @@
 """
   current_circuit.py
 
-Module that defines the quantum current quantum circuit (genearal implementation).
+Module that defines the quantum current quantum circuit.
 
 Dependencies:
 - Uses qiskit module to define a quantum circuit
@@ -21,7 +21,7 @@ from qiskit import QuantumCircuit #type: ignore
 from qiskit.primitives import StatevectorSampler #type: ignore
 
 #do my necessary imports
-from neuron import *
+from single_neuron import *
 
 class current_circuit():
     
@@ -41,7 +41,6 @@ class current_circuit():
         Returns:
         The current quantum circuit (QuantumCircuit).
         """
-
         return self._qc
 
     def get_num_of_qbits(self):
@@ -51,7 +50,6 @@ class current_circuit():
         Returns:
         The number of qbits in the quantum circuit (int).
         """
-
         return self._num_of_qbits
 
     def get_num_of_classical_bits(self):
@@ -61,19 +59,17 @@ class current_circuit():
         Returns:
         The number of classical bits in the quantum circuit (int).
         """
-
         return self._num_of_classical_bits
     
     def print_circuit(self):
         """
         Print the current quantum circuit.
         """
-
         print(self._qc.draw(output='text'))
 
-    def add_one_qubit_neuron(self,input1_value,input2_value,weight1,weight2,weight3,qbit_index):
+    def add_neuron(self,input1_value,input2_value,weight1,weight2,weight3,qbit_index,classical_bit_index):
         """
-        Add a one qubit quantum neuron operation to the current quantum circuit.
+        Add a quantum neuron operation to the current quantum circuit.
 
         Parameters:
         input1_value (float): The value of the first input of the neuron.
@@ -82,25 +78,11 @@ class current_circuit():
         weight2 (float): The weight of the second input of the neuron.
         weight3 (float): The bias of the neuron.
         qbit_index (int): The index of the qbit to which the quantum neuron operation is applied.
+        classical_bit_index (int): The index of the classical bit to which the quantum neuron operation is applied.
         """
+        neuron(self._qc,input1_value,input2_value,weight1,weight2,weight3,qbit_index,classical_bit_index)
 
-        one_qubit_neuron(self._qc,input1_value,input2_value,weight1,weight2,weight3,qbit_index)
-
-    def add_two_qubit_neuron(self,weight1,weight2,weight3,weight4,first_qbit_index):
-        """
-        Add a two qubit quantum neuron operation to the current quantum circuit.
-
-        Parameters:
-        weight1 (float): The weight of the first input of the neuron.
-        weight2 (float): The weight of the second input of the neuron.
-        weight3 (float): The weight of the third input of the neuron.
-        weight4 (float): The weight of the fourth input of the neuron.
-        first_qbit_index (int): The index of the first qbit of the two qubits to which the quantum neuron operation is applied.
-        """
-
-        two_qubit_neuron(self._qc,weight1,weight2,weight3,weight4,first_qbit_index)
-
-    def evaluate(self, number_of_shots = 1024, number_of_runs = 1):
+    def evaluate(self, number_of_shots = 1024, number_of_runs = 100):
         """
         Evaluate a quantum circuit (XOR candidate) and return the counts (histogram of the outputs).
 
@@ -117,7 +99,7 @@ class current_circuit():
         sampler = StatevectorSampler()
         #create jobs list
         jobs = []
-
+    
         #run the circuit several times
         for _ in range(number_of_runs):
 

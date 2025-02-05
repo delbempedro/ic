@@ -69,7 +69,7 @@ def compute_error(counts,expected_output):
     #return error
     return error
 
-def compute_total_error(inputs,expected_outputs,parameters):
+def compute_total_error(inputs,expected_outputs,parameters,number_of_runs=1):
     """
     Compute the total error for a set of inputs and expected outputs.
 
@@ -77,6 +77,7 @@ def compute_total_error(inputs,expected_outputs,parameters):
     inputs (list of lists): A list containing pairs of input values for the neuron.
     expected_outputs (list of floats): A list of expected output values for each input pair.
     parameters (list of floats): The parameters of the neuron, including weights and bias.
+    number_of_runs (int): The number of times the circuit is run.
 
     Returns:
     The total error (float) across all input pairs.
@@ -89,7 +90,7 @@ def compute_total_error(inputs,expected_outputs,parameters):
     for interation in range(len(inputs)):
 
         qNN_circuit = generate_qNN_circuit(inputs[interation],parameters) #generate circuit
-        counts = qNN_circuit.evaluate(number_of_runs = 1) #run circuit
+        counts = qNN_circuit.evaluate(number_of_runs=number_of_runs) #run circuit
         total_error += compute_error(counts,expected_outputs[interation]) #add error
 
     #normalize total error
@@ -98,7 +99,19 @@ def compute_total_error(inputs,expected_outputs,parameters):
     #return total error
     return total_error
 
-def exaustive_search(inputs,expected_outputs,grid_grain=5):
+def exaustive_search(inputs,expected_outputs,grid_grain=5,number_of_runs=1):
+    """
+    Perform an exaustive search of the parameter space to find the optimal parameters for the given inputs and expected outputs.
+
+    Parameters:
+    inputs (list of lists): A list containing pairs of input values for the neuron.
+    expected_outputs (list of floats): A list of expected output values for each input pair.
+    grid_grain (int): The number of points in the grid to search.
+    number_of_runs (int): The number of times the circuit is run.
+
+    Returns:
+    The optimal parameters (list of floats) and the total error (float) of the optimal parameters.
+    """
     
     #initialize final error
     final_error = 1
@@ -113,9 +126,7 @@ def exaustive_search(inputs,expected_outputs,grid_grain=5):
 
                 #compute total error
                 parameters = [weight1, weight2, weight3]
-                current_error = compute_total_error(inputs,expected_outputs,parameters)
-
-                print(weight1/np.pi,weight2/np.pi,weight3/np.pi,current_error)
+                current_error = compute_total_error(inputs,expected_outputs,parameters,number_of_runs=number_of_runs)
 
                 #update final error
                 if current_error < final_error:
