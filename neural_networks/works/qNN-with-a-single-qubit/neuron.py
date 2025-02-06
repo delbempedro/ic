@@ -1,13 +1,13 @@
 """
   neuron.py
 
-Module that defines a single quantum neuron
+Module that defines a quantum neuron with a single qubit
 
 Dependencies:
 -
 
 Since:
-- 11/2024
+- 01/2025
 
 Authors:
 - Pedro C. Delbem. <pedrodelbem@usp.br>

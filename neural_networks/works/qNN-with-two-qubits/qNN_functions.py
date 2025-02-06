@@ -1,11 +1,13 @@
 """
-  qNN.py
+  qNN_functions.py
 
-Module that defines the quantum current quantum circuit.
+Module that defines the functions to run the qNN with two qubits.
 
 Dependencies:
 - Uses qiskit.circuit.library module to generate a circuit with all the possible inputs
-- Uses qiskit.primitives module to run the circuit
+- Uses current_circuit.py module to define the quantum current quantum circuit
+- Uses numpy module to get linspace function
+- Uses math module to get pi function
 
 Since:
 - 01/2025
@@ -16,10 +18,9 @@ Authors:
 
 #Do qiskit necessary imports 
 from qiskit.circuit.library import TwoLocal #type: ignore
-from qiskit.primitives import StatevectorSampler #type: ignore
 
 #Do my biblioteca necessary imports
-from current_circuit_two_qNN import *
+from current_circuit import *
 
 #Do necesary other imports
 import numpy as np #type: ignore
@@ -164,14 +165,3 @@ def exaustive_grid_search(grid_grain=4,number_of_runs=1):
                         final_parameters = [i, j, k, l]
 
     return final_parameters, final_error
-
-"""final_parameters, final_error = exaustive_grid_search(grid_grain=10)
-print(final_error)
-print(final_parameters)
-all_inputs_circuit = all_inputs_circuit()
-#final_parameters = [1.3963, 1.3963, 1.7453, 1.7453]
-qNN_circuit = qNN_circuit(all_inputs_circuit, final_parameters)
-qNN_circuit.print_circuit()
-counts = evaluate_quantum_circuit(qNN_circuit.get_current_circuit(), number_of_runs=10)
-error_counts = error(counts)
-print(error_counts)"""
