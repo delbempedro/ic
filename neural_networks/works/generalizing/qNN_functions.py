@@ -150,11 +150,12 @@ def generate_multi_qubit_qNN_circuit(parameters_of_entanglement_circuit,number_o
     quantum_circuit (QuantumCircuit): The quantum circuit with all the possible inputs and a quantum neural network with two neurons.
     """
 
-    qNN = current_circuit(number_of_bits*2+1,1) #create the qNN circuit
+    number_of_qubits_required = number_of_bits*2+1
+    qNN = current_circuit(number_of_qubits_required,1) #create the qNN circuit
     auxiliary_circuit = all_inputs_circuit(number_of_bits) #copy the all inputs circuit
     duplicate_circuit = circuit_copy(auxiliary_circuit, number_of_bits) #duplicate the all inputs circuit
-    qNN.get_current_circuit().append(duplicate_circuit, [0, 1, 2, 3]) #add the all inputs circuit
-    qNN.add_multi_qubit_neuron(*parameters_of_entanglement_circuit, 2, 0) #add the neuron
+    qNN.get_current_circuit().append(duplicate_circuit, list(range(0,number_of_bits*2))) #add the all inputs circuit
+    qNN.add_multi_qubit_neuron(parameters_of_entanglement_circuit, number_of_bits=number_of_bits) #add the neuron
     qNN.get_current_circuit().measure_all()
 
     return qNN
