@@ -40,6 +40,7 @@ def compute_expected_outputs(inputs: List[List[int]], logic_gate: str = "XOR") -
     List[str]: A list of strings representing the expected outputs for each set of bits.
     """
 
+    #define the operator to compute the expected outputs
     if logic_gate == "XOR":
         op = operator.xor
     elif logic_gate == "AND":
@@ -48,8 +49,19 @@ def compute_expected_outputs(inputs: List[List[int]], logic_gate: str = "XOR") -
         op = operator.or_
     else:
         raise ValueError("Logic gate must be 'XOR', 'AND' or 'OR'")
+    
+    #compute the expected outputs
+    result_dict = {}
+    for row in inputs:#for each input
 
-    return [str(reduce(op, row)) for row in inputs]
+        input_key = ''.join(map(str, row))
+        result = reduce(op, row)
+        result_dict[input_key] = result
+
+    #return the expected outputs
+    return result_dict
+
+    #return [str(reduce(op, row)) for row in inputs]
 
 def generate_single_qubit_qNN_circuit(inputs,parameters,number_of_bits):
     """
@@ -208,12 +220,15 @@ def single_qubit_compute_total_error(inputs,expected_outputs,parameters,number_o
     #initialize total error
     total_error = 0
 
+    #define list of expected outputs
+    list_of_expected_outputs = compute_expected_outputs(inputs)
+
     #apply qNN circuit to each input
     for interation in range(len(inputs)):
 
         qNN_circuit = generate_single_qubit_qNN_circuit(inputs[interation],parameters,number_of_bits) #generate circuit
         counts = qNN_circuit.evaluate(number_of_runs=number_of_runs, number_of_shots=number_of_shots) #run circuit
-        total_error += single_qubit_compute_error(counts,expected_outputs[interation]) #add error
+        total_error += single_qubit_compute_error(counts,list_of_expected_outputs[interation]) #add error
 
     #normalize total error
     total_error = total_error/len(inputs)
@@ -221,7 +236,7 @@ def single_qubit_compute_total_error(inputs,expected_outputs,parameters,number_o
     #return total error
     return total_error
 
-def multi_qubit_compute_error(inputs,expected_outputs,counts):
+def multi_qubit_compute_error(inputs,expected_outputs,counts,number_of_bits=2):
     """
     Compute the error of the given quantum circuit.
 
@@ -231,31 +246,51 @@ def multi_qubit_compute_error(inputs,expected_outputs,counts):
     number of mistakes in the outputs of the quantum circuit divided by the total number of tests.
 
     Parameters:
+    inputs (list): A list containing pairs of input values for the neuron.
+    expected_outputs (list): A list of expected output values for each input pair.
     counts (list): A list of dictionaries, where each dictionary represents the counts of the outputs of the quantum circuit.
+    number_of_bits (int): The number of qbits in the quantum circuit.
 
     Returns:
     float: The error of the quantum circuit.
     """
 
     #define the statistics dictionary
-    statistics = {"00": [0,0], "01": [0,0], "10": [0,0], "11": [0,0]}
+    statistics = {}
+    for i in range(2**number_of_bits):
+        binary_key = format(i, f'0{number_of_bits}b')
+        statistics[binary_key] = [0, 0]
     
     #get the total number of tests
     total_tests = 0
 
+    # Processa as contagens
     for count in counts: #for each count
-        for key,value in count.items(): #extract the key and value
-            inputs = str(key[2])+str(key[3])
-            output = int(key[4])
-            statistics[inputs][output] = statistics[inputs][output] + value
-            total_tests = total_tests + value
+        for key, value in count.items(): #for each key and value
+
+            #define the inputs and the output
+            inputs = ''
+            for bit in range(number_of_bits, number_of_bits*2):
+                inputs += str(key[bit])
+            output = int(key[number_of_bits*2])
+
+            #update the statistics
+            statistics[inputs][output] += value
+
+            #update the total number of tests
+            total_tests += value
 
     #compute the error
     error = total_tests
-    error -= statistics["00"][int(expected_outputs[0])] + statistics["01"][int(expected_outputs[1])] + statistics["10"][int(expected_outputs[2])] + statistics["11"][int(expected_outputs[3])]
-    error = error / total_tests
+    """for index in range(2**number_of_bits):
+        binary_key = format(index, f'0{number_of_bits}b')
+        expected_output = int(expected_outputs[i])
+        error -= statistics[binary_key][expected_output]"""
+    for input in list(statistics.keys()):
+        error -= statistics[input][expected_outputs[input]]
+        
+    error /= total_tests
 
-    #return the error
     return error
 
 def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,number_of_runs=1,number_of_shots=1024,number_of_bits=2):
@@ -326,7 +361,7 @@ def multi_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=4,number
     for parameters in itertools.product(grid, repeat=number_of_bits*2):
                     
         counts = generate_multi_qubit_qNN_circuit(parameters,number_of_bits=number_of_bits).evaluate(number_of_runs=number_of_runs, number_of_shots=number_of_shots)
-        current_error = multi_qubit_compute_error(inputs,expected_outputs,counts)
+        current_error = multi_qubit_compute_error(inputs,expected_outputs,counts,number_of_bits=number_of_bits)
 
         if current_error < final_error:
             final_error = current_error
