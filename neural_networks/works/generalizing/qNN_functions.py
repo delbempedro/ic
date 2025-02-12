@@ -192,8 +192,8 @@ def single_qubit_compute_error(counts,expected_output):
 
     #compute error for each count
     for count in counts:
-        if expected_output in count:
-            error = number_of_shots - count[expected_output]
+        if str(expected_output) in count:
+            error = number_of_shots - count[str(expected_output)]
         else:
             error = number_of_shots
 
@@ -221,7 +221,7 @@ def single_qubit_compute_total_error(inputs,expected_outputs,parameters,number_o
     total_error = 0
 
     #define list of expected outputs
-    list_of_expected_outputs = compute_expected_outputs(inputs)
+    list_of_expected_outputs = list(expected_outputs.values())
 
     #apply qNN circuit to each input
     for interation in range(len(inputs)):
@@ -229,6 +229,7 @@ def single_qubit_compute_total_error(inputs,expected_outputs,parameters,number_o
         qNN_circuit = generate_single_qubit_qNN_circuit(inputs[interation],parameters,number_of_bits) #generate circuit
         counts = qNN_circuit.evaluate(number_of_runs=number_of_runs, number_of_shots=number_of_shots) #run circuit
         total_error += single_qubit_compute_error(counts,list_of_expected_outputs[interation]) #add error
+        print(total_error)
 
     #normalize total error
     total_error = total_error/len(inputs)
@@ -313,21 +314,22 @@ def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,numbe
     final_error = 1
 
     #initialize final parameters
-    final_parameters = [0]*number_of_bits
+    final_parameters = [0]*(number_of_bits+1)
 
     #initialize grid
     grid = np.linspace(-np.pi, np.pi, grid_grain)
 
     #exaustive search
-    for parameters in itertools.product(grid, repeat=number_of_bits+1):
-
+    for parameters in itertools.product(grid, repeat=(number_of_bits+1)):
+        
         #compute total error
         current_error = single_qubit_compute_total_error(inputs, expected_outputs, parameters, number_of_runs=number_of_runs, number_of_shots=number_of_shots, number_of_bits=number_of_bits)
 
         #update final error and final parameters
         if current_error < final_error:
             final_error = current_error
-            final_parameters = list(parameters) 
+            final_parameters = list(parameters)
+        print(parameters, current_error)
 
     #return final parameters
     return final_parameters, final_error

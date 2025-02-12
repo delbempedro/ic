@@ -21,7 +21,7 @@ from qiskit import QuantumCircuit #type: ignore
 from qiskit.primitives import StatevectorSampler #type: ignore
 
 #do my necessary imports
-from neuron import *
+from utils import *
 
 class current_circuit():
     
@@ -115,6 +115,7 @@ class current_circuit():
 
         #sample results with severals runs, each with several shots
         sampler = StatevectorSampler()
+
         #create jobs list
         jobs = []
     

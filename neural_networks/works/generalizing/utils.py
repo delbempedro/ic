@@ -1,7 +1,7 @@
 """
-  neuron.py
+  utils.py
 
-Module that defines a single quantum neuron
+Module that defines the util functions to create a quantum neuron.
 
 Dependencies:
 -
@@ -30,23 +30,16 @@ def single_qubit_neuron(qc,inputs,weights,number_of_bits=2,qbit_index=0):
 
     last_gate = ""
     for index in range(number_of_bits):
-
-        angle = inputs[index]*weights[index]
-        angle = angle + weights[-1]
-        print(angle, index, inputs[index], weights[index], weights[-1])
-
+        
         if last_gate == "rz":
-            qc.rx(angle,qbit_index)
+            qc.rx(inputs[index]*weights[index]+weights[-1],qbit_index)
             last_gate = "rx"
         elif last_gate == "rx":
-            qc.ry(angle,qbit_index)
+            qc.ry(inputs[index]*weights[index]+weights[-1],qbit_index)
             last_gate = "ry"
         else:
-            qc.rz(angle,qbit_index)
+            qc.rz(inputs[index]*weights[index]+weights[-1],qbit_index)
             last_gate = "rz"
-
-    """qc.rz(inputs[0]*weight1+weight3,qbit_index)
-    qc.rx(inputs[1]*weight2+weight3,qbit_index)"""
 
 def multi_qubit_neuron(qc,parameters,number_of_bits=2,first_qbit_index=0):
     """
@@ -71,21 +64,45 @@ def multi_qubit_neuron(qc,parameters,number_of_bits=2,first_qbit_index=0):
     for index in range(number_of_bits-1):
         qc.cx(first_qbit_index+index,first_qbit_index+index+1)
 
-    """control_gate = qc.x(first_qbit_index+number_of_bits)
-    for index in range(number_of_bits):
-        control_gate.control(first_qbit_index+index)
-        
-    qc.append(control_gate,range(number_of_bits+1))"""
     qc.mcx(list(range(first_qbit_index,first_qbit_index+number_of_bits)),first_qbit_index+number_of_bits)
 
-"""    qc.ry(weight1,first_qbit_index)
-    qc.ry(weight2,first_qbit_index+1)
-    qc.cx(first_qbit_index,first_qbit_index+1)
+def generate_counts(quantum_circuit,sampler,number_of_runs=1,number_of_shots=1024):
+    """
+    Generate the counts of the quantum circuit.
 
-    qc.ry(weight3,first_qbit_index)
-    qc.ry(weight4,first_qbit_index+1)
-    qc.cx(first_qbit_index,first_qbit_index+1)
+    Parameters:
+    quantum_circuit (QuantumCircuit): The quantum circuit to be executed.
+    sampler (StatevectorSampler): The sampler to be used.
+    number_of_runs (int): The number of times the quantum circuit is run.
+    number_of_shots (int): The number of shots to be executed in each run.
 
-    qc.x(first_qbit_index)
-    qc.x(first_qbit_index+1)
-    qc.ccx(first_qbit_index,first_qbit_index+1,first_qbit_index+2)"""
+    Returns:
+    list: A list of dictionaries, where each dictionary represents the counts of the outputs of the quantum circuit.
+    """
+
+    #create jobs list
+    jobs = []
+    
+    #run the circuit several times
+    for _ in range(number_of_runs):
+
+        #run the circuit
+        job = sampler.run([(quantum_circuit)], shots = number_of_shots)
+        #append the job to the jobs list
+        jobs.append(job)
+
+    #create the counts list
+    counts = []
+
+    #get and show raw results - counts
+    for job in jobs:
+
+        #get the data
+        data_pub = job.result()[0].data # 'pub' refers to Primitive Unified Bloc
+        job_counts = data_pub.meas.get_counts()
+
+        #append the counts to the counts list
+        counts.append(job_counts)
+
+    #return the counts list
+    return counts
