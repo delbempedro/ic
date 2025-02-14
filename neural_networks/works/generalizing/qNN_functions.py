@@ -203,7 +203,7 @@ def single_qubit_compute_error(counts,expected_output):
     #return error
     return error
 
-def single_qubit_compute_total_error(inputs,expected_outputs,parameters,number_of_runs=1,number_of_shots=1024,number_of_bits=2):
+def single_qubit_compute_total_error(inputs,expected_outputs,parameters,number_of_runs=1,number_of_shots=1024,number_of_bits=2,type_of_run="simulation"):
     """
     Compute the total error for a set of inputs and expected outputs.
 
@@ -212,6 +212,9 @@ def single_qubit_compute_total_error(inputs,expected_outputs,parameters,number_o
     expected_outputs (list of floats): A list of expected output values for each input pair.
     parameters (list of floats): The parameters of the neuron, including weights and bias.
     number_of_runs (int): The number of times the circuit is run.
+    number_of_shots (int): The number of shots to run the circuit.
+    number_of_bits (int): The number of qbits in the circuit.
+    type_of_run (str): The type of run to use.
 
     Returns:
     The total error (float) across all input pairs.
@@ -227,9 +230,8 @@ def single_qubit_compute_total_error(inputs,expected_outputs,parameters,number_o
     for interation in range(len(inputs)):
 
         qNN_circuit = generate_single_qubit_qNN_circuit(inputs[interation],parameters,number_of_bits) #generate circuit
-        counts = qNN_circuit.evaluate(number_of_runs=number_of_runs, number_of_shots=number_of_shots) #run circuit
+        counts = qNN_circuit.evaluate(number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run) #run circuit
         total_error += single_qubit_compute_error(counts,list_of_expected_outputs[interation]) #add error
-        print(total_error)
 
     #normalize total error
     total_error = total_error/len(inputs)
@@ -283,10 +285,6 @@ def multi_qubit_compute_error(inputs,expected_outputs,counts,number_of_bits=2):
 
     #compute the error
     error = total_tests
-    """for index in range(2**number_of_bits):
-        binary_key = format(index, f'0{number_of_bits}b')
-        expected_output = int(expected_outputs[i])
-        error -= statistics[binary_key][expected_output]"""
     for input in list(statistics.keys()):
         error -= statistics[input][expected_outputs[input]]
         
@@ -294,7 +292,7 @@ def multi_qubit_compute_error(inputs,expected_outputs,counts,number_of_bits=2):
 
     return error
 
-def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,number_of_runs=1,number_of_shots=1024,number_of_bits=2):
+def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,number_of_runs=1,number_of_shots=1024,number_of_bits=2,type_of_run="simulation"):
     """
     Perform an exaustive search of the parameter space to find the optimal parameters for the given inputs and expected outputs.
 
@@ -305,6 +303,7 @@ def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,numbe
     number_of_runs (int): The number of times the circuit is run.
     number_of_shots (int): The number of shots to run the circuit.
     number_of_bits (int): The number of qbits in the circuit.
+    type_of_run (str): The type of run to use.
 
     Returns:
     The optimal parameters (list of floats) and the total error (float) of the optimal parameters.
@@ -323,18 +322,17 @@ def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,numbe
     for parameters in itertools.product(grid, repeat=(number_of_bits+1)):
         
         #compute total error
-        current_error = single_qubit_compute_total_error(inputs, expected_outputs, parameters, number_of_runs=number_of_runs, number_of_shots=number_of_shots, number_of_bits=number_of_bits)
+        current_error = single_qubit_compute_total_error(inputs, expected_outputs, parameters, number_of_runs=number_of_runs, number_of_shots=number_of_shots, number_of_bits=number_of_bits, type_of_run=type_of_run)
 
         #update final error and final parameters
         if current_error < final_error:
             final_error = current_error
             final_parameters = list(parameters)
-        print(parameters, current_error)
 
     #return final parameters
     return final_parameters, final_error
 
-def multi_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=4,number_of_runs=1,number_of_shots=1024,number_of_bits=2):
+def multi_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=4,number_of_runs=1,number_of_shots=1024,number_of_bits=2,type_of_run="simulation"):
     """
     Perform an exaustive search of the parameter space to find the optimal parameters for the quantum neural network.
 
@@ -345,6 +343,7 @@ def multi_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=4,number
     number_of_runs (int): The number of times the circuit is run for each point in the grid.
     number_of_shots (int): The number of shots to run the circuit.
     number_of_bits (int): The number of qbits in the circuit.
+    type_of_run (str): The type of run to be used in the circuit.
 
     Returns:
     The optimal parameters (list of floats) and the total error (float) of the optimal parameters.
@@ -362,7 +361,7 @@ def multi_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=4,number
     #exaustive search
     for parameters in itertools.product(grid, repeat=number_of_bits*2):
                     
-        counts = generate_multi_qubit_qNN_circuit(parameters,number_of_bits=number_of_bits).evaluate(number_of_runs=number_of_runs, number_of_shots=number_of_shots)
+        counts = generate_multi_qubit_qNN_circuit(parameters,number_of_bits=number_of_bits).evaluate(number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run)
         current_error = multi_qubit_compute_error(inputs,expected_outputs,counts,number_of_bits=number_of_bits)
 
         if current_error < final_error:

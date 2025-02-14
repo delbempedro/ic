@@ -19,6 +19,8 @@ Authors:
 #do qiskit necessary imports
 from qiskit import QuantumCircuit #type: ignore
 from qiskit.primitives import StatevectorSampler #type: ignore
+from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler # type: ignore
+from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager # type: ignore
 
 #do my necessary imports
 from utils import *
@@ -100,45 +102,32 @@ class current_circuit():
 
         multi_qubit_neuron(self._qc,parameters,number_of_bits=number_of_bits,first_qbit_index=first_qbit_index)
 
-    def evaluate(self, number_of_shots = 1024, number_of_runs = 100):
+    def evaluate(self, number_of_shots = 1024, number_of_runs = 100, type_of_run = "simulation"):
         """
-        Evaluate a quantum circuit (XOR candidate) and return the counts (histogram of the outputs).
+        Evaluate a quantum circuit and return the counts (histogram of the outputs).
 
         Parameters:
         quantum_circuit (QuantumCircuit): The quantum circuit to be evaluated.
         number_of_shots (int): The number of shots to be used in the evaluation.
         number_of_runs (int): The number of times the quantum circuit is run.
+        type_of_run (str): The type of run to be used in the evaluation.
 
         Returns:
         list: A list of dictionaries, where each dictionary represents the counts of the outputs of the quantum circuit.
         """
 
-        #sample results with severals runs, each with several shots
-        sampler = StatevectorSampler()
+        #define the sampler
+        if type_of_run == "real_run":
+            backend = QiskitRuntimeService().least_busy(operational=True, simulator=False)
+            pass_manager = generate_preset_pass_manager(backend=backend, optimization_level=1)
+            self._qc = pass_manager.run(self._qc)
+            Sampler = Sampler(backend)
+        else:
+            Sampler = StatevectorSampler()
+        
 
-        #create jobs list
-        jobs = []
-    
-        #run the circuit several times
-        for _ in range(number_of_runs):
+        #get the counts
+        counts = generate_counts(self._qc,Sampler,number_of_runs=number_of_runs,number_of_shots=number_of_shots)
 
-            #run the circuit
-            job = sampler.run([(self._qc)], shots = number_of_shots)
-            #append the job to the jobs list
-            jobs.append(job)
-
-        #create the counts list
-        counts = []
-
-        #get and show raw results - counts
-        for job in jobs:
-
-            #get the data
-            data_pub = job.result()[0].data # 'pub' refers to Primitive Unified Bloc
-            job_counts = data_pub.meas.get_counts()
-
-            #append the counts to the counts list
-            counts.append(job_counts)
-
-        #return the counts list
+        #return the counts
         return counts
