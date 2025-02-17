@@ -47,6 +47,12 @@ def compute_expected_outputs(inputs: List[List[int]], logic_gate: str = "XOR") -
         op = operator.and_
     elif logic_gate == "OR":
         op = operator.or_
+    elif logic_gate == "NAND":
+        op = operator.and_
+    elif logic_gate == "NOR":
+        op = operator.or_
+    elif logic_gate == "XNOR":
+        op = operator.xor
     else:
         raise ValueError("Logic gate must be 'XOR', 'AND' or 'OR'")
     
