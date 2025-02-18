@@ -13,35 +13,66 @@ Authors:
 - Pedro C. Delbem. <pedrodelbem@usp.br>
 """
 
-def single_qubit_neuron(qc,inputs,weights,number_of_bits=2,qbit_index=0):
+def single_qubit_neuron(qc,inputs,weights,number_of_bits=2,first_qubit_index=0):
     """
     Applies a quantum neuron operation to the given quantum circuit.
 
     Parameters:
     qc (QuantumCircuit): The quantum circuit to which the quantum neuron operation is applied.
     inputs (list of floats): The values of the inputs to the neuron.
-    weight1 (float): The weight of the first input of the neuron.
-    weight2 (float): The weight of the second input of the neuron.
-    weight3 (float): The bias of the neuron.
-    qbit_index (int): The index of the qbit to which the quantum neuron operation is applied.
+    number_of_bits (int): The number of qbits in the circuit.
+    weights (list of floats): The weights of the inputs to the neuron.
+    first_qubit_index (int): The index of the qbit to which the quantum neuron operation is applied.
     """
 
-    qc.h(qbit_index)
+    if number_of_bits <= 3:
+        number_of_qubits_required = 1
+    else:
+        number_of_qubits_required = (number_of_bits//3)+1
+
+    whole_part_of_division = number_of_bits//3
+    rest_of_division = number_of_bits%3
+
+    for index in range(whole_part_of_division):
+
+        qc.h(first_qubit_index + index)
+        last_gate = ""
+
+        for sub_index in range(3):
+
+            input_index = index * 3 + sub_index
+
+            if last_gate == "rz":
+                qc.rx(inputs[input_index] * weights[input_index] + weights[-1], first_qubit_index + index)
+                last_gate = "rx"
+            elif last_gate == "rx":
+                qc.ry(inputs[input_index] * weights[input_index] + weights[-1], first_qubit_index + index)
+                last_gate = "ry"
+            else:
+                qc.rz(inputs[input_index] * weights[input_index] + weights[-1], first_qubit_index + index)
+                last_gate = "rz"
 
     last_gate = ""
-    for index in range(number_of_bits):
-        
+    for index in range(rest_of_division):
+
+        input_index = whole_part_of_division * 3 + index
+        print(index, input_index, len(inputs), len(weights))
+        print(inputs[input_index], weights[input_index], weights[-1])
         if last_gate == "rz":
-            qc.rx(inputs[index]*weights[index]+weights[-1],qbit_index)
+            qc.rx(inputs[input_index] * weights[input_index] + weights[-1], first_qubit_index + whole_part_of_division + index)
             last_gate = "rx"
         elif last_gate == "rx":
-            qc.ry(inputs[index]*weights[index]+weights[-1],qbit_index)
+            qc.ry(inputs[input_index] * weights[input_index] + weights[-1], first_qubit_index + whole_part_of_division + index)
             last_gate = "ry"
         else:
-            qc.rz(inputs[index]*weights[index]+weights[-1],qbit_index)
+            qc.rz(inputs[input_index] * weights[input_index] + weights[-1], first_qubit_index + whole_part_of_division + index)
             last_gate = "rz"
 
-def multi_qubit_neuron(qc,parameters,number_of_bits=2,first_qbit_index=0):
+    if number_of_qubits_required != 1:
+        qc.mcx(list(range(first_qubit_index,first_qubit_index+whole_part_of_division)),first_qubit_index+number_of_bits)
+
+
+def multi_qubit_neuron(qc,parameters,number_of_bits=2,first_qubit_index=0):
     """
     Quantum circuit for a neuron.
     
@@ -49,22 +80,22 @@ def multi_qubit_neuron(qc,parameters,number_of_bits=2,first_qbit_index=0):
     qc (QuantumCircuit): The quantum circuit to be modified.
     parameters (list of floats): The parameters of the neuron.
     number_of_bits (int): The number of qubits in the circuit.
-    first_qbit_index (int): The first qubit of the three qubits to be used in the neuron.
+    first_qubit_index (int): The first qubit of the three qubits to be used in the neuron.
     """
     
     for index in range(number_of_bits):
-        qc.ry(parameters[index],first_qbit_index+index)
+        qc.ry(parameters[index],first_qubit_index+index)
 
     for index in range(number_of_bits-1):
-        qc.cx(first_qbit_index+index,first_qbit_index+index+1)
+        qc.cx(first_qubit_index+index,first_qubit_index+index+1)
 
     for index in range(number_of_bits):
-        qc.ry(parameters[index],first_qbit_index+index)
+        qc.ry(parameters[index],first_qubit_index+index)
 
     for index in range(number_of_bits-1):
-        qc.cx(first_qbit_index+index,first_qbit_index+index+1)
+        qc.cx(first_qubit_index+index,first_qubit_index+index+1)
 
-    qc.mcx(list(range(first_qbit_index,first_qbit_index+number_of_bits)),first_qbit_index+number_of_bits)
+    qc.mcx(list(range(first_qubit_index,first_qubit_index+number_of_bits)),first_qubit_index+number_of_bits)
 
 def generate_counts(quantum_circuit,sampler,number_of_runs=1,number_of_shots=1024):
     """
