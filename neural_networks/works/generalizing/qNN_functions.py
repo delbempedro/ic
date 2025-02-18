@@ -87,10 +87,17 @@ def generate_single_qubit_qNN_circuit(inputs,parameters,number_of_bits):
         number_of_qubits_required = 1
     else:
         number_of_qubits_required = (number_of_bits//3)+1
-    qNN = current_circuit(number_of_qubits_required,1) #create the qNN circuit
-    qNN.add_single_qubit_neuron(inputs, parameters, number_of_bits) #add the neuron
-    qNN.get_current_circuit().measure_all()
 
+    #create the qNN circuit
+    if number_of_qubits_required != 1:
+        qNN = current_circuit(number_of_qubits_required+1,1)
+    else:
+        qNN = current_circuit(number_of_qubits_required,1)
+
+    qNN.add_single_qubit_neuron(inputs, parameters, number_of_bits) #add the neuron
+    qNN.get_current_circuit().measure_all() #measure all qubits
+
+    #return the circuit
     return qNN
 
 #Generates a circuit with all the possible inputs
@@ -203,6 +210,7 @@ def single_qubit_compute_error(counts,expected_output):
 
     #compute error for each count
     for count in counts:
+        print(count,count.keys())
         if str(expected_output) in count:
             error = number_of_shots - count[str(expected_output)]
         else:

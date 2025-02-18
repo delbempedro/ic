@@ -33,44 +33,22 @@ def single_qubit_neuron(qc,inputs,weights,number_of_bits=2,first_qubit_index=0):
     whole_part_of_division = number_of_bits//3
     rest_of_division = number_of_bits%3
 
+    for index in range(number_of_qubits_required):
+        qc.h(index)
+
     for index in range(whole_part_of_division):
+        qc.rz(weights[3*index]*inputs[3*index] + weights[-1], first_qubit_index+index)
+        qc.ry(weights[3*index+1]*inputs[3*index+1] + weights[-1], first_qubit_index+index)
+        qc.rx(weights[3*index+2]*inputs[3*index+2] + weights[-1], first_qubit_index+index)
 
-        qc.h(first_qubit_index + index)
-        last_gate = ""
-
-        for sub_index in range(3):
-
-            input_index = index * 3 + sub_index
-
-            if last_gate == "rz":
-                qc.rx(inputs[input_index] * weights[input_index] + weights[-1], first_qubit_index + index)
-                last_gate = "rx"
-            elif last_gate == "rx":
-                qc.ry(inputs[input_index] * weights[input_index] + weights[-1], first_qubit_index + index)
-                last_gate = "ry"
-            else:
-                qc.rz(inputs[input_index] * weights[input_index] + weights[-1], first_qubit_index + index)
-                last_gate = "rz"
-
-    last_gate = ""
-    for index in range(rest_of_division):
-
-        input_index = whole_part_of_division * 3 + index
-        print(index, input_index, len(inputs), len(weights))
-        print(inputs[input_index], weights[input_index], weights[-1])
-        if last_gate == "rz":
-            qc.rx(inputs[input_index] * weights[input_index] + weights[-1], first_qubit_index + whole_part_of_division + index)
-            last_gate = "rx"
-        elif last_gate == "rx":
-            qc.ry(inputs[input_index] * weights[input_index] + weights[-1], first_qubit_index + whole_part_of_division + index)
-            last_gate = "ry"
-        else:
-            qc.rz(inputs[input_index] * weights[input_index] + weights[-1], first_qubit_index + whole_part_of_division + index)
-            last_gate = "rz"
+    if rest_of_division == 1:
+        qc.rz(weights[-2]*inputs[-1] + weights[-1], first_qubit_index+whole_part_of_division)
+    elif rest_of_division ==2:
+        qc.rz(weights[-3]*inputs[-2] + weights[-1], first_qubit_index+whole_part_of_division)
+        qc.ry(weights[-2]*inputs[-1] + weights[-1], first_qubit_index+whole_part_of_division)
 
     if number_of_qubits_required != 1:
-        qc.mcx(list(range(first_qubit_index,first_qubit_index+whole_part_of_division)),first_qubit_index+number_of_bits)
-
+        qc.mcx(list(range(first_qubit_index,first_qubit_index+whole_part_of_division)),first_qubit_index+number_of_qubits_required)
 
 def multi_qubit_neuron(qc,parameters,number_of_bits=2,first_qubit_index=0):
     """
