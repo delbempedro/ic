@@ -204,17 +204,15 @@ def single_qubit_compute_error(counts,expected_output):
 
     #compute number of shots
     number_of_shots = sum(counts[0].values())
-
+    
     #initialize error with 0
     error = 0
 
     #compute error for each count
     for count in counts:
-        print(count,count.keys())
-        if str(expected_output) in count:
-            error = number_of_shots - count[str(expected_output)]
-        else:
-            error = number_of_shots
+        for key,value in count.items():
+            if key[-1] != str(expected_output):
+                error += value
 
     #normalize error
     error = error/number_of_shots
