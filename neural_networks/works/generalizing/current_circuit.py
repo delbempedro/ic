@@ -67,14 +67,14 @@ class current_circuit():
 
         return self._num_of_classical_bits
     
-    def print_circuit(self,output='text',style='ascii'):
+    def __repr__(self,output='text',style='ascii'):
         """
         Print the current quantum circuit.
         """
 
         print(self._qc.draw(output=output,style=style))
 
-    def add_single_qubit_neuron(self,inputs,weights,number_of_bits=2,first_qubit_index=0):
+    def add_single_qubit_neuron(self,inputs,weights,number_of_bits=2,first_qubit_index=0,number_of_inputs_per_qubit=3):
         """
         Add a quantum neuron operation to the current quantum circuit.
 
@@ -83,9 +83,10 @@ class current_circuit():
         weights (list of floats): The weights of the inputs to the neuron.
         number_of_bits (int): The number of qbits in the circuit.
         first_qubit_index (int): The index of the qbit to which the quantum neuron operation is applied.
+        number_of_inputs_per_qubit (int): The number of inputs per qubit.
         """
 
-        single_qubit_neuron(self._qc,inputs,weights,number_of_bits=number_of_bits,first_qubit_index=first_qubit_index)
+        single_qubit_neuron(self._qc,inputs,weights,number_of_bits=number_of_bits,first_qubit_index=first_qubit_index,number_of_inputs_per_qubit=number_of_inputs_per_qubit)
 
     def add_multi_qubit_neuron(self,parameters,number_of_bits=2,first_qubit_index=0): 
         """

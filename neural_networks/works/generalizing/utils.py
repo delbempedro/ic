@@ -13,7 +13,7 @@ Authors:
 - Pedro C. Delbem. <pedrodelbem@usp.br>
 """
 
-def single_qubit_neuron(qc,inputs,weights,number_of_bits=2,first_qubit_index=0):
+def single_qubit_neuron(qc,inputs,weights,number_of_bits=2,first_qubit_index=0,number_of_inputs_per_qubit=3):
     """
     Applies a quantum neuron operation to the given quantum circuit.
 
@@ -23,32 +23,40 @@ def single_qubit_neuron(qc,inputs,weights,number_of_bits=2,first_qubit_index=0):
     number_of_bits (int): The number of qbits in the circuit.
     weights (list of floats): The weights of the inputs to the neuron.
     first_qubit_index (int): The index of the qbit to which the quantum neuron operation is applied.
+    number_of_inputs_per_qubit (int): The number of inputs per qubit.
+
     """
 
-    if number_of_bits <= 3:
+    if number_of_bits <= number_of_inputs_per_qubit:
         number_of_qubits_required = 1
     else:
-        number_of_qubits_required = (number_of_bits//3)+1
+        number_of_qubits_required = (number_of_bits//number_of_inputs_per_qubit)+1
 
-    whole_part_of_division = number_of_bits//3
-    rest_of_division = number_of_bits%3
+    whole_part_of_division = number_of_bits//number_of_inputs_per_qubit
+    rest_of_division = number_of_bits%number_of_inputs_per_qubit
 
-    for index in range(number_of_qubits_required):
-        qc.h(index)
-
-    for index in range(whole_part_of_division):
-        qc.rz(weights[3*index]*inputs[3*index] + weights[-1], first_qubit_index+index)
-        qc.ry(weights[3*index+1]*inputs[3*index+1] + weights[-1], first_qubit_index+index)
-        qc.rx(weights[3*index+2]*inputs[3*index+2] + weights[-1], first_qubit_index+index)
+    if number_of_inputs_per_qubit == 3:
+        for index in range(whole_part_of_division):
+            qc.h(first_qubit_index+index)
+            qc.rz(weights[number_of_inputs_per_qubit*index]*inputs[number_of_inputs_per_qubit*index] + weights[-1], first_qubit_index+index)
+            qc.ry(weights[number_of_inputs_per_qubit*index+1]*inputs[number_of_inputs_per_qubit*index+1] + weights[-1], first_qubit_index+index)
+            qc.rx(weights[number_of_inputs_per_qubit*index+2]*inputs[number_of_inputs_per_qubit*index+2] + weights[-1], first_qubit_index+index)
+    if number_of_inputs_per_qubit == 2:
+        for index in range(whole_part_of_division):
+            qc.h(first_qubit_index+index)
+            qc.rz(weights[number_of_inputs_per_qubit*index]*inputs[number_of_inputs_per_qubit*index] + weights[-1], first_qubit_index+index)
+            qc.ry(weights[number_of_inputs_per_qubit*index+1]*inputs[number_of_inputs_per_qubit*index+1] + weights[-1], first_qubit_index+index)
 
     if rest_of_division == 1:
+        qc.h(first_qubit_index+whole_part_of_division)
         qc.rz(weights[-2]*inputs[-1] + weights[-1], first_qubit_index+whole_part_of_division)
     elif rest_of_division ==2:
+        qc.h(first_qubit_index+whole_part_of_division)
         qc.rz(weights[-3]*inputs[-2] + weights[-1], first_qubit_index+whole_part_of_division)
         qc.ry(weights[-2]*inputs[-1] + weights[-1], first_qubit_index+whole_part_of_division)
 
     if number_of_qubits_required != 1:
-        qc.mcx(list(range(first_qubit_index,first_qubit_index+whole_part_of_division)),first_qubit_index+number_of_qubits_required)
+        qc.mcx(list(range(first_qubit_index,first_qubit_index+whole_part_of_division)),first_qubit_index+number_of_qubits_required-number_of_qubits_required%2)
 
 def multi_qubit_neuron(qc,parameters,number_of_bits=2,first_qubit_index=0):
     """

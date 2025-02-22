@@ -69,7 +69,7 @@ def compute_expected_outputs(inputs: List[List[int]], logic_gate: str = "XOR") -
 
     #return [str(reduce(op, row)) for row in inputs]
 
-def generate_single_qubit_qNN_circuit(inputs,parameters,number_of_bits):
+def generate_single_qubit_qNN_circuit(inputs,parameters,number_of_bits,number_of_inputs_per_qubit=3):
     """
     Generate a quantum neural network circuit (qNN) with a single neuron.
 
@@ -78,23 +78,30 @@ def generate_single_qubit_qNN_circuit(inputs,parameters,number_of_bits):
     input2_value (float): The value of the second input of the neuron.
     parameters (list of floats): The parameters of the neuron, in order: first input weight, second input weight, bias.
     number_of_bits (int): The number of qbits in the circuit.
+    number_of_inputs_per_qubit (int): The number of inputs per qubit.
 
     Returns:
     The qNN circuit (current_circuit).
     """
 
-    if number_of_bits <= 3:
+    if number_of_bits <= number_of_inputs_per_qubit:
         number_of_qubits_required = 1
     else:
-        number_of_qubits_required = (number_of_bits//3)+1
+        number_of_qubits_required = (number_of_bits//number_of_inputs_per_qubit)+1
 
     #create the qNN circuit
-    if number_of_qubits_required != 1:
+    if number_of_qubits_required == 1:
+        qNN = current_circuit(1,1)
+    elif not number_of_qubits_required % 2: #check if the number of qubits is even
+        qNN = current_circuit(number_of_qubits_required,1)
+    else: #if the number of qubits is odd
+        qNN = current_circuit(number_of_qubits_required+1,1)
+    """if number_of_qubits_required != 1:
         qNN = current_circuit(number_of_qubits_required+1,1)
     else:
-        qNN = current_circuit(number_of_qubits_required,1)
+        qNN = current_circuit(number_of_qubits_required,1)"""
 
-    qNN.add_single_qubit_neuron(inputs, parameters, number_of_bits) #add the neuron
+    qNN.add_single_qubit_neuron(inputs, parameters, number_of_bits, number_of_inputs_per_qubit=number_of_inputs_per_qubit) #add the neuron
     qNN.get_current_circuit().measure_all() #measure all qubits
 
     #return the circuit
@@ -224,7 +231,7 @@ def single_qubit_compute_error(counts,expected_output):
     #return error
     return error
 
-def single_qubit_compute_total_error(inputs,expected_outputs,parameters,number_of_runs=1,number_of_shots=1024,number_of_bits=2,type_of_run="simulation"):
+def single_qubit_compute_total_error(inputs,expected_outputs,parameters,number_of_runs=1,number_of_shots=1024,number_of_bits=2,type_of_run="simulation",number_of_inputs_per_qubit=3):
     """
     Compute the total error for a set of inputs and expected outputs.
 
@@ -236,6 +243,7 @@ def single_qubit_compute_total_error(inputs,expected_outputs,parameters,number_o
     number_of_shots (int): The number of shots to run the circuit.
     number_of_bits (int): The number of qbits in the circuit.
     type_of_run (str): The type of run to use.
+    number_of_inputs_per_qubit (int): The number of inputs per qubit.
 
     Returns:
     The total error (float) across all input pairs.
@@ -250,7 +258,7 @@ def single_qubit_compute_total_error(inputs,expected_outputs,parameters,number_o
     #apply qNN circuit to each input
     for interation in range(len(inputs)):
 
-        qNN_circuit = generate_single_qubit_qNN_circuit(inputs[interation],parameters,number_of_bits) #generate circuit
+        qNN_circuit = generate_single_qubit_qNN_circuit(inputs[interation],parameters,number_of_bits,number_of_inputs_per_qubit=number_of_inputs_per_qubit) #generate circuit
         counts = qNN_circuit.evaluate(number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run) #run circuit
         total_error += single_qubit_compute_error(counts,list_of_expected_outputs[interation]) #add error
 
@@ -313,7 +321,7 @@ def multi_qubit_compute_error(inputs,expected_outputs,counts,number_of_bits=2):
 
     return error
 
-def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,number_of_runs=1,number_of_shots=1024,number_of_bits=2,type_of_run="simulation"):
+def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,number_of_runs=1,number_of_shots=1024,number_of_bits=2,type_of_run="simulation",number_of_inputs_per_qubit=3):
     """
     Perform an exaustive search of the parameter space to find the optimal parameters for the given inputs and expected outputs.
 
@@ -325,6 +333,7 @@ def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,numbe
     number_of_shots (int): The number of shots to run the circuit.
     number_of_bits (int): The number of qbits in the circuit.
     type_of_run (str): The type of run to use.
+    number_of_inputs_per_qubit (int): The number of inputs per qubit.
 
     Returns:
     The optimal parameters (list of floats) and the total error (float) of the optimal parameters.
@@ -343,7 +352,7 @@ def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,numbe
     for parameters in itertools.product(grid, repeat=(number_of_bits+1)):
         
         #compute total error
-        current_error = single_qubit_compute_total_error(inputs, expected_outputs, parameters, number_of_runs=number_of_runs, number_of_shots=number_of_shots, number_of_bits=number_of_bits, type_of_run=type_of_run)
+        current_error = single_qubit_compute_total_error(inputs, expected_outputs, parameters, number_of_runs=number_of_runs, number_of_shots=number_of_shots, number_of_bits=number_of_bits, type_of_run=type_of_run, number_of_inputs_per_qubit=number_of_inputs_per_qubit)
 
         #update final error and final parameters
         if current_error < final_error:
