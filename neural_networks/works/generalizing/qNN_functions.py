@@ -208,14 +208,18 @@ def single_qubit_compute_error(counts,expected_output):
     #initialize error with 0
     error = 0
 
+    #initialize total tests with 0
+    total_tests = 0
+
     #compute error for each count
     for count in counts:
         for key,value in count.items():
             if key[-1] != str(expected_output):
                 error += value
+            total_tests += value
 
     #normalize error
-    error = error/number_of_shots
+    error = error/total_tests
 
     #return error
     return error
@@ -345,6 +349,9 @@ def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,numbe
         if current_error < final_error:
             final_error = current_error
             final_parameters = list(parameters)
+
+        if current_error < 1/4:
+            break
 
     #return final parameters
     return final_parameters, final_error

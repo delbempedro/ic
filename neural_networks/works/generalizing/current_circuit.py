@@ -118,16 +118,17 @@ class current_circuit():
 
         #define the sampler
         if type_of_run == "real_run":
-            backend = QiskitRuntimeService().least_busy(operational=True, simulator=False)
+            service = QiskitRuntimeService()
+            backend = service.least_busy(operational=True, simulator=False)
             pass_manager = generate_preset_pass_manager(backend=backend, optimization_level=1)
             self._qc = pass_manager.run(self._qc)
-            Sampler = Sampler(backend)
+            sampler = Sampler(backend)
         else:
-            Sampler = StatevectorSampler()
+            sampler = StatevectorSampler()
         
 
         #get the counts
-        counts = generate_counts(self._qc,Sampler,number_of_runs=number_of_runs,number_of_shots=number_of_shots)
+        counts = generate_counts(self._qc,sampler,number_of_runs=number_of_runs,number_of_shots=number_of_shots)
 
         #return the counts
         return counts
