@@ -84,24 +84,15 @@ def generate_single_qubit_qNN_circuit(inputs,parameters,number_of_bits,number_of
     The qNN circuit (current_circuit).
     """
 
-    if number_of_bits <= number_of_inputs_per_qubit:
-        number_of_qubits_required = 1
-    else:
-        number_of_qubits_required = (number_of_bits//number_of_inputs_per_qubit)+1
-
     #create the qNN circuit
-    if number_of_qubits_required == 1:
+    if number_of_bits <= number_of_inputs_per_qubit:
         qNN = current_circuit(1,1)
-    elif not number_of_qubits_required % 2: #check if the number of qubits is even
-        qNN = current_circuit(number_of_qubits_required,1)
+    elif number_of_bits%2: #if the number of qubits is even
+        qNN = current_circuit(number_of_bits//number_of_inputs_per_qubit+2,1)
     else: #if the number of qubits is odd
-        qNN = current_circuit(number_of_qubits_required+1,1)
-    """if number_of_qubits_required != 1:
-        qNN = current_circuit(number_of_qubits_required+1,1)
-    else:
-        qNN = current_circuit(number_of_qubits_required,1)"""
+        qNN = current_circuit(number_of_bits//number_of_inputs_per_qubit+1,1)
 
-    qNN.add_single_qubit_neuron(inputs, parameters, number_of_bits, number_of_inputs_per_qubit=number_of_inputs_per_qubit) #add the neuron
+    qNN.add_single_qubit_neuron(inputs, parameters, number_of_bits=number_of_bits, number_of_inputs_per_qubit=number_of_inputs_per_qubit) #add the neuron
     qNN.get_current_circuit().measure_all() #measure all qubits
 
     #return the circuit

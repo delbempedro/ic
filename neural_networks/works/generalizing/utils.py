@@ -27,11 +27,6 @@ def single_qubit_neuron(qc,inputs,weights,number_of_bits=2,first_qubit_index=0,n
 
     """
 
-    if number_of_bits <= number_of_inputs_per_qubit:
-        number_of_qubits_required = 1
-    else:
-        number_of_qubits_required = (number_of_bits//number_of_inputs_per_qubit)+1
-
     whole_part_of_division = number_of_bits//number_of_inputs_per_qubit
     rest_of_division = number_of_bits%number_of_inputs_per_qubit
 
@@ -55,8 +50,15 @@ def single_qubit_neuron(qc,inputs,weights,number_of_bits=2,first_qubit_index=0,n
         qc.rz(weights[-3]*inputs[-2] + weights[-1], first_qubit_index+whole_part_of_division)
         qc.ry(weights[-2]*inputs[-1] + weights[-1], first_qubit_index+whole_part_of_division)
 
-    if number_of_qubits_required != 1:
-        qc.mcx(list(range(first_qubit_index,first_qubit_index+whole_part_of_division)),first_qubit_index+number_of_qubits_required-number_of_qubits_required%2)
+    if number_of_bits > number_of_inputs_per_qubit:
+
+        if number_of_bits%2:
+            number_of_control_qubits=number_of_bits//number_of_inputs_per_qubit+1
+        else:
+            number_of_control_qubits=number_of_bits//number_of_inputs_per_qubit
+
+        list_of_control_qubits = list(range(first_qubit_index,first_qubit_index+number_of_control_qubits))
+        qc.mcx(list_of_control_qubits,first_qubit_index+number_of_control_qubits)
 
 def multi_qubit_neuron(qc,parameters,number_of_bits=2,first_qubit_index=0):
     """

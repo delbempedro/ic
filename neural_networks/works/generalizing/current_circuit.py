@@ -67,7 +67,7 @@ class current_circuit():
 
         return self._num_of_classical_bits
     
-    def __repr__(self,output='text',style='ascii'):
+    def print_current_circuit(self,output='text',style='ascii'):
         """
         Print the current quantum circuit.
         """
