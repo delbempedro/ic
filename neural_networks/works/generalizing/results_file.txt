@@ -1,0 +1,74 @@
+number of bits: 2
+    type of operation: XOR
+        2 inputs per qubit qNN
+            final weights: [np.float64(-3.141592653589793), np.float64(1.5707963267948966), np.float64(-3.141592653589793)]
+            final error: 0.249755859375
+            real error: 0.250732421875
+
+        3 inputs per qubit qNN
+            final weights: [np.float64(-3.141592653589793), np.float64(1.5707963267948966), np.float64(3.141592653589793)]
+            final error: 0.2470703125
+            real error: 0.26318359375
+
+        input per qubit qNN
+            final weights: [np.float64(-3.141592653589793), np.float64(1.0471975511965974), np.float64(-1.0471975511965979), np.float64(-3.141592653589793)]
+            final error: 0.2177734375
+            real error: 0.3701171875
+
+    type of operation: AND
+        2 inputs per qubit qNN
+            final weights: [np.float64(-3.141592653589793), np.float64(-1.5707963267948966), np.float64(0.0)]
+            final error: 0.239990234375
+            real error: 0.249755859375
+
+        3 inputs per qubit qNN
+            final weights: [np.float64(-3.141592653589793), np.float64(-1.5707963267948966), np.float64(3.141592653589793)]
+            final error: 0.245849609375
+            real error: 0.24609375
+
+        input per qubit qNN
+            final weights: [np.float64(1.0471975511965974), np.float64(-1.0471975511965979), np.float64(-3.141592653589793), np.float64(-1.0471975511965979)]
+            final error: 0.3125
+            real error: 0.392578125
+
+    type of operation: OR
+        2 inputs per qubit qNN
+            final weights: [np.float64(0.0), np.float64(1.5707963267948966), np.float64(3.141592653589793)]
+            final error: 0.247314453125
+            real error: 0.247802734375
+
+        3 inputs per qubit qNN
+            final weights: [np.float64(0.0), np.float64(1.5707963267948966), np.float64(0.0)]
+            final error: 0.244140625
+            real error: 0.253662109375
+
+        input per qubit qNN
+            final weights: [np.float64(-3.141592653589793), np.float64(-3.141592653589793), np.float64(-3.141592653589793), np.float64(1.0471975511965974)]
+            final error: 0.21484375
+            real error: 0.31640625
+
+    type of operation: NAND
+        2 inputs per qubit qNN
+            final weights: [np.float64(-3.141592653589793), np.float64(-1.5707963267948966), np.float64(0.0)]
+            final error: 0.24951171875
+            real error: 0.240234375
+
+        3 inputs per qubit qNN
+            final weights: [np.float64(-3.141592653589793), np.float64(-1.5707963267948966), np.float64(3.141592653589793)]
+            final error: 0.247802734375
+            real error: 0.24462890625
+
+        input per qubit qNN
+            final weights: [np.float64(-1.0471975511965979), np.float64(-1.0471975511965979), np.float64(3.141592653589793), np.float64(-1.0471975511965979)]
+            final error: 0.302734375
+            real error: 0.4013671875
+
+    type of operation: NOR
+        2 inputs per qubit qNN
+            final weights: [np.float64(-1.5707963267948966), np.float64(0.0), np.float64(-1.5707963267948966)]
+            final error: 0.243896484375
+            real error: 0.267333984375
+
+        3 inputs per qubit qNN
+            final weights: [np.float64(-1.5707963267948966), np.float64(0.0), np.float64(-1.5707963267948966)]
+            final error: 0.244384765625

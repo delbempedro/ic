@@ -1,0 +1,97 @@
+number of bits: 2
+    type of operation: XOR
+        2 inputs per qubit qNN
+            final weights: [-π, 0.5π, 0]
+            final error: 0.240234375
+            real error: 0.25927734375
+
+        3 inputs per qubit qNN
+            final weights: [-π, 0.5π, -π]
+            final error: 0.246337890625
+            real error: 0.2509765625
+
+        input per qubit qNN
+            final weights: [-π, π, -π, -π]
+            final error: 0.216796875
+            real error: 0.23828125
+
+    type of operation: AND
+        2 inputs per qubit qNN
+            final weights: [-π, -0.5π, -π]
+            final error: 0.249755859375
+            real error: 0.27490234375
+
+        3 inputs per qubit qNN
+            final weights: [-π, -0.5π, 0]
+            final error: 0.2490234375
+            real error: 0.270263671875
+
+        input per qubit qNN
+            final weights: [-0.333333π, -0.333333π, -π, 0.333333π]
+            final error: 0.298828125
+            real error: 0.3310546875
+
+    type of operation: OR
+        2 inputs per qubit qNN
+            final weights: [-0.5π, 0, 0.5π]
+            final error: 0.249755859375
+            real error: 0.2646484375
+
+        3 inputs per qubit qNN
+            final weights: [-0.5π, 0, -0.5π]
+            final error: 0.24609375
+            real error: 0.26025390625
+
+        input per qubit qNN
+            final weights: [π, -0.333333π, -0.333333π, π]
+            final error: 0.21875
+            real error: 0.224609375
+
+    type of operation: NAND
+        2 inputs per qubit qNN
+            final weights: [-π, -0.5π, 0]
+            final error: 0.247802734375
+            real error: 0.262451171875
+
+        3 inputs per qubit qNN
+            final weights: [-π, -0.5π, π]
+            final error: 0.2451171875
+            real error: 0.26513671875
+
+        input per qubit qNN
+            final weights: [-0.333333π, -0.333333π, 0.333333π, -0.333333π]
+            final error: 0.3212890625
+            real error: 0.380859375
+
+    type of operation: NOR
+        2 inputs per qubit qNN
+            final weights: [-0.5π, 0, 0.5π]
+            final error: 0.2451171875
+            real error: 0.251953125
+
+        3 inputs per qubit qNN
+            final weights: [-0.5π, 0, -0.5π]
+            final error: 0.2490234375
+            real error: 0.24853515625
+
+        input per qubit qNN
+            final weights: [π, -0.333333π, 0.333333π, -0.333333π]
+            final error: 0.2216796875
+            real error: 0.23046875
+
+    type of operation: XNOR
+        2 inputs per qubit qNN
+            final weights: [-π, 0.5π, π]
+            final error: 0.235595703125
+            real error: 0.24560546875
+
+        3 inputs per qubit qNN
+            final weights: [-π, 0.5π, 0]
+            final error: 0.248779296875
+            real error: 0.264892578125
+
+        input per qubit qNN
+            final weights: [-π, π, 0.333333π, π]
+            final error: 0.2109375
+            real error: 0.28515625
+
