@@ -394,75 +394,93 @@ def multi_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=4,number
 
     return final_parameters, final_error
 
-def multi_qubit_qNN_gradient_descent(inputs, expected_outputs, 
-                                     learning_rate=0.1, max_iterations=1000, 
-                                     number_of_runs=1, number_of_shots=1024, 
-                                     number_of_bits=2, type_of_run="simulation",
-                                     tolerance=1e-6):
+def compute_gradient_single_qubit(parameters, inputs, expected_outputs, number_of_bits, number_of_runs, number_of_shots, type_of_run, epsilon=1e-3, number_of_inputs_per_qubit=3):
     """
-    Perform gradient descent optimization to find the optimal parameters for the quantum neural network.
-
-    Parameters:
-    inputs (list of lists): A list containing pairs of input values for the neuron.
-    expected_outputs (list of floats): A list of expected output values for each input pair.
-    learning_rate (float): The learning rate for gradient descent.
-    max_iterations (int): The maximum number of iterations for the gradient descent.
-    number_of_runs (int): The number of times the circuit is run for each set of parameters.
-    number_of_shots (int): The number of shots to run the circuit.
-    number_of_bits (int): The number of qubits in the circuit.
-    type_of_run (str): The type of run to be used in the circuit.
-    tolerance (float): The stopping criterion for convergence.
-
-    Returns:
-    The optimal parameters (list of floats) and the total error (float) of the optimal parameters.
+    Compute the gradient of the error function using finite differences for single qubit case.
     """
 
-    # Inicializa parâmetros aleatórios dentro do intervalo [-π, π]
-    parameters = np.random.uniform(-np.pi, np.pi, number_of_bits * 2)
-    
-    # Função para calcular o gradiente numericamente
-    def compute_gradient(params, epsilon=1e-4):
-        gradient = np.zeros_like(params)
-        for i in range(len(params)):
-            params_plus = params.copy()
-            params_minus = params.copy()
-            params_plus[i] += epsilon
-            params_minus[i] -= epsilon
-            
-            counts_plus = generate_multi_qubit_qNN_circuit(params_plus, number_of_bits=number_of_bits).evaluate(
-                number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run)
-            counts_minus = generate_multi_qubit_qNN_circuit(params_minus, number_of_bits=number_of_bits).evaluate(
-                number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run)
+    gradient = np.zeros(len(parameters))
 
-            error_plus = multi_qubit_compute_error(inputs, expected_outputs, counts_plus, number_of_bits=number_of_bits)
-            error_minus = multi_qubit_compute_error(inputs, expected_outputs, counts_minus, number_of_bits=number_of_bits)
+    for i in range(len(parameters)):
+        perturbed_params = parameters.copy()
 
-            gradient[i] = (error_plus - error_minus) / (2 * epsilon)
+        # Compute f(x + epsilon)
+        perturbed_params[i] += epsilon
+        error_plus = single_qubit_compute_total_error(
+            inputs, expected_outputs, perturbed_params, number_of_runs=number_of_runs, 
+            number_of_shots=number_of_shots, number_of_bits=number_of_bits, 
+            type_of_run=type_of_run, number_of_inputs_per_qubit=number_of_inputs_per_qubit
+        )
 
-        return gradient
+        # Compute f(x - epsilon)
+        perturbed_params[i] -= 2 * epsilon
+        error_minus = single_qubit_compute_total_error(
+            inputs, expected_outputs, perturbed_params, number_of_runs=number_of_runs, 
+            number_of_shots=number_of_shots, number_of_bits=number_of_bits, 
+            type_of_run=type_of_run, number_of_inputs_per_qubit=number_of_inputs_per_qubit
+        )
 
-    #Initializes final number of interations
+        # Compute numerical gradient
+        gradient[i] = (error_plus - error_minus) / (2 * epsilon)
+
+    return gradient
+
+
+def single_qubit_qNN_gradient_descent(inputs, expected_outputs, number_of_bits=2, number_of_runs=1, number_of_shots=1024, 
+                                      type_of_run="simulation", learning_rate=0.1, max_iterations=100, tolerance=0.25, 
+                                      number_of_inputs_per_qubit=3):
+    """
+    Optimize the quantum neural network parameters using independent gradient descent updates.
+    """
+
+    # Initialize parameters randomly within [-pi, pi]
+    parameters = np.random.uniform(-np.pi, np.pi, size=(number_of_bits + 1))
+
+    # Compute initial error
+    final_error = single_qubit_compute_total_error(
+        inputs, expected_outputs, parameters, number_of_runs=number_of_runs, 
+        number_of_shots=number_of_shots, number_of_bits=number_of_bits, 
+        type_of_run=type_of_run, number_of_inputs_per_qubit=number_of_inputs_per_qubit
+    )
+
+    # Store the best parameters
+    best_parameters = parameters.copy()
     final_number_of_iterations = max_iterations
 
-    # Loop do Gradient Descent
     for iteration in range(max_iterations):
-        counts = generate_multi_qubit_qNN_circuit(parameters, number_of_bits=number_of_bits).evaluate(
-            number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run)
-        
-        current_error = multi_qubit_compute_error(inputs, expected_outputs, counts, number_of_bits=number_of_bits)
+        # Compute gradient
+        gradient = compute_gradient_single_qubit(parameters, inputs, expected_outputs, number_of_bits, number_of_runs, 
+                                                 number_of_shots, type_of_run, number_of_inputs_per_qubit)
 
-        gradient = compute_gradient(parameters)
+        # Update parameters independently
+        for i in range(len(parameters)):
+            temp_parameters = parameters.copy()
+            temp_parameters[i] -= learning_rate * gradient[i]
 
-        # Atualiza os parâmetros
-        parameters -= learning_rate * gradient
+            # Compute error with updated parameter
+            temp_error = single_qubit_compute_total_error(
+                inputs, expected_outputs, temp_parameters, number_of_runs=number_of_runs, 
+                number_of_shots=number_of_shots, number_of_bits=number_of_bits, 
+                type_of_run=type_of_run, number_of_inputs_per_qubit=number_of_inputs_per_qubit
+            )
 
-        # Verifica critério de convergência
-        if np.linalg.norm(gradient) < tolerance:
-            #print(f"Converged in {iteration} iterations.")
+            # Only accept update if error improves
+            if temp_error < final_error:
+                parameters[i] = temp_parameters[i]
+                final_error = temp_error
+                best_parameters = parameters.copy()
+
+        # Reduce learning rate over time
+        learning_rate *= 0.99
+
+        # Check for convergence
+        if final_error < tolerance:
+            print(f"Converged after {iteration+1} iterations.")
             final_number_of_iterations = iteration
             break
 
-    return list(parameters), current_error, final_number_of_iterations
+    return list(best_parameters), final_error, final_number_of_iterations
+
 
 def compute_gradient(parameters, inputs, expected_outputs, number_of_bits, number_of_runs, number_of_shots, type_of_run, epsilon=1e-3):
     """
@@ -507,8 +525,8 @@ def compute_gradient(parameters, inputs, expected_outputs, number_of_bits, numbe
     return gradient
 
 
-def multi_qubit_qNN_gradient_descent2(inputs, expected_outputs, number_of_bits=2, number_of_runs=1, number_of_shots=1024, 
-                                     type_of_run="simulation", learning_rate=0.1, max_iterations=1000, tolerance=0.25):
+def multi_qubit_qNN_gradient_descent(inputs, expected_outputs, number_of_bits=2, number_of_runs=1, number_of_shots=1024, 
+                                     type_of_run="simulation", learning_rate=0.1, max_iterations=10, tolerance=0.25):
     """
     Optimize the quantum neural network parameters using gradient descent.
 
@@ -557,9 +575,14 @@ def multi_qubit_qNN_gradient_descent2(inputs, expected_outputs, number_of_bits=2
         # Check for convergence
         if new_error < tolerance:
             #print(f"Converged after {iteration+1} iterations.")
+            final_error = new_error
             final_number_of_iterations = iteration
             break
 
-        final_error = new_error
+        if new_error < final_error:
+            final_error = new_error
+            best_parameters = parameters.copy()
 
     return list(parameters), final_error, final_number_of_iterations
+
+
