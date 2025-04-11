@@ -1,5 +1,0 @@
-number of bits: 4
-    type of operation: XOR
-        2 inputs per qubit qNN
-            final weights: [np.float64(0.0), np.float64(-1.5707963267948966), np.float64(-3.141592653589793), np.float64(-3.141592653589793), np.float64(1.5707963267948966)]
-            final error: 0.487060546875

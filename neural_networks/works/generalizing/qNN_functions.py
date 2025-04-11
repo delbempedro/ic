@@ -27,6 +27,7 @@ import itertools
 from typing import List
 from functools import reduce
 import operator
+import random
 
 def compute_expected_outputs(inputs: List[List[int]], logic_gate: str = "XOR") -> List[str]:
     """
@@ -312,7 +313,7 @@ def multi_qubit_compute_error(inputs,expected_outputs,counts,number_of_bits=2):
 
     return error
 
-def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,number_of_runs=1,number_of_shots=1024,number_of_bits=2,type_of_run="simulation",number_of_inputs_per_qubit=3):
+def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,number_of_runs=1,number_of_shots=1024,number_of_bits=2,type_of_run="simulation",number_of_inputs_per_qubit=3, save_history=False, tolerance=0.25):
     """
     Perform an exaustive search of the parameter space to find the optimal parameters for the given inputs and expected outputs.
 
@@ -339,9 +340,18 @@ def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,numbe
     #initialize grid
     grid = np.linspace(-np.pi, np.pi, grid_grain)
 
+    #initialize history list
+    history_list = []
+
+    #initialize iteration counter
+    iteration = 0
+
     #exaustive search
     for parameters in itertools.product(grid, repeat=(number_of_bits+1)):
-        
+
+        #update iteration counter
+        iteration += 1
+
         #compute total error
         current_error = single_qubit_compute_total_error(inputs, expected_outputs, parameters, number_of_runs=number_of_runs, number_of_shots=number_of_shots, number_of_bits=number_of_bits, type_of_run=type_of_run, number_of_inputs_per_qubit=number_of_inputs_per_qubit)
 
@@ -350,13 +360,19 @@ def single_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=5,numbe
             final_error = current_error
             final_parameters = list(parameters)
 
-        if current_error < 1/4:
+        #save history
+        if save_history:
+            history_list.append(final_error)
+
+        if final_error < tolerance:
+            history_list.append(final_error)
+            return list(final_parameters), final_error, iteration, history_list  # convergiu
             break
 
     #return final parameters
-    return final_parameters, final_error
+    return final_parameters, final_error, iteration, history_list
 
-def multi_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=4,number_of_runs=1,number_of_shots=1024,number_of_bits=2,type_of_run="simulation"):
+def multi_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=4,number_of_runs=1,number_of_shots=1024,number_of_bits=2,type_of_run="simulation", save_history=False, tolerance=0.25):
     """
     Perform an exaustive search of the parameter space to find the optimal parameters for the quantum neural network.
 
@@ -382,8 +398,17 @@ def multi_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=4,number
     #initialize grid
     grid = np.linspace(-np.pi, np.pi, grid_grain)
 
+    #initialize history list
+    history_list = []
+
+    #initialize iteration counter
+    iterations = 0
+
     #exaustive search
     for parameters in itertools.product(grid, repeat=number_of_bits*2):
+
+        #update iteration counter
+        iterations += 1
                     
         counts = generate_multi_qubit_qNN_circuit(parameters,number_of_bits=number_of_bits).evaluate(number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run)
         current_error = multi_qubit_compute_error(inputs,expected_outputs,counts,number_of_bits=number_of_bits)
@@ -392,7 +417,16 @@ def multi_qubit_qNN_exaustive_search(inputs,expected_outputs,grid_grain=4,number
             final_error = current_error
             final_parameters = list(parameters)
 
-    return final_parameters, final_error
+        if final_error < tolerance:
+            history_list.append(final_error)
+            return list(final_parameters), final_error,iterations, history_list  # convergiu
+            break
+
+        #save history
+        if save_history:
+            history_list.append(final_error)
+
+    return final_parameters, final_error,iterations, history_list
 
 def compute_gradient_single_qubit(parameters, inputs, expected_outputs, number_of_bits, number_of_runs, number_of_shots, type_of_run, epsilon=1e-3, number_of_inputs_per_qubit=3):
     """
@@ -428,7 +462,7 @@ def compute_gradient_single_qubit(parameters, inputs, expected_outputs, number_o
 
 def single_qubit_qNN_gradient_descent(inputs, expected_outputs, number_of_bits=2, number_of_runs=1, number_of_shots=1024, 
                                       type_of_run="simulation", learning_rate=0.1, max_iterations=100, tolerance=0.25, 
-                                      number_of_inputs_per_qubit=3):
+                                      number_of_inputs_per_qubit=3, save_history=False):
     """
     Optimize the quantum neural network parameters using independent gradient descent updates.
     """
@@ -446,6 +480,9 @@ def single_qubit_qNN_gradient_descent(inputs, expected_outputs, number_of_bits=2
     # Store the best parameters
     best_parameters = parameters.copy()
     final_number_of_iterations = max_iterations
+
+    # Initialize history list
+    history_list = []
 
     for iteration in range(max_iterations):
         # Compute gradient
@@ -473,16 +510,104 @@ def single_qubit_qNN_gradient_descent(inputs, expected_outputs, number_of_bits=2
         # Reduce learning rate over time
         learning_rate *= 0.99
 
+        #save history
+        if save_history:
+            history_list.append(final_error)
+
         # Check for convergence
         if final_error < tolerance:
             print(f"Converged after {iteration+1} iterations.")
             final_number_of_iterations = iteration
+            history_list.append(final_error)
             break
 
-    return list(best_parameters), final_error, final_number_of_iterations
+    return list(best_parameters), final_error, final_number_of_iterations, history_list
 
+def single_qubit_qNN_random_search(inputs, expected_outputs, number_of_bits=2, number_of_inputs_per_qubit=3,
+                                     number_of_runs=1, number_of_shots=1024, type_of_run="simulation", max_iterations=1000, tolerance=0.25, save_history=False):
+    best_error = float("inf")
+    best_params = None
 
-def compute_gradient(parameters, inputs, expected_outputs, number_of_bits, number_of_runs, number_of_shots, type_of_run, epsilon=1e-3):
+    # Initialize history list
+    history_list = []
+
+    for iterations in range(max_iterations):
+
+        iterations += 1
+
+        params = np.random.uniform(-np.pi, np.pi, size=number_of_bits + 1)
+        error = single_qubit_compute_total_error(
+            inputs, expected_outputs, params,
+            number_of_runs=number_of_runs, number_of_shots=number_of_shots,
+            number_of_bits=number_of_bits, type_of_run=type_of_run,
+            number_of_inputs_per_qubit=number_of_inputs_per_qubit
+        )
+
+        if error < best_error:
+            best_error = error
+            best_params = params.copy()
+
+        if best_error < tolerance:
+            history_list.append(best_error)
+            return list(best_params), best_error, iterations+1, history_list  # convergiu
+        
+                #save history
+        if save_history:
+            history_list.append(best_error)
+
+    return list(best_params), best_error, max_iterations, history_list
+
+def single_qubit_qNN_simulated_annealing(inputs, expected_outputs, number_of_bits=2, number_of_inputs_per_qubit=3,
+                                          number_of_runs=1, number_of_shots=1024, type_of_run="simulation",
+                                          initial_temp=1.0, final_temp=1e-3, alpha=0.95, max_iterations=1000, tolerance=0.25, save_history=False):
+    current_params = np.random.uniform(-np.pi, np.pi, size=number_of_bits + 1)
+    current_error = single_qubit_compute_total_error(
+        inputs, expected_outputs, current_params,
+        number_of_runs=number_of_runs, number_of_shots=number_of_shots,
+        number_of_bits=number_of_bits, type_of_run=type_of_run,
+        number_of_inputs_per_qubit=number_of_inputs_per_qubit
+    )
+    best_params = current_params.copy()
+    best_error = current_error
+
+    temperature = initial_temp
+
+    # Initialize history list
+    history_list = []
+
+    for iteration in range(max_iterations):
+        if temperature < final_temp or best_error < tolerance:
+            history_list.append(best_error)
+            return list(best_params), best_error, iteration + 1, history_list
+            break
+
+        new_params = current_params + np.random.normal(0, 0.1, size=len(current_params))
+        new_params = np.mod(new_params + np.pi, 2 * np.pi) - np.pi
+
+        new_error = single_qubit_compute_total_error(
+            inputs, expected_outputs, new_params,
+            number_of_runs=number_of_runs, number_of_shots=number_of_shots,
+            number_of_bits=number_of_bits, type_of_run=type_of_run,
+            number_of_inputs_per_qubit=number_of_inputs_per_qubit
+        )
+
+        delta = new_error - current_error
+        if delta < 0 or np.exp(-delta / temperature) > np.random.rand():
+            current_params = new_params
+            current_error = new_error
+            if new_error < best_error:
+                best_params = new_params.copy()
+                best_error = new_error
+
+        #save history
+        if save_history:
+            history_list.append(best_error)
+
+        temperature *= alpha
+
+    return list(best_params), best_error, iteration + 1, history_list
+
+def compute_gradient_multi_qubit(parameters, inputs, expected_outputs, number_of_bits, number_of_runs, number_of_shots, type_of_run, epsilon=1e-3, save_history=False):
     """
     Compute the gradient of the error function using finite differences.
 
@@ -526,7 +651,7 @@ def compute_gradient(parameters, inputs, expected_outputs, number_of_bits, numbe
 
 
 def multi_qubit_qNN_gradient_descent(inputs, expected_outputs, number_of_bits=2, number_of_runs=1, number_of_shots=1024, 
-                                     type_of_run="simulation", learning_rate=0.1, max_iterations=10, tolerance=0.25):
+                                     type_of_run="simulation", learning_rate=0.1, max_iterations=10, tolerance=0.25, save_history=False):
     """
     Optimize the quantum neural network parameters using gradient descent.
 
@@ -559,9 +684,12 @@ def multi_qubit_qNN_gradient_descent(inputs, expected_outputs, number_of_bits=2,
     #Initializes final number of interations
     final_number_of_iterations = max_iterations
 
+    # Initialize history list
+    history_list = []
+
     for iteration in range(max_iterations):
         # Compute gradient
-        gradient = compute_gradient(parameters, inputs, expected_outputs, number_of_bits, number_of_runs, number_of_shots, type_of_run)
+        gradient = compute_gradient_multi_qubit(parameters, inputs, expected_outputs, number_of_bits, number_of_runs, number_of_shots, type_of_run)
 
         # Update parameters
         parameters -= learning_rate * gradient
@@ -577,12 +705,183 @@ def multi_qubit_qNN_gradient_descent(inputs, expected_outputs, number_of_bits=2,
             #print(f"Converged after {iteration+1} iterations.")
             final_error = new_error
             final_number_of_iterations = iteration
+            history_list.append(final_error)
+            return list(parameters), final_error, final_number_of_iterations, history_list
             break
 
         if new_error < final_error:
             final_error = new_error
             best_parameters = parameters.copy()
 
-    return list(parameters), final_error, final_number_of_iterations
+        #save history
+        if save_history:
+            history_list.append(final_error)
 
+    return list(parameters), final_error, final_number_of_iterations, history_list
 
+def multi_qubit_qNN_simulated_annealing(inputs, expected_outputs, number_of_bits=2,
+                                         number_of_runs=1, number_of_shots=1024, type_of_run="simulation",
+                                         initial_temp=1.0, final_temp=1e-3, alpha=0.95, max_iterations=1000, tolerance=0.25, save_history=False):
+    current_params = np.random.uniform(-np.pi, np.pi, size=number_of_bits * 2)
+    counts = generate_multi_qubit_qNN_circuit(current_params, number_of_bits=number_of_bits).evaluate(
+        number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run
+    )
+    current_error = multi_qubit_compute_error(inputs, expected_outputs, counts, number_of_bits=number_of_bits)
+    best_params = current_params.copy()
+    best_error = current_error
+
+    temperature = initial_temp
+
+    # Initialize history list
+    history_list = []
+
+    for iteration in range(max_iterations):
+        if temperature < final_temp or best_error < tolerance:
+            history_list.append(best_error)
+            return list(best_params), best_error, iteration + 1, history_list
+            break
+
+        new_params = current_params + np.random.normal(0, 0.1, size=len(current_params))
+        new_params = np.mod(new_params + np.pi, 2 * np.pi) - np.pi
+
+        counts = generate_multi_qubit_qNN_circuit(new_params, number_of_bits=number_of_bits).evaluate(
+            number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run
+        )
+        new_error = multi_qubit_compute_error(inputs, expected_outputs, counts, number_of_bits=number_of_bits)
+
+        delta = new_error - current_error
+        if delta < 0 or np.exp(-delta / temperature) > np.random.rand():
+            current_params = new_params
+            current_error = new_error
+            if new_error < best_error:
+                best_params = new_params.copy()
+                best_error = new_error
+
+        if save_history:
+            history_list.append(best_error)
+
+        temperature *= alpha
+
+    return list(best_params), best_error, iteration + 1, history_list
+
+def multi_qubit_qNN_random_search(inputs, expected_outputs, number_of_bits=2,
+                                   number_of_runs=1, number_of_shots=1024, type_of_run="simulation", max_iterations=1000, tolerance=0.25, save_history=False):
+    best_error = float("inf")
+    best_params = None
+
+    # Initialize history list
+    history_list = []
+
+    for iteration in range(max_iterations):
+        params = np.random.uniform(-np.pi, np.pi, size=number_of_bits * 2)
+        counts = generate_multi_qubit_qNN_circuit(params, number_of_bits=number_of_bits).evaluate(
+            number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run
+        )
+        error = multi_qubit_compute_error(inputs, expected_outputs, counts, number_of_bits=number_of_bits)
+
+        if error < best_error:
+            best_error = error
+            best_params = params.copy()
+
+        if best_error < tolerance:
+            history_list.append(best_error)
+            return list(best_params), best_error, iteration + 1, history_list  # convergiu
+        
+        if save_history:
+            history_list.append(best_error)
+
+    return list(best_params), best_error, max_iterations, history_list
+
+def single_qubit_qNN_genetic_algorithm(inputs, expected_outputs, population_size=20, generations=100, mutation_rate=0.1, number_of_runs=1, number_of_shots=1024, number_of_bits=2, type_of_run="simulation", number_of_inputs_per_qubit=3, tolerance=0.25, save_history=False):
+
+    def evaluate(individual):
+        return single_qubit_compute_total_error(inputs, expected_outputs, individual,
+                                                number_of_runs, number_of_shots, number_of_bits,
+                                                type_of_run, number_of_inputs_per_qubit)
+
+    def select_parents(population, errors):
+        fitness = [1 / (1 + e) for e in errors]
+        total = sum(fitness)
+        probabilities = [f / total for f in fitness]
+        return random.choices(population, probabilities, k=2)
+
+    def crossover(p1, p2):
+        point = random.randint(1, len(p1) - 1)
+        return p1[:point] + p2[point:], p2[:point] + p1[point:]
+
+    def mutate(individual):
+        return [x + random.uniform(-np.pi / 10, np.pi / 10) if random.random() < mutation_rate else x for x in individual]
+
+    # Inicialização
+    param_len = number_of_bits + 1
+    population = [list(np.random.uniform(-np.pi, np.pi, param_len)) for _ in range(population_size)]
+    history = []
+
+    for gen in range(generations):
+        errors = [evaluate(ind) for ind in population]
+        best_idx = int(np.argmin(errors))
+        best_ind = population[best_idx]
+        best_error = errors[best_idx]
+
+        if save_history:
+            history.append(best_error)
+
+        if best_error < tolerance:
+            return best_ind, best_error, gen, history
+
+        new_population = []
+        while len(new_population) < population_size:
+            p1, p2 = select_parents(population, errors)
+            c1, c2 = crossover(p1, p2)
+            new_population.extend([mutate(c1), mutate(c2)])
+
+        population = new_population[:population_size]
+
+    return best_ind, best_error, generations, history
+
+def multi_qubit_qNN_genetic_algorithm(inputs, expected_outputs, population_size=20, generations=100, mutation_rate=0.1, number_of_runs=1, number_of_shots=1024, number_of_bits=2, type_of_run="simulation", tolerance=0.25, save_history=False):
+
+    def evaluate(individual):
+        counts = generate_multi_qubit_qNN_circuit(individual, number_of_bits).evaluate(
+            number_of_runs, number_of_shots, type_of_run)
+        return multi_qubit_compute_error(inputs, expected_outputs, counts, number_of_bits)
+
+    def select_parents(population, errors):
+        fitness = [1 / (1 + e) for e in errors]
+        total = sum(fitness)
+        probabilities = [f / total for f in fitness]
+        return random.choices(population, probabilities, k=2)
+
+    def crossover(p1, p2):
+        point = random.randint(1, len(p1) - 1)
+        return p1[:point] + p2[point:], p2[:point] + p1[point:]
+
+    def mutate(individual):
+        return [x + random.uniform(-np.pi / 10, np.pi / 10) if random.random() < mutation_rate else x for x in individual]
+
+    # Inicialização
+    param_len = number_of_bits * 2
+    population = [list(np.random.uniform(-np.pi, np.pi, param_len)) for _ in range(population_size)]
+    history = []
+
+    for gen in range(generations):
+        errors = [evaluate(ind) for ind in population]
+        best_idx = int(np.argmin(errors))
+        best_ind = population[best_idx]
+        best_error = errors[best_idx]
+
+        if save_history:
+            history.append(best_error)
+
+        if best_error < tolerance:
+            return best_ind, best_error, gen, history
+
+        new_population = []
+        while len(new_population) < population_size:
+            p1, p2 = select_parents(population, errors)
+            c1, c2 = crossover(p1, p2)
+            new_population.extend([mutate(c1), mutate(c2)])
+
+        population = new_population[:population_size]
+
+    return best_ind, best_error, generations, history
