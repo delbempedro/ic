@@ -23,9 +23,9 @@ import numpy as np # type: ignore
 #do my necessary imports
 from trainer_utils import *
 
-class current_circuit():
+class trainer_qNN():
     
-    def __init__(self,grid_grain=10,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation", save_history=False, tolerance=0.25, logic_gate="XOR", type_of_enconding="phase", number_of_inputs_per_qubit=2):
+    def __init__(self,grid_grain=10,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation", save_history=False, tolerance=0.25, logic_gate="XOR", type_of_enconding=None, number_of_inputs_per_qubit=2):
         """
         Create trainer for the quantum neural network.
         """
@@ -42,12 +42,16 @@ class current_circuit():
         self._type_of_enconding = type_of_enconding
         if type_of_enconding == "phase":
             self._number_of_inputs_per_qubit = number_of_inputs_per_qubit
+        elif type_of_enconding != "amplitude":
+            raise ValueError("Invalid type of enconding.")
         if save_history:
             self.history_list = []
         else:
             self.history_list = None
         self._inputs = [list(t) for t in product([0, 1], repeat=self._number_of_inputs)]
         self._expected_outputs = compute_expected_outputs(self._inputs, logic_gate=self._logic_gate)
+
+        self._control_flag = False
 
     def get_results(self):
         """
@@ -56,60 +60,69 @@ class current_circuit():
         if type(self._final_parameters) == None:
             raise ValueError("The qNN has not been trained.")
         else:
-            return self._final_parameters, self._final_error, self._final_number_of_iteration, self._history_list
+            #define dictonary
+            dictonary_with_results = {"Final Parameters": [float(parameter) for parameter in self._final_parameters], "Final Error": self._final_error, "Number of Iterations": self._final_number_of_iterations, "History List": self._history_list}
+
+            return dictonary_with_results
     
-    def train(self, type_of_training="exaustive"):
+    def train(self, type_of_training=None):
         """
         Train the quantum neural network.
         """
-        if type_of_training == "exaustive":
+        #switch control flag
+        self._control_flag = True
+
+        if type_of_training == "exaustive_search":
 
             if self._type_of_enconding == "amplitude":
 
-                return self.amplitude_qNN_exaustive_search(self)
+                return self.amplitude_qNN_exaustive_search()
             else:
 
-                return self.phase_qNN_exaustive_search(self)
+                return self.phase_qNN_exaustive_search()
             
         elif type_of_training == "gradient_descent":
 
             if self._type_of_enconding == "amplitude":
 
-                return self.amplitude_qNN_gradient_descent(self)
+                return self.amplitude_qNN_gradient_descent()
             else:
 
-                return self.phase_qNN_gradient_descent(self)
+                return self.phase_qNN_gradient_descent()
             
         elif type_of_training == "random_search":
 
             if self._type_of_enconding == "amplitude":
 
-                return self.amplitude_qNN_random_search(self)
+                return self.amplitude_qNN_random_search()
             else:
 
-                return self.phase_qNN_random_search(self)
+                return self.phase_qNN_random_search()
             
         elif type_of_training == "simulated_annealing":
 
             if self._type_of_enconding == "amplitude":
 
-                return self.amplitude_qNN_simulated_annealing(self)
+                return self.amplitude_qNN_simulated_annealing()
             else:
 
-                return self.phase_qNN_simulated_annealing(self)
+                return self.phase_qNN_simulated_annealing()
             
         elif type_of_training == "genetic_algorithm":
 
             if self._type_of_enconding == "amplitude":
 
-                return self.amplitude_qNN_genetic_algorithm(self)
+                return self.amplitude_qNN_genetic_algorithm()
             else:
 
-                return self.phase_qNN_genetic_algorithm(self)
+                return self.phase_qNN_genetic_algorithm()
 
         else:
 
             raise ValueError("Invalid type of training.")
+
+        #switch control flag
+        self._control_flag = False
 
     def phase_qNN_exaustive_search(self):
         """
@@ -125,44 +138,48 @@ class current_circuit():
         Returns:
         The optimal parameters (list of floats), the total error (float) of the optimal parameters, number of iterations (int) and history list of errors (list of floats).
         """
+        if self._control_flag:
+            #initialize final error
+            self._final_error = 1
 
-        #initialize final error
-        self._final_error = 1
+            #initialize final parameters
+            self._final_parameters = [0]*(self._number_of_inputs+1)
 
-        #initialize final parameters
-        self._final_parameters = [0]*(self._number_of_inputs+1)
+            #initialize grid
+            grid = np.linspace(-np.pi, np.pi, self._grid_grain)
 
-        #initialize grid
-        grid = np.linspace(-np.pi, np.pi, self._grid_grain)
+            #initialize history list
+            self._history_list = []
 
-        #initialize history list
-        self._history_list = []
+            #initialize iteration counter
+            self._final_number_of_iterations = 0
 
-        #initialize iteration counter
-        self._final_number_of_iteration = 0
+            #exaustive search
+            for parameters in product(grid, repeat=(self._number_of_inputs+1)):
 
-        #exaustive search
-        for parameters in product(grid, repeat=(self._number_of_inputs+1)):
+                #update iteration counter
+                self._final_number_of_iterations += 1
 
-            #update iteration counter
-            self._final_number_of_iteration += 1
+                #compute total error
+                current_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
 
-            #compute total error
-            current_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
+                #update final error and final parameters
+                self._final_parameters, self._final_error = update_if_better(current_error, self._final_parameters, self._final_error, parameters)
 
-            #update final error and final parameters
-            self._final_parameters, self._final_error = update_if_better(current_error, self._final_parameters, self._final_error, parameters)
+                #save history
+                if self.save_history:
+                    self._history_list.append(self._final_error)
 
-            #save history
-            if self.save_history:
-                self._history_list.append(self._final_error)
+                #check convergence
+                if self._final_error < self.tolerance:
+                    return self.get_results()
 
-            #check convergence
-            if self._final_error < self.tolerance:
-                return self.get_results(self)
+            #return final parameters
+            return self.get_results()
 
-        #return final parameters
-        return self.get_results(self)
+        else:
+
+            raise ValueError("The method cannot be called directly.")
     
     def amplitude_qNN_exaustive_search(self):
         """
@@ -178,44 +195,48 @@ class current_circuit():
         Returns:
         The optimal parameters (list of floats), the total error (float) of the optimal parameters, number of iterations (int) and history list of errors (list of floats).
         """
+        if self._control_flag:
+            #initialize final error
+            self._final_error = 1
 
-        #initialize final error
-        self._final_error = 1
+            #initialize final parameters
+            self._final_parameters = [0]*self._number_of_inputs
 
-        #initialize final parameters
-        self._final_parameters = [0]*self._number_of_inputs
+            #initialize grid
+            grid = np.linspace(-np.pi, np.pi, self._grid_grain)
 
-        #initialize grid
-        grid = np.linspace(-np.pi, np.pi, self._grid_grain)
+            #initialize history list
+            self._history_list = []
 
-        #initialize history list
-        self._history_list = []
+            #initialize iteration counter
+            self._final_number_of_iterations = 0
 
-        #initialize iteration counter
-        self._final_number_of_iteration = 0
+            #exaustive search
+            for parameters in product(grid, repeat=self._number_of_inputs*2):
 
-        #exaustive search
-        for parameters in product(grid, repeat=self._number_of_inputs*2):
+                #update iteration counter
+                self._final_number_of_iterations += 1
 
-            #update iteration counter
-            self._final_number_of_iteration += 1
+                #update current error and parameters
+                counts = generate_amplitude_qNN_circuit(parameters,number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
+                current_error = amplitude_qNN_compute_error(self._inputs,self._expected_outputs,counts,number_of_inputs=self._number_of_inputs)
 
-            #update current error and parameters
-            counts = generate_amplitude_qNN_circuit(parameters,number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
-            current_error = amplitude_qNN_compute_error(self._inputs,self._expected_outputs,counts,number_of_inputs=self._number_of_inputs)
+                #update final error and final parameters
+                self._final_parameters, self._final_error = update_if_better(current_error, self._final_parameters, self._final_error, parameters)
 
-            #update final error and final parameters
-            self._final_parameters, self._final_error = update_if_better(current_error, self._final_parameters, self._final_error, parameters)
+                #save history
+                if self._save_history:
+                    self._history_list.append(self._final_error)
 
-            #save history
-            if self._save_history:
-                self._history_list.append(self._final_error)
+                #check convergence
+                if self._final_error < self._tolerance:
+                    return self.get_results()
 
-            #check convergence
-            if self._final_error < self._tolerance:
-                return self.get_results(self)
+            return self.get_results()
+        
+        else:
 
-        return self.get_results(self)
+            raise ValueError("The method cannot be called directly.")
 
     def phase_qNN_gradient_descent(self):
         """
@@ -227,48 +248,52 @@ class current_circuit():
         Returns:
         The optimal parameters (list of floats), the total error (float) of the optimal parameters, number of iterations (int) and history list of errors (list of floats).
         """
+        if self._control_flag:
+            #initialize parameters randomly within [-pi, pi]
+            parameters = np.random.uniform(-np.pi, np.pi, size=(self._number_of_inputs + 1))
 
-        #initialize parameters randomly within [-pi, pi]
-        parameters = np.random.uniform(-np.pi, np.pi, size=(self._number_of_inputs + 1))
+            #initialize final error and final parameters
+            self._final_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
+            self._final_parameters = parameters.copy()
 
-        #initialize final error and final parameters
-        self._final_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
-        self._final_parameters = parameters.copy()
+            #define the learning rate
+            learning_rate = 0.1
 
-        #define the learning rate
-        learning_rate = 0.1
+            #initialize history list
+            self._history_list = []
 
-        #initialize history list
-        self._history_list = []
+            #gradient descent
+            for iteration in range(self._max_iterations):
 
-        #gradient descent
-        for iteration in range(self._max_iterations):
+                #atualize iteration counter
+                self._final_number_of_iterations = iteration
 
-            #atualize iteration counter
-            self._final_number_of_iteration = iteration
+                #compute gradient
+                gradient = phase_qNN_compute_gradient(parameters, self._inputs, self._expected_outputs, self._number_of_inputs, self._number_of_runs, self._number_of_shots, self._type_of_run)
 
-            #compute gradient
-            gradient = phase_qNN_compute_gradient(parameters, self._inputs, self._expected_outputs, self._number_of_inputs, self._number_of_runs, self._number_of_shots, self._type_of_run)
+                #update parameters
+                parameters -= learning_rate * gradient
 
-            #update parameters
-            parameters -= learning_rate * gradient
+                #compute current error
+                counts = generate_phase_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
+                current_error = phase_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
 
-            #compute current error
-            counts = generate_phase_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
-            current_error = phase_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
+                #update final error and final parameters
+                self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
 
-            #update final error and final parameters
-            self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
+                #save history
+                if self._save_history:
+                    self._history_list.append(self._final_error)
 
-            #save history
-            if self._save_history:
-                self._history_list.append(self._final_error)
+                #check for convergence
+                if current_error < self._tolerance:
+                    return self.get_results()
 
-            #check for convergence
-            if current_error < self._tolerance:
-                return self.get_results(self)
+            return self.get_results()
+        
+        else:
 
-        return self.get_results(self)
+            raise ValueError("The method cannot be called directly.")
 
     def amplitude_qNN_gradient_descent(self):
         """
@@ -280,48 +305,52 @@ class current_circuit():
         Returns:
         The optimal parameters (list of floats), the total error (float) of the optimal parameters, number of iterations (int) and history list of errors (list of floats).
         """
-
-        #initialize parameters randomly within [-pi, pi]
-        parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs * 2)
-        
-        #initialize final error
-        counts = generate_amplitude_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
-        self._final_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
-
-        #define learning rate
-        learning_rate = 0.1
-
-        #initialize history list
-        self._history_list = []
-
-        #gradient descent
-        for iteration in range(self._max_iterations):
-
-            #atualize iteration counter
-            self._final_number_of_iteration = iteration
-
-            #compute gradient
-            gradient = amplitude_qNN_compute_gradient(parameters, self._inputs, self._expected_outputs, self._number_of_inputs, self._number_of_runs, self._number_of_shots, self._type_of_run)
-
-            #update parameters
-            parameters -= learning_rate * gradient
-
-            #compute current error
+        if self._control_flag:
+            #initialize parameters randomly within [-pi, pi]
+            parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs * 2)
+            
+            #initialize final error
             counts = generate_amplitude_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
-            current_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
+            self._final_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
 
-            #update final error and final parameters
-            self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
+            #define learning rate
+            learning_rate = 0.1
 
-            #save history
-            if self._save_history:
-                self._history_list.append(self._final_error)
+            #initialize history list
+            self._history_list = []
 
-            #check for convergence
-            if current_error < self._tolerance:
-                return self.get_results(self)
+            #gradient descent
+            for iteration in range(self._max_iterations):
 
-        return self.get_results(self)
+                #atualize iteration counter
+                self._final_number_of_iterations = iteration
+
+                #compute gradient
+                gradient = amplitude_qNN_compute_gradient(parameters, self._inputs, self._expected_outputs, self._number_of_inputs, self._number_of_runs, self._number_of_shots, self._type_of_run)
+
+                #update parameters
+                parameters -= learning_rate * gradient
+
+                #compute current error
+                counts = generate_amplitude_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
+                current_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
+
+                #update final error and final parameters
+                self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
+
+                #save history
+                if self._save_history:
+                    self._history_list.append(self._final_error)
+
+                #check for convergence
+                if current_error < self._tolerance:
+                    return self.get_results()
+
+            return self.get_results()
+        
+        else:
+
+            raise ValueError("The method cannot be called directly.")
 
     def phase_qNN_random_search(self):
         """
@@ -337,37 +366,41 @@ class current_circuit():
         Returns:
         The optimal parameters (list of floats), the total error (float) of the optimal parameters, number of iterations (int) and history list of errors (list of floats).
         """
+        if self._control_flag:
+            #initialize final error and final parameters
+            self._final_error = 1.1 #maximum possible error is 1.0
+            self._final_parameters = None
 
-        #initialize final error and final parameters
-        self._final_error = 1.1 #maximum possible error is 1.0
-        self._final_parameters = None
+            #initialize history list
+            self._history_list = []
 
-        #initialize history list
-        self._history_list = []
+            #random search
+            for iteration in range(self._max_iterations):
 
-        #random search
-        for iterations in range(self._max_iterations):
+                #atualize iteration counter
+                self._final_number_of_iterations = iteration
 
-            #atualize iteration counter
-            self._final_number_of_iterations = iterations
+                #update parameters and current error
+                parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs + 1)
+                current_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
 
-            #update parameters and current error
-            parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs + 1)
-            current_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
+                #update final error and final parameters
+                self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
 
-            #update final error and final parameters
-            self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
+                #check for convergence
+                if self._final_error < self._tolerance:
+                    self._history_list.append(self._final_error)
+                    return self.get_results()
+                
+                #save history
+                if self._save_history:
+                    self._history_list.append(self._final_error)
 
-            #check for convergence
-            if self._final_error < self._tolerance:
-                self._history_list.append(self._final_error)
-                return self.get_results(self)
-            
-            #save history
-            if self._save_history:
-                self._history_list.append(self._final_error)
+            return self.get_results()
+        
+        else:
 
-        return self.get_results(self)
+            raise ValueError("The method cannot be called directly.")
     
     def amplitude_qNN_random_search(self):
         """
@@ -383,37 +416,41 @@ class current_circuit():
         Returns:
         The optimal parameters (list of floats), the total error (float) of the optimal parameters, number of iterations (int) and history list of errors (list of floats).
         """
+        if self._control_flag:
+            #initialize final parameters and final error
+            self._final_error = 1.1 #maximum possible error is 1.0
+            self._final_parameters = None
 
-        #initialize final parameters and final error
-        self._final_error = 1.1 #maximum possible error is 1.0
-        self._final_parameters = None
+            #initialize history list
+            self._history_list = []
 
-        #initialize history list
-        self._history_list = []
+            #randam search
+            for iteration in range(self._max_iterations):
 
-        #randam search
-        for iteration in range(self._max_iterations):
+                #atualize iteration counter
+                self._final_number_of_iterations = iteration
 
-            #atualize iteration counter
-            self._final_number_of_iteration = iteration
+                #update parameters and current error
+                parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs * 2)
+                counts = generate_amplitude_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
+                current_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
 
-            #update parameters and current error
-            parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs * 2)
-            counts = generate_amplitude_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
-            current_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
+                #update final error and final parameters
+                self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
 
-            #update final error and final parameters
-            self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
+                #save history
+                if self._save_history:
+                    self._history_list.append(self._final_error)
 
-            #save history
-            if self._save_history:
-                self._history_list.append(self._final_error)
+                #check convergence
+                if self._final_error < self._tolerance:
+                    return self.get_results()
 
-            #check convergence
-            if self._final_error < self._tolerance:
-                return self.get_results(self)
+            return self.get_results()
+        
+        else:
 
-        return self.get_results(self)
+            raise ValueError("The method cannot be called directly.")
 
     def phase_qNN_simulated_annealing(self):
         """
@@ -431,63 +468,67 @@ class current_circuit():
         Returns:
         The optimal parameters (list of floats), the total error (float) of the optimal parameters, number of iterations (int) and history list of errors (list of floats).
         """
-        
-        #initialize parameters and current error
-        parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs + 1)
-        current_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inpus=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
-        
-        #initialize final error and final parameters
-        self._final_parameters = parameters.copy()
-        self._final_error = current_error
-
-        #define initial and final temperature
-        temperature = 1.0
-        final_temperature = 1e-3
-
-        #define alpha
-        alpha = 0.95
-
-        #initialize history list
-        self._history_list = []
-
-        #simulated annealing
-        for iteration in range(self._max_iterations):
-
-            #atualize iteration counter
-            self._final_number_of_iteration = iteration
-
-            #update new parameters
-            new_parameters = parameters + np.random.normal(0, 0.1, size=len(parameters))
-            new_parameters = np.mod(new_parameters + np.pi, 2 * np.pi) - np.pi
-
-            #update new error
-            new_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, new_parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
-
-            #update delta
-            delta = new_error - current_error
-
-            #accept or reject
-            if delta < 0 or np.exp(-delta / temperature) > np.random.rand():
-
-                #atualize parameters and current error
-                parameters = new_parameters
-                current_error = new_error
-
-                #update final error and final parameters
-                self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
-
-            #save history
-            if self._save_history:
-                self._history_list.append(self._final_error)
-
-            #check convergence
-            if temperature < final_temperature or self._final_error < self._tolerance:
-                return self.get_results(self)
+        if self._control_flag:
+            #initialize parameters and current error
+            parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs + 1)
+            current_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
             
-            #update temperature
-            temperature *= alpha
+            #initialize final error and final parameters
+            self._final_parameters = parameters.copy()
+            self._final_error = current_error
 
-        return self.get_results(self)
+            #define initial and final temperature
+            temperature = 1.0
+            final_temperature = 1e-3
+
+            #define alpha
+            alpha = 0.95
+
+            #initialize history list
+            self._history_list = []
+
+            #simulated annealing
+            for iteration in range(self._max_iterations):
+
+                #atualize iteration counter
+                self._final_number_of_iterations = iteration
+
+                #update new parameters
+                new_parameters = parameters + np.random.normal(0, 0.1, size=len(parameters))
+                new_parameters = np.mod(new_parameters + np.pi, 2 * np.pi) - np.pi
+
+                #update new error
+                new_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, new_parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
+
+                #update delta
+                delta = new_error - current_error
+
+                #accept or reject
+                if delta < 0 or np.exp(-delta / temperature) > np.random.rand():
+
+                    #atualize parameters and current error
+                    parameters = new_parameters
+                    current_error = new_error
+
+                    #update final error and final parameters
+                    self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
+
+                #save history
+                if self._save_history:
+                    self._history_list.append(self._final_error)
+
+                #check convergence
+                if temperature < final_temperature or self._final_error < self._tolerance:
+                    return self.get_results()
+                
+                #update temperature
+                temperature *= alpha
+
+            return self.get_results()
+        
+        else:
+
+            raise ValueError("The method cannot be called directly.")
 
     def amplitude_qNN_simulated_annealing(self):
         """
@@ -506,65 +547,69 @@ class current_circuit():
         The optimal parameters (list of floats), the total error (float) of the optimal parameters,
         number of iterations (int), and history list of errors (list of floats).
         """
+        if self._control_flag:
+            #initialize parameters and current error
+            parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs * 2)
+            counts = generate_amplitude_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
+            current_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
+                    
+            #initialize final error and final parameters
+            self._final_parameters = parameters.copy()
+            self._final_error = current_error
+
+            #define initial and final temperature
+            temperature = 1.0
+            final_temperature = 1e-3
+
+            #define alpha
+            alpha = 0.95
+
+            #initialize history list
+            self._history_list = []
+
+            #simulated annealing
+            for iteration in range(self._max_iterations):
+
+                #atualize iteration counter
+                self._final_number_of_iterations = iteration
+
+                #update new parameters
+                new_parameters = parameters + np.random.normal(0, 0.1, size=len(parameters))
+                new_parameters = np.mod(new_parameters + np.pi, 2 * np.pi) - np.pi
+
+                #update new error
+                counts = generate_amplitude_qNN_circuit(new_parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
+                new_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
+
+                #update delta
+                delta = new_error - current_error
+
+                #accept or reject
+                if delta < 0 or np.exp(-delta / temperature) > np.random.rand():
+
+                    #atualize parameters and current error
+                    parameters = new_parameters
+                    current_error = new_error
+                    
+                    self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
+
+                #save history
+                if self._save_history:
+                    self._history_list.append(self._final_error)
+
+                #check convergence
+                if temperature < final_temperature or self._final_error < self._tolerance:
+                    return self.get_results()
+
+                #update temperature
+                temperature *= alpha
+
+            return self.get_results()
         
-        #initialize parameters and current error
-        parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs * 2)
-        counts = generate_amplitude_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
-        current_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
-                
-        #initialize final error and final parameters
-        self._final_parameters = parameters.copy()
-        self._final_error = current_error
+        else:
 
-        #define initial and final temperature
-        temperature = 1.0
-        final_temperature = 1e-3
-
-        #define alpha
-        alpha = 0.95
-
-        #initialize history list
-        self._history_list = []
-
-        #simulated annealing
-        for iteration in range(self._max_iterations):
-
-            #atualize iteration counter
-            self._final_number_of_iteration = iteration
-
-            #update new parameters
-            new_parameters = parameters + np.random.normal(0, 0.1, size=len(parameters))
-            new_parameters = np.mod(new_parameters + np.pi, 2 * np.pi) - np.pi
-
-            #update new error
-            counts = generate_amplitude_qNN_circuit(new_parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self.t_ype_of_run)
-            new_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
-
-            #update delta
-            delta = new_error - current_error
-
-            #accept or reject
-            if delta < 0 or np.exp(-delta / temperature) > np.random.rand():
-
-                #atualize parameters and current error
-                parameters = new_parameters
-                current_error = new_error
-                
-                self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
-
-            #save history
-            if self._save_history:
-                self._history_list.append(self._final_error)
-
-            #check convergence
-            if temperature < final_temperature or self._final_error < self._tolerance:
-                return self.get_results(self)
-
-            #update temperature
-            temperature *= alpha
-
-        return self.get_results(self)
-    
+            raise ValueError("The method cannot be called directly.")
+        
     def phase_qNN_genetic_algorithm(self):
         """
         Perform a genetic algorithm to find optimal parameters for the phase quantum neural network.
@@ -581,53 +626,57 @@ class current_circuit():
         Returns:
         The optimal parameters (list of floats), the total error (float) of the optimal parameters, number of iterations (int) and history list of errors (list of floats).
         """
+        if self._control_flag:
+            #define constants
+            population_size = 20
+            mutation_rate = 0.1
 
-        #define constants
-        population_size = 20
-        mutation_rate = 0.1
+            #initialize population
+            population = [list(np.random.uniform(-np.pi, np.pi, self._number_of_inputs + 1)) for _ in range(population_size)]
+            
+            #initialize history list
+            self._history_list = []
 
-        #initialize population
-        population = [list(np.random.uniform(-np.pi, np.pi, self._number_of_inputs + 1)) for _ in range(population_size)]
+            for generation in range(self._max_iterations):
+
+                #atualize iteration counter
+                self._final_number_of_iterations = generation
+
+                #compute errors
+                errors = [phase_qNN_evaluate(individual) for individual in population]
+
+                #get best error
+                best_idx = int(np.argmin(errors))
+
+                #update final parameters and final error
+                self._final_parameters = population[best_idx]
+                self._final_error = errors[best_idx]
+
+                #save history
+                if self._save_history:
+                    self._history_list.append(self._final_error)
+
+                #check convergence
+                if self._final_error < self._tolerance:
+                    return self.get_results()
+
+                #create new population list
+                new_population = []
+
+                #generate descendents
+                while len(new_population) < population_size:
+                    p1, p2 = select_parents(population, errors)
+                    c1, c2 = crossover(p1, p2)
+                    new_population.extend([mutate(c1, mutation_rate=mutation_rate), mutate(c2, mutation_rate=mutation_rate)])
+
+                #update population
+                population = new_population[:population_size]
+
+            return self.get_results()
         
-        #initialize history list
-        self._history_list = []
+        else:
 
-        for generation in range(self._max_iterations):
-
-            #atualize iteration counter
-            self._final_number_of_iteration = generation
-
-            #compute errors
-            errors = [phase_qNN_evaluate(individual) for individual in population]
-
-            #get best error
-            best_idx = int(np.argmin(errors))
-
-            #update final parameters and final error
-            self._final_parameters = population[best_idx]
-            self._final_error = errors[best_idx]
-
-            #save history
-            if self._save_history:
-                self._history.append(self._final_error)
-
-            #check convergence
-            if self._final_error < self._tolerance:
-                return self.get_results(self)
-
-            #create new population list
-            new_population = []
-
-            #generate descendents
-            while len(new_population) < population_size:
-                p1, p2 = select_parents(population, errors)
-                c1, c2 = crossover(p1, p2)
-                new_population.extend([mutate(c1, mutation_rate=mutation_rate), mutate(c2, mutation_rate=mutation_rate)])
-
-            #update population
-            population = new_population[:population_size]
-
-        return self.get_results(self)
+            raise ValueError("The method cannot be called directly.")
     
     def amplitude_qNN_genetic_algorithm(self):
         """
@@ -640,50 +689,54 @@ class current_circuit():
         The optimal parameters (list of floats), the total error (float) of the optimal parameters,
         number of iterations (int), and history list of errors (list of floats).
         """
+        if self._control_flag:
+            #define constants
+            population_size = 20
+            mutation_rate = 0.1
 
-        #define constants
-        population_size = 20
-        mutation_rate = 0.1
+            #initialize population
+            population = [list(np.random.uniform(-np.pi, np.pi, self._number_of_inputs * 2)) for _ in range(population_size)]
+            
+            #initialize history list
+            self._history_list = []
 
-        #initialize population
-        population = [list(np.random.uniform(-np.pi, np.pi, self._number_of_inputs * 2)) for _ in range(population_size)]
+            for generation in range(self._max_iterations):
+
+                #atualize iteration counter
+                self._final_number_of_iterations = generation
+
+                #compute errors
+                errors = [amplitude_qNN_evaluate(individual) for individual in population]
+
+                #get best error
+                best_idx = int(np.argmin(errors))
+
+                #update final parameters and final error
+                self._final_parameters = population[best_idx]
+                self._final_error = errors[best_idx]
+
+                #save history
+                if self._save_history:
+                    self._history_list.append(self._final_error)
+
+                #check convergence
+                if self._final_error < self._tolerance:
+                    return self.get_results()
+
+                #create new population list
+                new_population = []
+
+                #generate descendents
+                while len(new_population) < population_size:
+                    p1, p2 = select_parents(population, errors)
+                    c1, c2 = crossover(p1, p2)
+                    new_population.extend([mutate(c1, mutation_rate=mutation_rate), mutate(c2, mutation_rate=mutation_rate)])
+
+                #update population
+                population = new_population[:population_size]
+
+            return self.get_results()
         
-        #initialize history list
-        self._history_list = []
+        else:
 
-        for generation in range(self._max_iterations):
-
-            #atualize iteration counter
-            self._final_number_of_iteration = generation
-
-            #compute errors
-            errors = [amplitude_qNN_evaluate(individual) for individual in population]
-
-            #get best error
-            best_idx = int(np.argmin(errors))
-
-            #update final parameters and final error
-            self._final_parameters = population[best_idx]
-            self._final_error = errors[best_idx]
-
-            #save history
-            if self._save_history:
-                self._history.append(self._final_error)
-
-            #check convergence
-            if self._final_error < self._tolerance:
-                return self.get_results(self)
-
-            #create new population list
-            new_population = []
-
-            #generate descendents
-            while len(new_population) < population_size:
-                p1, p2 = select_parents(population, errors)
-                c1, c2 = crossover(p1, p2)
-                new_population.extend([mutate(c1, mutation_rate=mutation_rate), mutate(c2, mutation_rate=mutation_rate)])
-
-            #update population
-            population = new_population[:population_size]
-
-        return self.get_results(self)
+            raise ValueError("The method cannot be called directly.")
