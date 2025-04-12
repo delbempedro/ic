@@ -61,7 +61,7 @@ class trainer_qNN():
             raise ValueError("The qNN has not been trained.")
         else:
             #define dictonary
-            dictonary_with_results = {"Final Parameters": [float(parameter) for parameter in self._final_parameters], "Final Error": self._final_error, "Number of Iterations": self._final_number_of_iterations, "History List": self._history_list}
+            dictonary_with_results = {"Final Parameters": [float(parameter%(2*np.pi)) for parameter in self._final_parameters], "Final Error": self._final_error, "Number of Iterations": self._final_number_of_iterations, "History List": self._history_list}
 
             return dictonary_with_results
     
@@ -161,17 +161,17 @@ class trainer_qNN():
                 self._final_number_of_iterations += 1
 
                 #compute total error
-                current_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
+                current_error = phase_qNN_evaluate(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
 
                 #update final error and final parameters
-                self._final_parameters, self._final_error = update_if_better(current_error, self._final_parameters, self._final_error, parameters)
+                self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
 
                 #save history
-                if self.save_history:
+                if self._save_history:
                     self._history_list.append(self._final_error)
 
                 #check convergence
-                if self._final_error < self.tolerance:
+                if self._final_error < self._tolerance:
                     return self.get_results()
 
             #return final parameters
@@ -218,11 +218,10 @@ class trainer_qNN():
                 self._final_number_of_iterations += 1
 
                 #update current error and parameters
-                counts = generate_amplitude_qNN_circuit(parameters,number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
-                current_error = amplitude_qNN_compute_error(self._inputs,self._expected_outputs,counts,number_of_inputs=self._number_of_inputs)
+                current_error = amplitude_qNN_evaluate(self._inputs,self._expected_outputs,parameters,number_of_inputs=self._number_of_inputs)
 
                 #update final error and final parameters
-                self._final_parameters, self._final_error = update_if_better(current_error, self._final_parameters, self._final_error, parameters)
+                self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
 
                 #save history
                 if self._save_history:
@@ -250,10 +249,10 @@ class trainer_qNN():
         """
         if self._control_flag:
             #initialize parameters randomly within [-pi, pi]
-            parameters = np.random.uniform(-np.pi, np.pi, size=(self._number_of_inputs + 1))
+            parameters = random_parameters(tipe_of_enconding=self._type_of_enconding, number_of_inputs=self._number_of_inputs)
 
             #initialize final error and final parameters
-            self._final_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
+            self._final_error = phase_qNN_evaluate(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
             self._final_parameters = parameters.copy()
 
             #define the learning rate
@@ -266,7 +265,7 @@ class trainer_qNN():
             for iteration in range(self._max_iterations):
 
                 #atualize iteration counter
-                self._final_number_of_iterations = iteration
+                self._final_number_of_iterations = iteration+1
 
                 #compute gradient
                 gradient = phase_qNN_compute_gradient(parameters, self._inputs, self._expected_outputs, self._number_of_inputs, self._number_of_runs, self._number_of_shots, self._type_of_run)
@@ -275,8 +274,7 @@ class trainer_qNN():
                 parameters -= learning_rate * gradient
 
                 #compute current error
-                counts = generate_phase_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
-                current_error = phase_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
+                current_error = phase_qNN_evaluate(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
 
                 #update final error and final parameters
                 self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
@@ -307,11 +305,11 @@ class trainer_qNN():
         """
         if self._control_flag:
             #initialize parameters randomly within [-pi, pi]
-            parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs * 2)
-            
-            #initialize final error
-            counts = generate_amplitude_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
-            self._final_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
+            parameters = random_parameters(tipe_of_enconding=self._type_of_enconding, number_of_inputs=self._number_of_inputs)
+
+            #initialize final error and final parameters
+            self._final_error = amplitude_qNN_evaluate(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run)
+            self._final_parameters = parameters.copy()
 
             #define learning rate
             learning_rate = 0.1
@@ -323,7 +321,7 @@ class trainer_qNN():
             for iteration in range(self._max_iterations):
 
                 #atualize iteration counter
-                self._final_number_of_iterations = iteration
+                self._final_number_of_iterations = iteration+1
 
                 #compute gradient
                 gradient = amplitude_qNN_compute_gradient(parameters, self._inputs, self._expected_outputs, self._number_of_inputs, self._number_of_runs, self._number_of_shots, self._type_of_run)
@@ -332,8 +330,7 @@ class trainer_qNN():
                 parameters -= learning_rate * gradient
 
                 #compute current error
-                counts = generate_amplitude_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
-                current_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
+                current_error = amplitude_qNN_evaluate(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run)
 
                 #update final error and final parameters
                 self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
@@ -378,23 +375,22 @@ class trainer_qNN():
             for iteration in range(self._max_iterations):
 
                 #atualize iteration counter
-                self._final_number_of_iterations = iteration
+                self._final_number_of_iterations = iteration+1
 
                 #update parameters and current error
-                parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs + 1)
-                current_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
+                parameters = random_parameters(tipe_of_enconding=self._type_of_enconding, number_of_inputs=self._number_of_inputs)
+                current_error = phase_qNN_evaluate(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
 
                 #update final error and final parameters
                 self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
 
-                #check for convergence
-                if self._final_error < self._tolerance:
-                    self._history_list.append(self._final_error)
-                    return self.get_results()
-                
                 #save history
                 if self._save_history:
                     self._history_list.append(self._final_error)
+
+                #check for convergence
+                if self._final_error < self._tolerance:
+                    return self.get_results()
 
             return self.get_results()
         
@@ -428,12 +424,11 @@ class trainer_qNN():
             for iteration in range(self._max_iterations):
 
                 #atualize iteration counter
-                self._final_number_of_iterations = iteration
+                self._final_number_of_iterations = iteration+1
 
                 #update parameters and current error
-                parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs * 2)
-                counts = generate_amplitude_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
-                current_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
+                parameters = random_parameters(tipe_of_enconding=self._type_of_enconding, number_of_inputs=self._number_of_inputs)
+                current_error = amplitude_qNN_evaluate(self._inputs, self._expected_outputs, parameters, number_of_inputs=self._number_of_inputs)
 
                 #update final error and final parameters
                 self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
@@ -470,8 +465,8 @@ class trainer_qNN():
         """
         if self._control_flag:
             #initialize parameters and current error
-            parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs + 1)
-            current_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
+            parameters = random_parameters(tipe_of_enconding=self._type_of_enconding, number_of_inputs=self._number_of_inputs)
+            current_error = phase_qNN_evaluate(self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
             
             #initialize final error and final parameters
             self._final_parameters = parameters.copy()
@@ -491,14 +486,14 @@ class trainer_qNN():
             for iteration in range(self._max_iterations):
 
                 #atualize iteration counter
-                self._final_number_of_iterations = iteration
+                self._final_number_of_iterations = iteration+1
 
                 #update new parameters
                 new_parameters = parameters + np.random.normal(0, 0.1, size=len(parameters))
                 new_parameters = np.mod(new_parameters + np.pi, 2 * np.pi) - np.pi
 
                 #update new error
-                new_error = phase_qNN_compute_total_error(self._inputs, self._expected_outputs, new_parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
+                new_error = phase_qNN_evaluate(self._inputs, self._expected_outputs, new_parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit)
 
                 #update delta
                 delta = new_error - current_error
@@ -549,9 +544,8 @@ class trainer_qNN():
         """
         if self._control_flag:
             #initialize parameters and current error
-            parameters = np.random.uniform(-np.pi, np.pi, size=self._number_of_inputs * 2)
-            counts = generate_amplitude_qNN_circuit(parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
-            current_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
+            parameters = random_parameters(tipe_of_enconding=self._type_of_enconding, number_of_inputs=self._number_of_inputs)
+            current_error = amplitude_qNN_evaluate(self._inputs, self._expected_outputs, parameters, number_of_inputs=self._number_of_inputs)
                     
             #initialize final error and final parameters
             self._final_parameters = parameters.copy()
@@ -571,15 +565,14 @@ class trainer_qNN():
             for iteration in range(self._max_iterations):
 
                 #atualize iteration counter
-                self._final_number_of_iterations = iteration
+                self._final_number_of_iterations = iteration+1
 
                 #update new parameters
                 new_parameters = parameters + np.random.normal(0, 0.1, size=len(parameters))
                 new_parameters = np.mod(new_parameters + np.pi, 2 * np.pi) - np.pi
 
                 #update new error
-                counts = generate_amplitude_qNN_circuit(new_parameters, number_of_inputs=self._number_of_inputs).evaluate(number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, type_of_run=self._type_of_run)
-                new_error = amplitude_qNN_compute_error(self._inputs, self._expected_outputs, counts, number_of_inputs=self._number_of_inputs)
+                new_error = amplitude_qNN_evaluate(self._inputs, self._expected_outputs, new_parameters, number_of_inputs=self._number_of_inputs)
 
                 #update delta
                 delta = new_error - current_error
@@ -632,7 +625,7 @@ class trainer_qNN():
             mutation_rate = 0.1
 
             #initialize population
-            population = [list(np.random.uniform(-np.pi, np.pi, self._number_of_inputs + 1)) for _ in range(population_size)]
+            population = [list(random_parameters(tipe_of_enconding=self._type_of_enconding, number_of_inputs=self._number_of_inputs)) for _ in range(population_size)]
             
             #initialize history list
             self._history_list = []
@@ -640,10 +633,10 @@ class trainer_qNN():
             for generation in range(self._max_iterations):
 
                 #atualize iteration counter
-                self._final_number_of_iterations = generation
+                self._final_number_of_iterations = generation+1
 
                 #compute errors
-                errors = [phase_qNN_evaluate(individual) for individual in population]
+                errors = [phase_qNN_evaluate(self._inputs, self._expected_outputs, individual, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, number_of_inputs_per_qubit=self._number_of_inputs_per_qubit) for individual in population]
 
                 #get best error
                 best_idx = int(np.argmin(errors))
@@ -695,7 +688,7 @@ class trainer_qNN():
             mutation_rate = 0.1
 
             #initialize population
-            population = [list(np.random.uniform(-np.pi, np.pi, self._number_of_inputs * 2)) for _ in range(population_size)]
+            population = [list(random_parameters(tipe_of_enconding=self._type_of_enconding, number_of_inputs=self._number_of_inputs)) for _ in range(population_size)]
             
             #initialize history list
             self._history_list = []
@@ -703,10 +696,10 @@ class trainer_qNN():
             for generation in range(self._max_iterations):
 
                 #atualize iteration counter
-                self._final_number_of_iterations = generation
+                self._final_number_of_iterations = generation+1
 
                 #compute errors
-                errors = [amplitude_qNN_evaluate(individual) for individual in population]
+                errors = [amplitude_qNN_evaluate(self._inputs, self._expected_outputs, individual, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run) for individual in population]
 
                 #get best error
                 best_idx = int(np.argmin(errors))

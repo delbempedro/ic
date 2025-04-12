@@ -19,21 +19,17 @@ Since:
 Authors:
 - Pedro C. Delbem. <pedrodelbem@usp.br>
 """
-
-#do qiskit necessary imports
-from qiskit.circuit.library import TwoLocal #type: ignore
-
 #do necessary imports
 from typing import List
 from functools import reduce
-from math import pi
 import operator
 import random
 import numpy as np # type: ignore
 
 
 #do my biblioteca necessary imports
-from current_circuit import *
+from amplitude_encondig_utils import *
+from phase_enconding_utils import *
 
 def compute_expected_outputs(inputs: List[List[int]], logic_gate: str = "XOR") -> List[str]:
     """
@@ -76,160 +72,7 @@ def compute_expected_outputs(inputs: List[List[int]], logic_gate: str = "XOR") -
 
     #return [str(reduce(op, row)) for row in inputs]
 
-def generate_phase_qNN_circuit(inputs,parameters,number_of_inputs,number_of_inputs_per_qubit=3):
-    """
-    Generate a quantum neural network circuit (qNN) with a single neuron.
-
-    Parameters:
-    input1_value (float): The value of the first input of the neuron.
-    input2_value (float): The value of the second input of the neuron.
-    parameters (list of floats): The parameters of the neuron, in order: first input weight, second input weight, bias.
-    number_of_inputs (int): The number of qbits in the circuit.
-    number_of_inputs_per_qubit (int): The number of inputs per qubit.
-
-    Returns:
-    The qNN circuit (current_circuit).
-    """
-
-    #create the qNN circuit
-    if number_of_inputs <= number_of_inputs_per_qubit:
-        qNN = neuron_circuit(1,1)
-    elif number_of_inputs%2: #if the number of qubits is even
-        qNN = neuron_circuit(number_of_inputs//number_of_inputs_per_qubit+2,1)
-    else: #if the number of qubits is odd
-        qNN = neuron_circuit(number_of_inputs//number_of_inputs_per_qubit+1,1)
-
-    qNN.add_single_qubit_neuron(inputs, parameters, number_of_inputs=number_of_inputs, number_of_inputs_per_qubit=number_of_inputs_per_qubit) #add the neuron
-    qNN.get_current_circuit().measure_all() #measure all qubits
-
-    #return the circuit
-    return qNN
-
-#Generates a circuit with all the possible inputs
-def all_inputs_circuit(number_of_inputs):
-    """
-    Generates a quantum circuit that produces all the possible inputs for a given number of qubits.
-
-    The circuit is constructed using the TwoLocal method. The parameters are set to predefined values 
-    to generate all possible inputs.
-
-    Parameters:
-    num_qubits (int): The number of qubits in the circuit.
-
-    Returns:
-    QuantumCircuit: The quantum circuit that generates all the possible inputs.
-    """
-
-    entanglement_circuit = TwoLocal(number_of_inputs, "rx", "cz", entanglement="linear", reps=1) #generates a circuit that mixture two qubits - an entanglement circuit
-    parameters = [pi] * number_of_inputs + [pi / 2] * (number_of_inputs) #previously chosen/learned parameters to generate all the possible inputs
-    parameter_dict = dict(zip(entanglement_circuit.parameters, parameters)) #assigns the parameters to the circuit
-    initial_states_circuit = entanglement_circuit.assign_parameters(parameter_dict) #a circuit that can generate all the possible inputs
-
-    #return the circuit
-    return initial_states_circuit
-
-def circuit_copy(initial_circuit, number_of_inputs):
-    """
-    Creates a quantum circuit that duplicates the given initial circuit with additional qubits.
-
-    This function constructs a new quantum circuit by duplicating the specified number of qubits 
-    from the initial circuit and adding two additional qubits to the circuit. The resulting circuit 
-    reproduces the input values using controlled-NOT operations to copy the state of the first two 
-    qubits to the additional qubits.
-
-    Parameters:
-    initial_circuit (QuantumCircuit): The initial quantum circuit to be copied.
-    number_of_inputs (int): The number of qubits to duplicate from the initial circuit.
-
-    Returns:
-    QuantumCircuit: A new quantum circuit with duplicated qubits and additional operations to copy the input.
-    """
-
-    circuit_copy = QuantumCircuit(number_of_inputs*2) #duplicate the number of qubits
-    circuit_copy = circuit_copy.compose(initial_circuit, qubits=list(range(0,number_of_inputs))) #first half with the initial_states_2b_circ
-    circuit_copy.barrier() #to visually separate circuit components
-
-    for index in range(number_of_inputs):
-        circuit_copy.x(number_of_inputs+index)
-
-    for index in range(number_of_inputs):
-        circuit_copy.cx(index,number_of_inputs+index)
-
-    for index in range(number_of_inputs):
-        circuit_copy.x(number_of_inputs+index)
-
-    """#a layer to copy/reproduce the generated inputs in qubits 0 and 1
-    circuit_copy.x(2)    #change value of qubit 2 from 0 to 1
-    circuit_copy.x(3)    #change value of qubit 3 from 0 to 1
-    circuit_copy.cx(0,2) #qb0 ''AND'' 1 (or NOT qb0) to copy qubit 0 to qubit 2
-    circuit_copy.cx(1,3) #qb1 ''AND'' 1 (or NOT qb1) to copy qubit 1 to qubit 3
-    circuit_copy.x(2)    #NOT of qubit 2 => qubit 2 equal to equal qubit 0
-    circuit_copy.x(3)    #NOT of qubit 3 => qubit 3 equal to equal qubit 1"""
-
-    return circuit_copy
-
-def generate_amplitude_qNN_circuit(parameters_of_entanglement_circuit,number_of_inputs=2):
-    """
-    Generates a quantum circuit that produces all the possible inputs and a quantum neural network with two neurons.
-
-    The circuit is constructed by using the TwoLocal method. The parameters are set to the previously chosen/learned parameters to generate all the possible inputs.
-    The TwoLocal method generates a circuit that mixture two qubits - an entanglement circuit.
-    A quantum neural network with two neurons is added to the circuit, by using the add_bin_neuron3 method of the current_circuit class.
-    The parameters of the quantum neural network are set to the previously chosen/learned parameters.
-
-    Parameters:
-    parameters_of_entanglement_circuit (list): A list of parameters for the U and controlled-phase (cp) gates.
-    number_of_inputs (int): The number of inputs.
-
-    Returns:
-    quantum_circuit (QuantumCircuit): The quantum circuit with all the possible inputs and a quantum neural network with two neurons.
-    """
-
-    number_of_qubits_required = number_of_inputs*2+1
-    qNN = neuron_circuit(number_of_qubits_required,1) #create the qNN circuit
-    auxiliary_circuit = all_inputs_circuit(number_of_inputs) #copy the all inputs circuit
-    duplicate_circuit = circuit_copy(auxiliary_circuit, number_of_inputs) #duplicate the all inputs circuit
-    qNN.get_current_circuit().append(duplicate_circuit, list(range(0,number_of_inputs*2))) #add the all inputs circuit
-    qNN.add_amplitude_qubit_neuron(parameters_of_entanglement_circuit, number_of_inputs=number_of_inputs) #add the neuron
-    qNN.get_current_circuit().measure_all()
-
-    return qNN
-
-def phase_qNN_compute_error(counts,expected_output):
-    """
-    Compute the error between the actual outputs and the expected outputs.
-
-    Parameters:
-    counts (list of dictionaries): The counts of the outputs of the quantum circuit.
-    expected_outputs (list of floats): The expected outputs of the quantum circuit.
-
-    Returns:
-    The error (float).
-    """
-
-    #compute number of shots
-    number_of_shots = sum(counts[0].values())
-    
-    #initialize error with 0
-    error = 0
-
-    #initialize total tests with 0
-    total_tests = 0
-
-    #compute error for each count
-    for count in counts:
-        for key,value in count.items():
-            if key[-1] != str(expected_output):
-                error += value
-            total_tests += value
-
-    #normalize error
-    error = error/total_tests
-
-    #return error
-    return error
-
-def phase_qNN_compute_total_error(inputs,expected_outputs,parameters,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation",number_of_inputs_per_qubit=3):
+def phase_qNN_evaluate(inputs,expected_outputs,parameters,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation",number_of_inputs_per_qubit=3):
     """
     Compute the total error for a set of inputs and expected outputs.
 
@@ -266,60 +109,17 @@ def phase_qNN_compute_total_error(inputs,expected_outputs,parameters,number_of_r
     #return total error
     return total_error
 
-def amplitude_qNN_compute_error(inputs,expected_outputs,counts,number_of_inputs=2):
+def amplitude_qNN_evaluate(inputs,expected_outputs,parameters,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation"):
     """
-    Compute the error of the given quantum circuit.
-
-    The error is computed by counting the number of mistakes in the outputs of the quantum circuit.
-    The output of the quantum circuit is in the form of a string of length 5, where the first two
-    characters are the inputs and the last character is the output. The error is the sum of the
-    number of mistakes in the outputs of the quantum circuit divided by the total number of tests.
-
-    Parameters:
-    inputs (list): A list containing pairs of input values for the neuron.
-    expected_outputs (list): A list of expected output values for each input pair.
-    counts (list): A list of dictionaries, where each dictionary represents the counts of the outputs of the quantum circuit.
-    number_of_inputs (int): The number of qbits in the quantum circuit.
-
-    Returns:
-    float: The error of the quantum circuit.
+    Generate amplitude qNN circuit and compute error
     """
+    #compute counts
+    counts = generate_amplitude_qNN_circuit(parameters, number_of_inputs=number_of_inputs).evaluate(number_of_runs=number_of_runs,number_of_shots=number_of_shots,type_of_run=type_of_run)
 
-    #define the statistics dictionary
-    statistics = {}
-    for i in range(2**number_of_inputs):
-        binary_key = format(i, f'0{number_of_inputs}b')
-        statistics[binary_key] = [0, 0]
+    return amplitude_qNN_compute_error(inputs, expected_outputs, counts, number_of_inputs=number_of_inputs)
     
-    #get the total number of tests
-    total_tests = 0
 
-    # Processa as contagens
-    for count in counts: #for each count
-        for key, value in count.items(): #for each key and value
-
-            #define the inputs and the output
-            inputs = ''
-            for bit in range(number_of_inputs, number_of_inputs*2):
-                inputs += str(key[bit])
-            output = int(key[number_of_inputs*2])
-
-            #update the statistics
-            statistics[inputs][output] += value
-
-            #update the total number of tests
-            total_tests += value
-
-    #compute the error
-    error = total_tests
-    for input in list(statistics.keys()):
-        error -= statistics[input][expected_outputs[input]]
-        
-    error /= total_tests
-
-    return error
-
-def phase_qNN_compute_gradient(parameters, inputs, expected_outputs, number_of_bits, number_of_runs, number_of_shots, type_of_run, epsilon=1e-3, number_of_inputs_per_qubit=3):
+def phase_qNN_compute_gradient(parameters, inputs, expected_outputs, number_of_inputs, number_of_runs, number_of_shots, type_of_run, epsilon=1e-3, number_of_inputs_per_qubit=3):
     """
     Compute the gradient of the error function using finite differences for phase encoding case.
     """
@@ -331,17 +131,17 @@ def phase_qNN_compute_gradient(parameters, inputs, expected_outputs, number_of_b
 
         # Compute f(x + epsilon)
         perturbed_params[i] += epsilon
-        error_plus = phase_qNN_compute_total_error(
+        error_plus = phase_qNN_evaluate(
             inputs, expected_outputs, perturbed_params, number_of_runs=number_of_runs, 
-            number_of_shots=number_of_shots, number_of_bits=number_of_bits, 
+            number_of_shots=number_of_shots, number_of_inputs=number_of_inputs, 
             type_of_run=type_of_run, number_of_inputs_per_qubit=number_of_inputs_per_qubit
         )
 
         # Compute f(x - epsilon)
         perturbed_params[i] -= 2 * epsilon
-        error_minus = phase_qNN_compute_total_error(
+        error_minus = phase_qNN_evaluate(
             inputs, expected_outputs, perturbed_params, number_of_runs=number_of_runs, 
-            number_of_shots=number_of_shots, number_of_bits=number_of_bits, 
+            number_of_shots=number_of_shots, number_of_inputs=number_of_inputs, 
             type_of_run=type_of_run, number_of_inputs_per_qubit=number_of_inputs_per_qubit
         )
 
@@ -350,7 +150,7 @@ def phase_qNN_compute_gradient(parameters, inputs, expected_outputs, number_of_b
 
     return gradient
 
-def amplitude_qNN_compute_gradient(parameters, inputs, expected_outputs, number_of_bits, number_of_runs, number_of_shots, type_of_run, epsilon=1e-3, save_history=False):
+def amplitude_qNN_compute_gradient(parameters, inputs, expected_outputs, number_of_inputs, number_of_runs, number_of_shots, type_of_run, epsilon=1e-3, save_history=False):
     """
     Compute the gradient of the error function using finite differences for amplitude encoding case.
 
@@ -358,7 +158,7 @@ def amplitude_qNN_compute_gradient(parameters, inputs, expected_outputs, number_
     parameters (list of floats): Current parameters of the circuit.
     inputs (list of lists): Input data.
     expected_outputs (list of floats): Expected outputs.
-    number_of_bits (int): Number of qubits.
+    number_of_inputs (int): Number of qubits.
     number_of_runs (int): Number of times the circuit is run.
     number_of_shots (int): Number of shots.
     type_of_run (str): Type of quantum run.
@@ -375,22 +175,44 @@ def amplitude_qNN_compute_gradient(parameters, inputs, expected_outputs, number_
 
         # Compute f(x + epsilon)
         perturbed_params[i] += epsilon
-        counts_plus = generate_amplitude_qNN_circuit(perturbed_params, number_of_bits=number_of_bits).evaluate(
+        counts_plus = generate_amplitude_qNN_circuit(perturbed_params, number_of_inputs=number_of_inputs).evaluate(
             number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run
         )
-        error_plus = amplitude_qNN_compute_error(inputs, expected_outputs, counts_plus, number_of_bits=number_of_bits)
+        error_plus = amplitude_qNN_compute_error(inputs, expected_outputs, counts_plus, number_of_inputs=number_of_inputs)
 
         # Compute f(x - epsilon)
         perturbed_params[i] -= 2 * epsilon
-        counts_minus = generate_amplitude_qNN_circuit(perturbed_params, number_of_bits=number_of_bits).evaluate(
+        counts_minus = generate_amplitude_qNN_circuit(perturbed_params, number_of_inputs=number_of_inputs).evaluate(
             number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run
         )
-        error_minus = amplitude_qNN_compute_error(inputs, expected_outputs, counts_minus, number_of_bits=number_of_bits)
+        error_minus = amplitude_qNN_compute_error(inputs, expected_outputs, counts_minus, number_of_inputs=number_of_inputs)
 
         # Compute numerical gradient
         gradient[i] = (error_plus - error_minus) / (2 * epsilon)
 
     return gradient
+
+def random_parameters(tipe_of_enconding=None, number_of_inputs=2):
+    """
+    Generate random parameters for a quantum neural network.
+
+    Parameters:
+    tipe_of_enconding (str): Type of enconding, either "phase" or "amplitude".
+    number_of_inputs (int): Number of inputs.
+
+    Returns:
+    list of floats: Random parameters.
+    """
+    #define size of list of random parameters based on enconding and number of inputs
+    if tipe_of_enconding == "phase":
+        size = number_of_inputs + 1
+    elif tipe_of_enconding == "amplitude":
+        size = number_of_inputs * 2
+    else:
+        raise ValueError("Invalid type of enconding.")
+        
+    return np.random.uniform(-np.pi, np.pi, size=size)
+    
 
 def update_if_better(parameters, current_error, final_parameters, final_error):
     """
@@ -406,48 +228,8 @@ def update_if_better(parameters, current_error, final_parameters, final_error):
     tuple: The final parameters and error.
     """
     if current_error < final_error:
-        return parameters.copy(), current_error
+        return parameters, current_error
     return final_parameters, final_error
-
-def phase_qNN_evaluate(inputs,expected_outputs,individual,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation",number_of_inputs_per_qubit=2):
-    """
-    Evaluate an individual in the phase encoding case.
-
-    Parameters:
-    inputs (list of lists): Input data.
-    expected_outputs (list of floats): Expected outputs.
-    individual (list of floats): Parameters of the individual.
-    number_of_runs (int): Number of times the circuit is run.
-    number_of_shots (int): Number of shots.
-    number_of_inputs (int): Number of qubits.
-    type_of_run (str): Type of quantum run.
-    number_of_inputs_per_qubit (int): Number of inputs per qubit.
-
-    Returns:
-    float: The total error of the individual.
-    """
-
-    return phase_qNN_compute_total_error(inputs=inputs, expected_outputs=expected_outputs, parameters=individual, number_of_runs=number_of_runs, number_of_shots=number_of_shots, number_of_inputs=number_of_inputs, type_of_run=type_of_run, number_of_inputs_per_qubit=number_of_inputs_per_qubit)
-
-def amplitude_qNN_evaluate(inputs,expected_outputs,individual,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation"):
-    """
-    Evaluate an individual in the amplitude encoding case.
-
-    Parameters:
-    inputs (list of lists): Input data.
-    expected_outputs (list of floats): Expected outputs.
-    individual (list of floats): Parameters of the individual.
-    number_of_runs (int, optional): Number of times the circuit is run. Default is 1.
-    number_of_shots (int, optional): Number of shots. Default is 1024.
-    number_of_inputs (int, optional): Number of qubits. Default is 2.
-    type_of_run (str, optional): Type of quantum run. Default is "simulation".
-
-    Returns:
-    float: The error of the individual.
-    """
-
-    counts = generate_amplitude_qNN_circuit(parameters=individual, number_of_inputs=number_of_inputs).evaluate(number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run)
-    return amplitude_qNN_compute_error(inputs, expected_outputs, counts, number_of_inputs)
 
 def select_parents(population, errors):
     """
