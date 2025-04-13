@@ -118,8 +118,7 @@ def amplitude_qNN_evaluate(inputs,expected_outputs,parameters,number_of_runs=1,n
 
     return amplitude_qNN_compute_error(inputs, expected_outputs, counts, number_of_inputs=number_of_inputs)
     
-
-def phase_qNN_compute_gradient(parameters, inputs, expected_outputs, number_of_inputs, number_of_runs, number_of_shots, type_of_run, epsilon=1e-3, number_of_inputs_per_qubit=3):
+def compute_gradient(parameters, inputs, expected_outputs, number_of_inputs, number_of_runs, number_of_shots, type_of_run, epsilon=1e-3, number_of_inputs_per_qubit=3, evaluate_function=None):
     """
     Compute the gradient of the error function using finite differences for phase encoding case.
     """
@@ -131,61 +130,19 @@ def phase_qNN_compute_gradient(parameters, inputs, expected_outputs, number_of_i
 
         # Compute f(x + epsilon)
         perturbed_params[i] += epsilon
-        error_plus = phase_qNN_evaluate(
+        error_plus = evaluate_function(
             inputs, expected_outputs, perturbed_params, number_of_runs=number_of_runs, 
             number_of_shots=number_of_shots, number_of_inputs=number_of_inputs, 
-            type_of_run=type_of_run, number_of_inputs_per_qubit=number_of_inputs_per_qubit
+            type_of_run=type_of_run
         )
 
         # Compute f(x - epsilon)
         perturbed_params[i] -= 2 * epsilon
-        error_minus = phase_qNN_evaluate(
+        error_minus = evaluate_function(
             inputs, expected_outputs, perturbed_params, number_of_runs=number_of_runs, 
             number_of_shots=number_of_shots, number_of_inputs=number_of_inputs, 
-            type_of_run=type_of_run, number_of_inputs_per_qubit=number_of_inputs_per_qubit
+            type_of_run=type_of_run
         )
-
-        # Compute numerical gradient
-        gradient[i] = (error_plus - error_minus) / (2 * epsilon)
-
-    return gradient
-
-def amplitude_qNN_compute_gradient(parameters, inputs, expected_outputs, number_of_inputs, number_of_runs, number_of_shots, type_of_run, epsilon=1e-3, save_history=False):
-    """
-    Compute the gradient of the error function using finite differences for amplitude encoding case.
-
-    Parameters:
-    parameters (list of floats): Current parameters of the circuit.
-    inputs (list of lists): Input data.
-    expected_outputs (list of floats): Expected outputs.
-    number_of_inputs (int): Number of qubits.
-    number_of_runs (int): Number of times the circuit is run.
-    number_of_shots (int): Number of shots.
-    type_of_run (str): Type of quantum run.
-    epsilon (float): Small perturbation for numerical gradient computation.
-
-    Returns:
-    list of floats: Gradient vector.
-    """
-
-    gradient = np.zeros(len(parameters))
-
-    for i in range(len(parameters)):
-        perturbed_params = parameters.copy()
-
-        # Compute f(x + epsilon)
-        perturbed_params[i] += epsilon
-        counts_plus = generate_amplitude_qNN_circuit(perturbed_params, number_of_inputs=number_of_inputs).evaluate(
-            number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run
-        )
-        error_plus = amplitude_qNN_compute_error(inputs, expected_outputs, counts_plus, number_of_inputs=number_of_inputs)
-
-        # Compute f(x - epsilon)
-        perturbed_params[i] -= 2 * epsilon
-        counts_minus = generate_amplitude_qNN_circuit(perturbed_params, number_of_inputs=number_of_inputs).evaluate(
-            number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run
-        )
-        error_minus = amplitude_qNN_compute_error(inputs, expected_outputs, counts_minus, number_of_inputs=number_of_inputs)
 
         # Compute numerical gradient
         gradient[i] = (error_plus - error_minus) / (2 * epsilon)
@@ -210,7 +167,9 @@ def random_parameters(tipe_of_enconding=None, number_of_inputs=2):
         size = number_of_inputs * 2
     else:
         raise ValueError("Invalid type of enconding.")
-        
+    
+    #generate random parameters
+    np.random.seed(None)
     return np.random.uniform(-np.pi, np.pi, size=size)
     
 
