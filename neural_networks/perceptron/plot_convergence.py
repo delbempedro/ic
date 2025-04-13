@@ -84,9 +84,11 @@ def plot_convergence_for_directory(input_dir, output_dir):
             for method, errors in error_history.items():
                 plt.plot(range(1, len(errors) + 1), errors, label=method)
 
+            title = make_title(filename)
+
             plt.xlabel('Iteration')
             plt.ylabel('Error')
-            plt.title(f'Convergence Plot for {filename}')
+            plt.title(title)
             plt.legend()
             plt.grid(True)
 
@@ -97,6 +99,18 @@ def plot_convergence_for_directory(input_dir, output_dir):
             plt.close()
 
             print(f"Plot saved to {output_path}")
+
+def make_title(filename):
+
+    parts_of_filename = filename.split("_")
+    # Remove the file extension
+    parts_of_filename[-1] = parts_of_filename[-1].split(".")[0]
+    # Remove the first part of the filename
+    parts_of_filename.pop(0)
+    # Join the remaining parts with spaces
+    final_title = "Enconding: "+parts_of_filename[0]+" | "+"Tolerance: "+parts_of_filename[1]+" | "+"Grid Grain: "+parts_of_filename[2]+" | "
+
+    return f"Convergence Plot for {final_title}"
 
 def main():
     """

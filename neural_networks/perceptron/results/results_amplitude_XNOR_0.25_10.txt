@@ -1,0 +1,31 @@
+Results for amplitude encoding, tolerance=0.25, grid_grain=10
+  Training with exaustive_search method      Error: 0.2412109375 | Iterations: 1
+       History of errors:
+          Iteration 1: Error: 0.2412109375
+  Training with gradient_descent method      Error: 0.2421875 | Iterations: 2
+       History of errors:
+          Iteration 1: Error: 0.447265625
+          Iteration 2: Error: 0.2421875
+  Training with random_search method      Error: 0.248046875 | Iterations: 15
+       History of errors:
+          Iteration 1: Error: 0.37109375
+          Iteration 2: Error: 0.2841796875
+          Iteration 3: Error: 0.2841796875
+          Iteration 4: Error: 0.2822265625
+          Iteration 5: Error: 0.2822265625
+          Iteration 6: Error: 0.2822265625
+          Iteration 7: Error: 0.2822265625
+          Iteration 8: Error: 0.2822265625
+          Iteration 9: Error: 0.2783203125
+          Iteration 10: Error: 0.2607421875
+          Iteration 11: Error: 0.2607421875
+          Iteration 12: Error: 0.2607421875
+          Iteration 13: Error: 0.2607421875
+          Iteration 14: Error: 0.2607421875
+          Iteration 15: Error: 0.248046875
+  Training with simulated_annealing method      Error: 0.2314453125 | Iterations: 1
+       History of errors:
+          Iteration 1: Error: 0.2314453125
+  Training with genetic_algorithm method      Error: 0.2333984375 | Iterations: 1
+       History of errors:
+          Iteration 1: Error: 0.2333984375

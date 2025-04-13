@@ -1,0 +1,117 @@
+Results for phase encoding, tolerance=0.25, grid_grain=10
+  Training with exaustive_search method      Error: 0.24560546875 | Iterations: 9
+       History of errors:
+          Iteration 1: Error: 0.484619140625
+          Iteration 2: Error: 0.484619140625
+          Iteration 3: Error: 0.484619140625
+          Iteration 4: Error: 0.283935546875
+          Iteration 5: Error: 0.283935546875
+          Iteration 6: Error: 0.283935546875
+          Iteration 7: Error: 0.283935546875
+          Iteration 8: Error: 0.283935546875
+          Iteration 9: Error: 0.24560546875
+  Training with gradient_descent method      Error: 0.19970703125 | Iterations: 4
+       History of errors:
+          Iteration 1: Error: 0.392578125
+          Iteration 2: Error: 0.376953125
+          Iteration 3: Error: 0.28857421875
+          Iteration 4: Error: 0.19970703125
+  Training with random_search method      Error: 0.170654296875 | Iterations: 7
+       History of errors:
+          Iteration 1: Error: 0.546142578125
+          Iteration 2: Error: 0.537841796875
+          Iteration 3: Error: 0.465087890625
+          Iteration 4: Error: 0.384765625
+          Iteration 5: Error: 0.384765625
+          Iteration 6: Error: 0.384765625
+          Iteration 7: Error: 0.170654296875
+  Training with simulated_annealing method      Error: 0.2158203125 | Iterations: 85
+       History of errors:
+          Iteration 1: Error: 0.52978515625
+          Iteration 2: Error: 0.52490234375
+          Iteration 3: Error: 0.52490234375
+          Iteration 4: Error: 0.52490234375
+          Iteration 5: Error: 0.521728515625
+          Iteration 6: Error: 0.521728515625
+          Iteration 7: Error: 0.51904296875
+          Iteration 8: Error: 0.517822265625
+          Iteration 9: Error: 0.496337890625
+          Iteration 10: Error: 0.496337890625
+          Iteration 11: Error: 0.496337890625
+          Iteration 12: Error: 0.496337890625
+          Iteration 13: Error: 0.48291015625
+          Iteration 14: Error: 0.48291015625
+          Iteration 15: Error: 0.48291015625
+          Iteration 16: Error: 0.48291015625
+          Iteration 17: Error: 0.48291015625
+          Iteration 18: Error: 0.48291015625
+          Iteration 19: Error: 0.48291015625
+          Iteration 20: Error: 0.48291015625
+          Iteration 21: Error: 0.48291015625
+          Iteration 22: Error: 0.48291015625
+          Iteration 23: Error: 0.48291015625
+          Iteration 24: Error: 0.48291015625
+          Iteration 25: Error: 0.48291015625
+          Iteration 26: Error: 0.48291015625
+          Iteration 27: Error: 0.48291015625
+          Iteration 28: Error: 0.48291015625
+          Iteration 29: Error: 0.45751953125
+          Iteration 30: Error: 0.42626953125
+          Iteration 31: Error: 0.377685546875
+          Iteration 32: Error: 0.376953125
+          Iteration 33: Error: 0.376953125
+          Iteration 34: Error: 0.376953125
+          Iteration 35: Error: 0.376953125
+          Iteration 36: Error: 0.376953125
+          Iteration 37: Error: 0.376953125
+          Iteration 38: Error: 0.35107421875
+          Iteration 39: Error: 0.35107421875
+          Iteration 40: Error: 0.35107421875
+          Iteration 41: Error: 0.35107421875
+          Iteration 42: Error: 0.35107421875
+          Iteration 43: Error: 0.35107421875
+          Iteration 44: Error: 0.35107421875
+          Iteration 45: Error: 0.35107421875
+          Iteration 46: Error: 0.315673828125
+          Iteration 47: Error: 0.315673828125
+          Iteration 48: Error: 0.315673828125
+          Iteration 49: Error: 0.29833984375
+          Iteration 50: Error: 0.29833984375
+          Iteration 51: Error: 0.29833984375
+          Iteration 52: Error: 0.29833984375
+          Iteration 53: Error: 0.29833984375
+          Iteration 54: Error: 0.29833984375
+          Iteration 55: Error: 0.29833984375
+          Iteration 56: Error: 0.29833984375
+          Iteration 57: Error: 0.29833984375
+          Iteration 58: Error: 0.29833984375
+          Iteration 59: Error: 0.29833984375
+          Iteration 60: Error: 0.29833984375
+          Iteration 61: Error: 0.29833984375
+          Iteration 62: Error: 0.29833984375
+          Iteration 63: Error: 0.29833984375
+          Iteration 64: Error: 0.29833984375
+          Iteration 65: Error: 0.29833984375
+          Iteration 66: Error: 0.29833984375
+          Iteration 67: Error: 0.29833984375
+          Iteration 68: Error: 0.29833984375
+          Iteration 69: Error: 0.29833984375
+          Iteration 70: Error: 0.29833984375
+          Iteration 71: Error: 0.29833984375
+          Iteration 72: Error: 0.29833984375
+          Iteration 73: Error: 0.29833984375
+          Iteration 74: Error: 0.29833984375
+          Iteration 75: Error: 0.283935546875
+          Iteration 76: Error: 0.27490234375
+          Iteration 77: Error: 0.27490234375
+          Iteration 78: Error: 0.27490234375
+          Iteration 79: Error: 0.27490234375
+          Iteration 80: Error: 0.27490234375
+          Iteration 81: Error: 0.27490234375
+          Iteration 82: Error: 0.27490234375
+          Iteration 83: Error: 0.27490234375
+          Iteration 84: Error: 0.2724609375
+          Iteration 85: Error: 0.2158203125
+  Training with genetic_algorithm method      Error: 0.216796875 | Iterations: 1
+       History of errors:
+          Iteration 1: Error: 0.216796875
