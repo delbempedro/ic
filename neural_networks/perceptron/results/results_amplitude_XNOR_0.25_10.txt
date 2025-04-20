@@ -1,31 +1,59 @@
 Results for amplitude encoding, tolerance=0.25, grid_grain=10
-  Training with exaustive_search method      Error: 0.2412109375 | Iterations: 1
+  Training with exhaustive_search method      Error: 0.2431640625 | Iterations: 2
        History of errors:
-          Iteration 1: Error: 0.2412109375
-  Training with gradient_descent method      Error: 0.2421875 | Iterations: 2
+          Iteration 1: Error: 0.271484375
+          Iteration 2: Error: 0.2431640625
+  Training with gradient_descent method      Error: 0.21484375 | Iterations: 40
        History of errors:
-          Iteration 1: Error: 0.447265625
-          Iteration 2: Error: 0.2421875
-  Training with random_search method      Error: 0.248046875 | Iterations: 15
-       History of errors:
-          Iteration 1: Error: 0.37109375
-          Iteration 2: Error: 0.2841796875
-          Iteration 3: Error: 0.2841796875
-          Iteration 4: Error: 0.2822265625
-          Iteration 5: Error: 0.2822265625
-          Iteration 6: Error: 0.2822265625
-          Iteration 7: Error: 0.2822265625
-          Iteration 8: Error: 0.2822265625
+          Iteration 1: Error: 0.2783203125
+          Iteration 2: Error: 0.2783203125
+          Iteration 3: Error: 0.2783203125
+          Iteration 4: Error: 0.2783203125
+          Iteration 5: Error: 0.2783203125
+          Iteration 6: Error: 0.2783203125
+          Iteration 7: Error: 0.2783203125
+          Iteration 8: Error: 0.2783203125
           Iteration 9: Error: 0.2783203125
-          Iteration 10: Error: 0.2607421875
-          Iteration 11: Error: 0.2607421875
-          Iteration 12: Error: 0.2607421875
-          Iteration 13: Error: 0.2607421875
-          Iteration 14: Error: 0.2607421875
-          Iteration 15: Error: 0.248046875
-  Training with simulated_annealing method      Error: 0.2314453125 | Iterations: 1
+          Iteration 10: Error: 0.2783203125
+          Iteration 11: Error: 0.27734375
+          Iteration 12: Error: 0.27734375
+          Iteration 13: Error: 0.27734375
+          Iteration 14: Error: 0.2666015625
+          Iteration 15: Error: 0.2666015625
+          Iteration 16: Error: 0.2666015625
+          Iteration 17: Error: 0.2666015625
+          Iteration 18: Error: 0.2666015625
+          Iteration 19: Error: 0.2666015625
+          Iteration 20: Error: 0.2666015625
+          Iteration 21: Error: 0.2666015625
+          Iteration 22: Error: 0.2666015625
+          Iteration 23: Error: 0.2666015625
+          Iteration 24: Error: 0.2666015625
+          Iteration 25: Error: 0.2666015625
+          Iteration 26: Error: 0.2666015625
+          Iteration 27: Error: 0.2509765625
+          Iteration 28: Error: 0.2509765625
+          Iteration 29: Error: 0.2509765625
+          Iteration 30: Error: 0.2509765625
+          Iteration 31: Error: 0.2509765625
+          Iteration 32: Error: 0.2509765625
+          Iteration 33: Error: 0.2509765625
+          Iteration 34: Error: 0.2509765625
+          Iteration 35: Error: 0.2509765625
+          Iteration 36: Error: 0.2509765625
+          Iteration 37: Error: 0.2509765625
+          Iteration 38: Error: 0.2509765625
+          Iteration 39: Error: 0.2509765625
+          Iteration 40: Error: 0.21484375
+  Training with random_search method      Error: 0.232421875 | Iterations: 4
        History of errors:
-          Iteration 1: Error: 0.2314453125
-  Training with genetic_algorithm method      Error: 0.2333984375 | Iterations: 1
+          Iteration 1: Error: 0.6728515625
+          Iteration 2: Error: 0.279296875
+          Iteration 3: Error: 0.279296875
+          Iteration 4: Error: 0.232421875
+  Training with simulated_annealing method      Error: 0.2470703125 | Iterations: 1
        History of errors:
-          Iteration 1: Error: 0.2333984375
+          Iteration 1: Error: 0.2470703125
+  Training with genetic_algorithm method      Error: 0.2119140625 | Iterations: 1
+       History of errors:
+          Iteration 1: Error: 0.2119140625

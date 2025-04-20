@@ -108,7 +108,7 @@ def make_title(filename):
     # Remove the first part of the filename
     parts_of_filename.pop(0)
     # Join the remaining parts with spaces
-    final_title = "Enconding: "+parts_of_filename[0]+" | "+"Tolerance: "+parts_of_filename[1]+" | "+"Grid Grain: "+parts_of_filename[2]+" | "
+    final_title = "Enconding: "+parts_of_filename[0]+" | "+"Logic Gate: "+parts_of_filename[1]+" | "+ "Tolerance: "+parts_of_filename[2]+" | "+"Grid Grain: "+parts_of_filename[3]+" | "
 
     return f"Convergence Plot for {final_title}"
 

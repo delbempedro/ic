@@ -31,6 +31,9 @@ import numpy as np # type: ignore
 from amplitude_encondig_utils import *
 from phase_enconding_utils import *
 
+#define random number generator
+rng = np.random.default_rng()
+
 def compute_expected_outputs(inputs: List[List[int]], logic_gate: str = "XOR") -> List[str]:
     """
     Compute the expected outputs for a given list of inputs and a specified logic gate.
@@ -96,18 +99,22 @@ def phase_qNN_evaluate(inputs,expected_outputs,parameters,number_of_runs=1,numbe
     #define list of expected outputs
     list_of_expected_outputs = list(expected_outputs.values())
 
+    #define counts list
+    counts_list = []
+
     #apply qNN circuit to each input
     for interation in range(len(inputs)):
 
         qNN_circuit = generate_phase_qNN_circuit(inputs[interation],parameters,number_of_inputs,number_of_inputs_per_qubit=number_of_inputs_per_qubit) #generate circuit
         counts = qNN_circuit.evaluate(number_of_runs=number_of_runs, number_of_shots=number_of_shots, type_of_run=type_of_run) #run circuit
+        counts_list.append(counts) #add counts to list
         total_error += phase_qNN_compute_error(counts,list_of_expected_outputs[interation]) #add error
 
     #normalize total error
     total_error = total_error/len(inputs)
 
     #return total error
-    return total_error
+    return total_error, counts_list
 
 def amplitude_qNN_evaluate(inputs,expected_outputs,parameters,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation"):
     """
@@ -149,7 +156,7 @@ def compute_gradient(parameters, inputs, expected_outputs, number_of_inputs, num
 
     return gradient
 
-def random_parameters(tipe_of_enconding=None, number_of_inputs=2):
+def random_parameters(type_of_encoding=None, number_of_inputs=2):
     """
     Generate random parameters for a quantum neural network.
 
@@ -161,14 +168,16 @@ def random_parameters(tipe_of_enconding=None, number_of_inputs=2):
     list of floats: Random parameters.
     """
     #define size of list of random parameters based on enconding and number of inputs
-    if tipe_of_enconding == "phase":
+    if type_of_encoding == "phase":
         size = number_of_inputs + 1
-    elif tipe_of_enconding == "amplitude":
+    elif type_of_encoding == "amplitude":
         size = number_of_inputs * 2
     else:
         raise ValueError("Invalid type of enconding.")
     
     #generate random parameters
+    #rng.seed(None)
+    #return rng.uniform(-np.pi, np.pi, size=size)
     np.random.seed(None)
     return np.random.uniform(-np.pi, np.pi, size=size)
     
