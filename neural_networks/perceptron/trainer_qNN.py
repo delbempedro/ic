@@ -27,7 +27,7 @@ from trainer_utils import *
 
 class trainer_qNN():
     
-    def __init__(self,grid_grain=10,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation", save_history=False, tolerance=0.25, logic_gate="XOR", type_of_encoding=None, number_of_inputs_per_qubit=2, learning_rate=0.1, temperature=1.0, final_temperature=1e-3, alpha=0.95, population_size=20, mutation_rate=0.1, rng=None, force_high_initial_error=False):
+    def __init__(self,grid_grain=10,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation", save_history=False, tolerance=0.25, logic_gate="XOR", type_of_encoding=None, number_of_inputs_per_qubit=2, learning_rate=0.1, temperature=1.0, final_temperature=1e-3, alpha=0.95, population_size=20, mutation_rate=0.1, rng=None, force_high_initial_error=False, save_counts=False, save_parameters_history=False):
         """
         Create trainer for the quantum neural network.
         """
@@ -46,6 +46,8 @@ class trainer_qNN():
         self._max_iterations = number_of_inputs**grid_grain
         self._type_of_encoding = type_of_encoding
         self._force_high_initial_error = force_high_initial_error
+        self._save_counts = save_counts
+        self._save_parameters_history = save_parameters_history
 
         #define type of encoding
         if type_of_encoding == "phase":
@@ -71,6 +73,18 @@ class trainer_qNN():
         else:
             self.history_list = None
 
+        #define parameters list history
+        if save_parameters_history:
+            self._parameters_history_list = []
+        else:
+            self._parameters_history_list = None
+
+        #define counts list
+        if save_counts:
+            self._counts_list = []
+        else:
+            self._counts_list = None
+
         #define inputs and expected outputs
         self._inputs = [list(t) for t in product([0, 1], repeat=self._number_of_inputs)]
         self._expected_outputs = compute_expected_outputs(self._inputs, logic_gate=self._logic_gate)
@@ -81,7 +95,7 @@ class trainer_qNN():
         """
         if self._final_parameters is not None:
             #define dictonary
-            dictonary_with_results = {"Final Parameters": [float(parameter%(2*np.pi)) for parameter in self._final_parameters], "Final Error": self._final_error, "Number of Iterations": self._final_number_of_iterations, "History List": self._history_list if self._history_list is not None else []}
+            dictonary_with_results = {"Final Parameters": [float(parameter%(2*np.pi)) for parameter in self._final_parameters], "Final Error": self._final_error, "Number of Iterations": self._final_number_of_iterations, "History List": self._history_list if self._history_list is not None else [], "Counts List": self._counts_list if self._counts_list is not None else [], "Parameters History List": self._parameters_history_list if self._parameters_history_list is not None else []}
 
             return dictonary_with_results
         else:
@@ -119,6 +133,8 @@ class trainer_qNN():
         #initialize grid
         grid = np.linspace(-np.pi, np.pi, self._grid_grain)
 
+        number_of_parameters = {"amplitude":self._number_of_inputs*2,"phase":self._number_of_inputs+1}
+
         #initialize history list
         self._history_list = []
 
@@ -126,16 +142,25 @@ class trainer_qNN():
         self._final_number_of_iterations = 0
 
         #exaustive search
-        for parameters in product(grid, repeat=(self._number_of_inputs+1)):
+        for parameters in product(grid, repeat=(number_of_parameters[self._type_of_encoding])): #FIX LOOP NUMBER FOR AMPLITUDE ENCONDING
 
             #update iteration counter
             self._final_number_of_iterations += 1
 
-            #compute total error
-            current_error = self._evaluate_function[self._type_of_encoding](self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run)
-
+            if self._save_counts:
+                #compute total error and counts
+                current_error, counts = self._evaluate_function[self._type_of_encoding](self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run, save_counts=self._save_counts)
+                self._counts_list.append(counts)
+            else:
+                #compute total error
+                current_error = self._evaluate_function[self._type_of_encoding](self._inputs, self._expected_outputs, parameters, number_of_runs=self._number_of_runs, number_of_shots=self._number_of_shots, number_of_inputs=self._number_of_inputs, type_of_run=self._type_of_run)
+            
             #update final error and final parameters
             self._final_parameters, self._final_error = update_if_better(parameters, current_error, self._final_parameters, self._final_error)
+
+            #save parameters history
+            if self._save_parameters_history:
+                self._parameters_history_list.append(self._final_parameters)
 
             #save history
             if self._save_history:

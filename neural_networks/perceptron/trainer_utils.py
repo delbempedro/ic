@@ -75,7 +75,7 @@ def compute_expected_outputs(inputs: List[List[int]], logic_gate: str = "XOR") -
 
     #return [str(reduce(op, row)) for row in inputs]
 
-def phase_qNN_evaluate(inputs,expected_outputs,parameters,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation",number_of_inputs_per_qubit=3):
+def phase_qNN_evaluate(inputs,expected_outputs,parameters,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation",number_of_inputs_per_qubit=3,save_counts=False):
     """
     Compute the total error for a set of inputs and expected outputs.
 
@@ -113,17 +113,27 @@ def phase_qNN_evaluate(inputs,expected_outputs,parameters,number_of_runs=1,numbe
     #normalize total error
     total_error = total_error/len(inputs)
 
-    #return total error
-    return total_error, counts_list
+    
+    if save_counts:
+        #return total error and counts list
+        return total_error, counts_list
+    else:
+        #return total error
+        return total_error
 
-def amplitude_qNN_evaluate(inputs,expected_outputs,parameters,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation"):
+def amplitude_qNN_evaluate(inputs,expected_outputs,parameters,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation",save_counts=False):
     """
     Generate amplitude qNN circuit and compute error
     """
     #compute counts
     counts = generate_amplitude_qNN_circuit(parameters, number_of_inputs=number_of_inputs).evaluate(number_of_runs=number_of_runs,number_of_shots=number_of_shots,type_of_run=type_of_run)
 
-    return amplitude_qNN_compute_error(inputs, expected_outputs, counts, number_of_inputs=number_of_inputs)
+    if save_counts:
+        #return total error and counts
+        return amplitude_qNN_compute_error(inputs, expected_outputs, counts, number_of_inputs=number_of_inputs), counts
+    else:
+        #return total error
+        return amplitude_qNN_compute_error(inputs, expected_outputs, counts, number_of_inputs=number_of_inputs)
     
 def compute_gradient(parameters, inputs, expected_outputs, number_of_inputs, number_of_runs, number_of_shots, type_of_run, epsilon=1e-3, number_of_inputs_per_qubit=3, evaluate_function=None):
     """
