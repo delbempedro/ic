@@ -1,0 +1,13 @@
+Results for phase encoding, tolerance=0.25, grid_grain=10
+  Training with exhaustive_search method      Parameters: [3.141592653589793, 3.141592653589793, 2.443460952792061] | Error: 0.244140625 | Iterations: 9
+       History of errors:
+          Iteration 1: Error: 0.50537109375
+          Iteration 2: Error: 0.50537109375
+          Iteration 3: Error: 0.50537109375
+          Iteration 4: Error: 0.278076171875
+          Iteration 5: Error: 0.278076171875
+          Iteration 6: Error: 0.278076171875
+          Iteration 7: Error: 0.278076171875
+          Iteration 8: Error: 0.278076171875
+          Iteration 9: Error: 0.244140625
+  Training with gradient_descent method

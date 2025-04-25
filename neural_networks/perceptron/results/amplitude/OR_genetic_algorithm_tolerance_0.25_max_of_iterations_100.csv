@@ -1,0 +1,12 @@
+Logic Gate; Method; Iteration; Error; Run
+OR; genetic_algorithm; 1; 0.2431640625; 0
+OR; genetic_algorithm; 1; 0.236328125; 1
+OR; genetic_algorithm; 1; 0.228515625; 2
+OR; genetic_algorithm; 1; 0.2431640625; 3
+OR; genetic_algorithm; 1; 0.2392578125; 4
+OR; genetic_algorithm; 1; 0.2568359375; 5
+OR; genetic_algorithm; 2; 0.2490234375; 5
+OR; genetic_algorithm; 1; 0.2265625; 6
+OR; genetic_algorithm; 1; 0.2373046875; 7
+OR; genetic_algorithm; 1; 0.234375; 8
+OR; genetic_algorithm; 1; 0.2236328125; 9

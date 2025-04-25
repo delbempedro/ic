@@ -1,0 +1,12 @@
+Logic Gate; Method; Iteration; Error; Run
+XNOR; genetic_algorithm; 1; 0.2587890625; 0
+XNOR; genetic_algorithm; 2; 0.24609375; 0
+XNOR; genetic_algorithm; 1; 0.2451171875; 1
+XNOR; genetic_algorithm; 1; 0.2314453125; 2
+XNOR; genetic_algorithm; 1; 0.2421875; 3
+XNOR; genetic_algorithm; 1; 0.244140625; 4
+XNOR; genetic_algorithm; 1; 0.23828125; 5
+XNOR; genetic_algorithm; 1; 0.2275390625; 6
+XNOR; genetic_algorithm; 1; 0.232421875; 7
+XNOR; genetic_algorithm; 1; 0.2353515625; 8
+XNOR; genetic_algorithm; 1; 0.228515625; 9

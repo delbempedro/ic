@@ -1,0 +1,65 @@
+Results for amplitude encoding, tolerance=0.25, grid_grain=10
+  Training with exhaustive_search method      Parameters: [3.141592653589793, 3.141592653589793, 5.235987755982988] | Error: 0.248046875 | Iterations: 4
+       History of errors:
+          Iteration 1: Error: 0.2626953125
+          Iteration 2: Error: 0.2509765625
+          Iteration 3: Error: 0.2509765625
+          Iteration 4: Error: 0.248046875
+  Training with gradient_descent method      Parameters: [2.9061867416126246, 2.223142635670902, 3.610996705336875, 3.8710062747901004] | Error: 0.2470703125 | Iterations: 11
+       History of errors:
+          Iteration 1: Error: 0.2802734375
+          Iteration 2: Error: 0.2802734375
+          Iteration 3: Error: 0.2802734375
+          Iteration 4: Error: 0.2802734375
+          Iteration 5: Error: 0.2802734375
+          Iteration 6: Error: 0.2802734375
+          Iteration 7: Error: 0.2607421875
+          Iteration 8: Error: 0.2607421875
+          Iteration 9: Error: 0.2607421875
+          Iteration 10: Error: 0.2607421875
+          Iteration 11: Error: 0.2470703125
+  Training with random_search method      Parameters: [1.0369149044051351, 2.004323412479252, 1.8188116548580364, 2.0246787363691015] | Error: 0.2451171875 | Iterations: 3
+       History of errors:
+          Iteration 1: Error: 0.57421875
+          Iteration 2: Error: 0.2783203125
+          Iteration 3: Error: 0.2451171875
+  Training with simulated_annealing method      Parameters: [0.2930374102119937, 0.5016878338159794, 5.920831207103523, 3.3543894289348084] | Error: 0.2490234375 | Iterations: 35
+       History of errors:
+          Iteration 1: Error: 0.36328125
+          Iteration 2: Error: 0.36328125
+          Iteration 3: Error: 0.3486328125
+          Iteration 4: Error: 0.326171875
+          Iteration 5: Error: 0.2978515625
+          Iteration 6: Error: 0.2978515625
+          Iteration 7: Error: 0.2978515625
+          Iteration 8: Error: 0.2958984375
+          Iteration 9: Error: 0.2958984375
+          Iteration 10: Error: 0.2958984375
+          Iteration 11: Error: 0.26953125
+          Iteration 12: Error: 0.259765625
+          Iteration 13: Error: 0.259765625
+          Iteration 14: Error: 0.2587890625
+          Iteration 15: Error: 0.2587890625
+          Iteration 16: Error: 0.2587890625
+          Iteration 17: Error: 0.2587890625
+          Iteration 18: Error: 0.2587890625
+          Iteration 19: Error: 0.2587890625
+          Iteration 20: Error: 0.2587890625
+          Iteration 21: Error: 0.2587890625
+          Iteration 22: Error: 0.2587890625
+          Iteration 23: Error: 0.2587890625
+          Iteration 24: Error: 0.2587890625
+          Iteration 25: Error: 0.2587890625
+          Iteration 26: Error: 0.2587890625
+          Iteration 27: Error: 0.2587890625
+          Iteration 28: Error: 0.2587890625
+          Iteration 29: Error: 0.2587890625
+          Iteration 30: Error: 0.2587890625
+          Iteration 31: Error: 0.2587890625
+          Iteration 32: Error: 0.2587890625
+          Iteration 33: Error: 0.2587890625
+          Iteration 34: Error: 0.2587890625
+          Iteration 35: Error: 0.2490234375
+  Training with genetic_algorithm method      Parameters: [5.749678157670072, 2.284418756338682, 0.9953291490635481, 0.7493438737978604] | Error: 0.2294921875 | Iterations: 1
+       History of errors:
+          Iteration 1: Error: 0.2294921875

@@ -1,0 +1,11 @@
+Logic Gate; Method; Iteration; Error; Run
+NAND; genetic_algorithm; 1; 0.244140625; 0
+NAND; genetic_algorithm; 1; 0.2373046875; 1
+NAND; genetic_algorithm; 1; 0.2431640625; 2
+NAND; genetic_algorithm; 1; 0.2294921875; 3
+NAND; genetic_algorithm; 1; 0.2431640625; 4
+NAND; genetic_algorithm; 1; 0.244140625; 5
+NAND; genetic_algorithm; 1; 0.2255859375; 6
+NAND; genetic_algorithm; 1; 0.2470703125; 7
+NAND; genetic_algorithm; 1; 0.240234375; 8
+NAND; genetic_algorithm; 1; 0.2373046875; 9

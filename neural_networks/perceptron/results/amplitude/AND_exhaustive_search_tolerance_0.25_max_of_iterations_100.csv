@@ -1,0 +1,17 @@
+Logic Gate; Method; Iteration; Error; Run
+AND; exhaustive_search; 1; 0.248046875; 0
+AND; exhaustive_search; 1; 0.2607421875; 1
+AND; exhaustive_search; 2; 0.240234375; 1
+AND; exhaustive_search; 1; 0.263671875; 2
+AND; exhaustive_search; 2; 0.2412109375; 2
+AND; exhaustive_search; 1; 0.2421875; 3
+AND; exhaustive_search; 1; 0.2314453125; 4
+AND; exhaustive_search; 1; 0.244140625; 5
+AND; exhaustive_search; 1; 0.240234375; 6
+AND; exhaustive_search; 1; 0.2529296875; 7
+AND; exhaustive_search; 2; 0.2529296875; 7
+AND; exhaustive_search; 3; 0.2529296875; 7
+AND; exhaustive_search; 4; 0.2529296875; 7
+AND; exhaustive_search; 5; 0.2353515625; 7
+AND; exhaustive_search; 1; 0.248046875; 8
+AND; exhaustive_search; 1; 0.24609375; 9

@@ -1,0 +1,18 @@
+Logic Gate; Method; Iteration; Error; Run
+XOR; genetic_algorithm; 1; 0.173828125; 0
+XOR; genetic_algorithm; 1; 0.21923828125; 1
+XOR; genetic_algorithm; 1; 0.213134765625; 2
+XOR; genetic_algorithm; 1; 0.21337890625; 3
+XOR; genetic_algorithm; 1; 0.251953125; 4
+XOR; genetic_algorithm; 2; 0.35400390625; 4
+XOR; genetic_algorithm; 3; 0.25537109375; 4
+XOR; genetic_algorithm; 4; 0.338623046875; 4
+XOR; genetic_algorithm; 5; 0.22998046875; 4
+XOR; genetic_algorithm; 1; 0.244384765625; 5
+XOR; genetic_algorithm; 1; 0.248046875; 6
+XOR; genetic_algorithm; 1; 0.384033203125; 7
+XOR; genetic_algorithm; 2; 0.3564453125; 7
+XOR; genetic_algorithm; 3; 0.243896484375; 7
+XOR; genetic_algorithm; 1; 0.291015625; 8
+XOR; genetic_algorithm; 2; 0.15771484375; 8
+XOR; genetic_algorithm; 1; 0.23681640625; 9
