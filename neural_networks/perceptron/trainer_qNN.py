@@ -27,7 +27,7 @@ from trainer_utils import *
 
 class trainer_qNN():
     
-    def __init__(self,grid_grain=10,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation", save_history=False, tolerance=0.25, logic_gate="XOR", type_of_encoding=None, number_of_inputs_per_qubit=2, learning_rate=0.1, temperature=1.0, final_temperature=1e-3, alpha=0.95, population_size=20, mutation_rate=0.1, rng=None, force_high_initial_error=False):
+    def __init__(self,grid_grain=10,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation", save_history=False, tolerance=0.25, logic_gate="XOR", type_of_encoding=None, number_of_inputs_per_qubit=2, learning_rate=0.1, temperature=1.0, final_temperature=1e-3, alpha=0.95, population_size=20, mutation_rate=0.1, rng=None, force_high_initial_error=False, grid_start_index=0):
         """
         Create trainer for the quantum neural network.
         """
@@ -60,10 +60,14 @@ class trainer_qNN():
         self._evaluate_function = {"amplitude": amplitude_qNN_evaluate, "phase": partial_phase_qNN_evaluate}
 
         #define training methods
+        if grid_start_index < grid_grain: #if grid start index is valid
+            partial_cg_exhaustive_search = partial(self._cg_exhaustive_search, grid_start_index=grid_start_index)
+        else:
+            raise ValueError("Invalid grid start index.")
         partial_gradient_descent = partial(self._gradient_descent, learning_rate=learning_rate)
         partial_simulated_annealing = partial(self._simulated_annealing, temperature=temperature, final_temperature=final_temperature, alpha=alpha)
         partial_genetic_algorithm = partial(self._genetic_algorithm, population_size=population_size, mutation_rate=mutation_rate)
-        self._training_methods = {"exhaustive_search": self._exhaustive_search, "gradient_descent": partial_gradient_descent, "random_search": self._random_search, "simulated_annealing": partial_simulated_annealing, "genetic_algorithm": partial_genetic_algorithm}
+        self._training_methods = {"cg-exhaustive_search": partial_cg_exhaustive_search, "gradient_descent": partial_gradient_descent, "random_search": self._random_search, "simulated_annealing": partial_simulated_annealing, "genetic_algorithm": partial_genetic_algorithm}
         
         #define history list
         if save_history:
@@ -81,7 +85,7 @@ class trainer_qNN():
         """
         if self._final_parameters is not None:
             #define dictonary
-            dictonary_with_results = {"Final Parameters": [float(parameter%(2*np.pi)-np.pi) for parameter in self._final_parameters], "Final Error": self._final_error, "Number of Iterations": self._final_number_of_iterations, "History List": self._history_dictonary if self._history_dictonary is not None else []}
+            dictonary_with_results = {"Final Parameters": [float(((parameter+np.pi)%2*np.pi)-np.pi) for parameter in self._final_parameters], "Final Error": self._final_error, "Number of Iterations": self._final_number_of_iterations, "History List": self._history_dictonary if self._history_dictonary is not None else []}
 
             return dictonary_with_results
         else:
@@ -96,7 +100,7 @@ class trainer_qNN():
         except KeyError:
             raise ValueError("Invalid type of training.")
 
-    def _exhaustive_search(self):
+    def _cg_exhaustive_search(self, grid_start_index=0):
         """
         Perform an exhaustive search to find optimal parameters for the quantum neural network.
 
@@ -118,6 +122,7 @@ class trainer_qNN():
 
         #initialize grid
         grid = np.linspace(-np.pi, np.pi, self._grid_grain)
+        grid = np.roll(grid, -grid_start_index)
 
         number_of_parameters = {"amplitude":self._number_of_inputs*2,"phase":self._number_of_inputs+1}
 
@@ -146,8 +151,8 @@ class trainer_qNN():
             if self._save_history:
                 self._history_dictonary["Error"].append(current_error)
                 self._history_dictonary["Best Error"].append(self._final_error)
-                self._history_dictonary["Parameters"].append([float(parameter%(2*np.pi)-np.pi) for parameter in parameters])
-                self._history_dictonary["Best Parameters"].append([float(parameter%(2*np.pi)-np.pi) for parameter in self._final_parameters])
+                self._history_dictonary["Parameters"].append([float(((parameter+np.pi)%2*np.pi)-np.pi) for parameter in parameters])
+                self._history_dictonary["Best Parameters"].append([float(((parameter+np.pi)%2*np.pi)-np.pi) for parameter in self._final_parameters])
 
             #check convergence
             if self._final_error < self._tolerance:
@@ -204,8 +209,8 @@ class trainer_qNN():
             if self._save_history:
                 self._history_dictonary["Error"].append(current_error)
                 self._history_dictonary["Best Error"].append(self._final_error)
-                self._history_dictonary["Parameters"].append([float(parameter%(2*np.pi)-np.pi) for parameter in parameters])
-                self._history_dictonary["Best Parameters"].append([float(parameter%(2*np.pi)-np.pi) for parameter in self._final_parameters])
+                self._history_dictonary["Parameters"].append([float(((parameter+np.pi)%2*np.pi)-np.pi) for parameter in parameters])
+                self._history_dictonary["Best Parameters"].append([float(((parameter+np.pi)%2*np.pi)-np.pi) for parameter in self._final_parameters])
 
             #check for convergence
             if current_error < self._tolerance:
@@ -250,8 +255,8 @@ class trainer_qNN():
             if self._save_history:
                 self._history_dictonary["Error"].append(current_error)
                 self._history_dictonary["Best Error"].append(self._final_error)
-                self._history_dictonary["Parameters"].append([float(parameter%(2*np.pi)-np.pi) for parameter in parameters])
-                self._history_dictonary["Best Parameters"].append([float(parameter%(2*np.pi)-np.pi) for parameter in self._final_parameters])
+                self._history_dictonary["Parameters"].append([float(((parameter+np.pi)%2*np.pi)-np.pi) for parameter in parameters])
+                self._history_dictonary["Best Parameters"].append([float(((parameter+np.pi)%2*np.pi)-np.pi) for parameter in self._final_parameters])
 
             #check for convergence
             if self._final_error < self._tolerance:
@@ -320,8 +325,8 @@ class trainer_qNN():
             if self._save_history:
                 self._history_dictonary["Error"].append(current_error)
                 self._history_dictonary["Best Error"].append(self._final_error)
-                self._history_dictonary["Parameters"].append([float(parameter%(2*np.pi)-np.pi) for parameter in parameters])
-                self._history_dictonary["Best Parameters"].append([float(parameter%(2*np.pi)-np.pi) for parameter in self._final_parameters])
+                self._history_dictonary["Parameters"].append([float(((parameter+np.pi)%2*np.pi)-np.pi) for parameter in parameters])
+                self._history_dictonary["Best Parameters"].append([float(((parameter+np.pi)%2*np.pi)-np.pi) for parameter in self._final_parameters])
 
             #check convergence
             if temperature < final_temperature or self._final_error < self._tolerance:
@@ -374,7 +379,7 @@ class trainer_qNN():
             #save history
             if self._save_history:
                 self._history_dictonary["Best Error"].append(self._final_error)
-                self._history_dictonary["Best Parameters"].append([float(parameter%(2*np.pi)-np.pi) for parameter in self._final_parameters])
+                self._history_dictonary["Best Parameters"].append([float(((parameter+np.pi)%2*np.pi)-np.pi) for parameter in self._final_parameters])
 
             #check convergence
             if self._final_error < self._tolerance:
