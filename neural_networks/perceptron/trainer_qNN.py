@@ -27,7 +27,7 @@ from trainer_utils import *
 
 class trainer_qNN():
     
-    def __init__(self,grid_grain=10,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation", save_history=False, tolerance=0.25, logic_gate="XOR", type_of_encoding=None, number_of_inputs_per_qubit=2, learning_rate=0.1, temperature=1.0, final_temperature=1e-3, alpha=0.95, population_size=20, mutation_rate=0.1, rng=None, force_high_initial_error=False, grid_start_index=0):
+    def __init__(self,grid_grain=10,number_of_runs=1,number_of_shots=1024,number_of_inputs=2,type_of_run="simulation", save_history=False, tolerance=0.25, logic_gate="XOR", type_of_encoding=None, number_of_inputs_per_qubit=2, learning_rate=0.1, temperature=1.0, final_temperature=1e-3, alpha=0.95, population_size=20, mutation_rate=0.1, grid_start_index=0, grid_ranges=[]):
         """
         Create trainer for the quantum neural network.
         """
@@ -45,7 +45,6 @@ class trainer_qNN():
         self._logic_gate = logic_gate
         self._max_iterations = number_of_inputs**grid_grain
         self._type_of_encoding = type_of_encoding
-        self._force_high_initial_error = force_high_initial_error
 
         #define type of encoding
         if type_of_encoding == "phase":
@@ -54,6 +53,11 @@ class trainer_qNN():
             self._number_of_inputs_per_qubit = None
         else:
             raise ValueError("Invalid type of encoding.")
+
+        if len(grid_ranges):
+            self._grid_ranges = grid_ranges
+        else:
+            self._grid_ranges = None
         
         #define evaluate function
         partial_phase_qNN_evaluate = partial(phase_qNN_evaluate, number_of_inputs_per_qubit = self._number_of_inputs_per_qubit)
@@ -121,8 +125,19 @@ class trainer_qNN():
         self._final_parameters = [0]*(self._number_of_inputs+1)
 
         #initialize grid
-        grid = np.linspace(-np.pi, np.pi, self._grid_grain)
-        grid = np.roll(grid, -grid_start_index)
+        parameter_ranges = []
+
+        #define grid
+        if self._grid_ranges is None:
+            base_grid = np.linspace(-np.pi, np.pi, self._grid_grain)
+            base_grid = np.roll(base_grid, -grid_start_index)
+            parameter_ranges = [base_grid]*number_of_parameters[self._type_of_encoding]
+        else:
+            for start, end in self._grid_ranges:
+                grid = np.linspace(start, end, self._grid_grain)
+                grid = np.roll(grid, -grid_start_index)
+                parameter_ranges.append(grid)
+
 
         number_of_parameters = {"amplitude":self._number_of_inputs*2,"phase":self._number_of_inputs+1}
 
@@ -130,7 +145,7 @@ class trainer_qNN():
         self._final_number_of_iterations = 0
 
         #exaustive search
-        for parameters in product(grid, repeat=(number_of_parameters[self._type_of_encoding])): #FIX LOOP NUMBER FOR AMPLITUDE ENCONDING
+        for parameters in product(*parameter_ranges):
 
             #update iteration counter
             self._final_number_of_iterations += 1
