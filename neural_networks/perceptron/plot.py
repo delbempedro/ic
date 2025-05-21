@@ -14,7 +14,7 @@ from pathlib import Path
 import re
 
 # Ask the user to input the folder path
-folder_path = input("Enter the path to the folder containing the CSV files: ")
+folder_path = "results/"+input("Enter the path to the folder containing the CSV files: ")
 folder = Path(folder_path)
 
 # Create the "plots" folder if it doesn't exist
