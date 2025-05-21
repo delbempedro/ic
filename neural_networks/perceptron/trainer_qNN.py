@@ -127,6 +127,8 @@ class trainer_qNN():
         #initialize grid
         parameter_ranges = []
 
+        number_of_parameters = {"amplitude":self._number_of_inputs*2,"phase":self._number_of_inputs+1}
+
         #define grid
         if self._grid_ranges is None:
             base_grid = np.linspace(-np.pi, np.pi, self._grid_grain)
@@ -137,9 +139,6 @@ class trainer_qNN():
                 grid = np.linspace(start, end, self._grid_grain)
                 grid = np.roll(grid, -grid_start_index)
                 parameter_ranges.append(grid)
-
-
-        number_of_parameters = {"amplitude":self._number_of_inputs*2,"phase":self._number_of_inputs+1}
 
         #initialize iteration counter
         self._final_number_of_iterations = 0

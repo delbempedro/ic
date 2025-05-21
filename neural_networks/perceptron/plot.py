@@ -2,157 +2,178 @@
 """
 plot.py
 
-Module to plot the convergence of qNN trainin methods.
-
-Dependencies:
-- Use os to handle file paths
-- Use pandas to organize the data
-- Use plotly.io to save the plots as PNG and HTML
-- Use plotly.graph_objects to create the plots
-
-Since:
-- 04/2025
+Module to plot the convergence of qNN training methods.
 
 Authors:
-- Pedro C. Delbem. <pedrodelbem@usp.br>
+- Pedro C. Delbem <pedrodelbem@usp.br>
 """
-import os
-import argparse
-import pandas as pd # type: ignore
-import plotly.graph_objects as go # type: ignore
-import plotly.io as pio # type: ignore
 
-def load_and_prepare_data(folder_paths, convergence_threshold=0.25):
-    df_list = []
-    for folder_path in folder_paths:
-        all_files = [f for f in os.listdir(folder_path) if f.endswith(".csv")]
-        all_paths = [os.path.join(folder_path, f) for f in all_files]
+import pandas as pd
+import plotly.graph_objects as go
+from pathlib import Path
+import re
 
-        for path in all_paths:
-            df = pd.read_csv(path, sep=";")
-            df.columns = df.columns.str.strip().str.lower()  # Normalize column names
-            df_list.append(df)
+# Ask the user to input the folder path
+folder_path = input("Enter the path to the folder containing the CSV files: ")
+folder = Path(folder_path)
 
-    full_df = pd.concat(df_list, ignore_index=True)
+# Create the "plots" folder if it doesn't exist
+plots_folder = Path("plots")
+plots_folder.mkdir(exist_ok=True)
 
-    # Convert relevant columns to appropriate types
-    full_df["iteration"] = full_df["iteration"].astype(int)
-    full_df["error"] = full_df["error"].astype(float)
-    full_df["run"] = full_df["run"].astype(int)
+# Collect all CSV files
+csv_files = list(folder.glob("*.csv"))
+if not csv_files:
+    print("No .csv files found in the specified folder.")
+    exit()
 
-    # Ensure all iterations are present per (logic gate, method, run)
-    completed_runs = []
-    global_max_iter = full_df["iteration"].max()
+# Load and normalize all files
+all_data = []
+gate_to_tolerance = {}
 
-    for (gate, method, run), run_df in full_df.groupby(["logic gate", "method", "run"]):
-        # Handle duplicates: average repeated iterations
-        run_df = run_df.groupby("iteration").mean(numeric_only=True)
+for file in csv_files:
+    try:
+        df = pd.read_csv(file, sep=";")
+        df.columns = df.columns.str.strip().str.lower()
+        if df.empty:
+            print(f"Skipping empty file: {file.name}")
+            continue
 
-        # Reindex to ensure all iterations are present
-        run_df = run_df.reindex(range(global_max_iter + 1))
+        required = {"logic gate", "method", "iteration", "error", "run"}
+        if not required.issubset(df.columns):
+            print(f"Missing columns in {file.name}: {df.columns}")
+            continue
 
-        # Add additional columns for identification
-        run_df["logic gate"] = gate
-        run_df["method"] = method
-        run_df["run"] = run
+        df["iteration"] = df["iteration"].astype(int)
+        df["error"] = df["error"].astype(float)
+        df["run"] = df["run"].astype(int)
 
-        completed_runs.append(run_df.reset_index())
+        logic_gate = df["logic gate"].iloc[0]
 
-    full_df = pd.concat(completed_runs, ignore_index=True)
-    full_df.rename(columns={"index": "iteration"}, inplace=True)
+        # Only extract tolerance once per logic gate
+        if logic_gate not in gate_to_tolerance:
+            match = re.search(r'tolerance[_\-]?([0-9.]+)', file.stem)
+            if match:
+                tolerance = float(match.group(1))
+                gate_to_tolerance[logic_gate] = tolerance
+            else:
+                print(f"Warning: Couldn't extract tolerance from {file.name}. Using 0.")
+                gate_to_tolerance[logic_gate] = 0.0
 
-    return full_df, global_max_iter
+        all_data.append(df)
 
-def generate_and_save_plots(full_df, output_root_folder, convergence_threshold, max_iteration):
-    output_folder = os.path.join(output_root_folder, "plots")
-    os.makedirs(output_folder, exist_ok=True)
+    except Exception as e:
+        print(f"Error with file {file.name}: {e}")
 
-    grouped_by_logic = full_df.groupby("logic gate")
+if not all_data:
+    print("No valid data found.")
+    exit()
 
-    for logic_gate, logic_df in grouped_by_logic:
-        fig = go.Figure()
+# Merge all DataFrames
+full_df = pd.concat(all_data, ignore_index=True)
 
-        for method, method_df in logic_df.groupby("method"):
-            # Calculate mean, std, min, and max for all iterations
-            summary = method_df.groupby("iteration")["error"].agg(["mean", "std", "min", "max"]).reset_index()
+# Extract the name of the parent directory (for file naming)
+parent_directory_name = folder.name
 
-            # Mean curve with markers
+# Create one interactive plot per logic gate
+for logic_gate in full_df["logic gate"].unique():
+    df_gate = full_df[full_df["logic gate"] == logic_gate]
+    fig = go.Figure()
+
+    for method in df_gate["method"].unique():
+        df_method = df_gate[df_gate["method"] == method]
+
+        # Plot individual runs (transparent)
+        for run in df_method["run"].unique():
+            df_run = df_method[df_method["run"] == run]
             fig.add_trace(go.Scatter(
-                x=summary["iteration"],
-                y=summary["mean"],
+                x=df_run["iteration"],
+                y=df_run["error"],
                 mode="lines+markers",
-                name=f"{method} (mean)",
-                line=dict(width=2),
-            ))
-
-            # Shaded area for min-max range
-            fig.add_trace(go.Scatter(
-                x=pd.concat([summary["iteration"], summary["iteration"][::-1]]),
-                y=pd.concat([summary["max"], summary["min"][::-1]]),
-                fill="toself",
-                fillcolor="rgba(0, 100, 80, 0.1)",
-                line=dict(color="rgba(255,255,255,0)"),
-                hoverinfo="skip",
-                name=f"{method} (min-max range)"
-            ))
-
-            # Error bars for standard deviation
-            fig.add_trace(go.Scatter(
-                x=summary["iteration"],
-                y=summary["mean"],
-                mode="markers",
-                error_y=dict(
-                    type='data',
-                    array=summary["std"],
-                    visible=True,
-                    color='gray'
-                ),
-                marker=dict(opacity=0),
+                name=f"{method} (run {run})",
+                line=dict(width=1),
+                opacity=0.3,
+                hoverinfo="x+y+name",
+                legendgroup=method,
                 showlegend=False
             ))
 
-        # Add convergence threshold line
+        # Group by iteration and compute summary statistics
+        summary = df_method.groupby("iteration")["error"].agg(["mean", "std", "min", "max"]).reset_index()
+
+        # Shaded area between min and max
         fig.add_trace(go.Scatter(
-            x=[0, max_iteration],
-            y=[convergence_threshold, convergence_threshold],
+            x=summary["iteration"],
+            y=summary["max"],
             mode="lines",
-            name=f"Convergence Threshold (error = {convergence_threshold})",
-            line=dict(color="black", width=2, dash="dash"),
-            hoverinfo="skip"
+            line=dict(width=0),
+            name=f"{method} (max)",
+            hoverinfo="skip",
+            legendgroup=method,
+            showlegend=False
+        ))
+        fig.add_trace(go.Scatter(
+            x=summary["iteration"],
+            y=summary["min"],
+            mode="lines",
+            fill='tonexty',
+            fillcolor='rgba(0,100,200,0.1)',
+            line=dict(width=0),
+            name=f"{method} min/max range",
+            hoverinfo="skip",
+            legendgroup=method,
+            showlegend=False
         ))
 
-        # Update layout
-        fig.update_layout(
-            title=f"Convergence Plot for {logic_gate} Gate",
-            xaxis_title="Iteration",
-            yaxis_title="Error",
-            template="plotly_white",
-            hovermode="x unified"
-        )
+        # Mean with standard deviation bars
+        fig.add_trace(go.Scatter(
+            x=summary["iteration"],
+            y=summary["mean"],
+            mode="markers+lines",
+            name=f"{method} (mean)",
+            line=dict(width=2),
+            marker=dict(size=6),
+            error_y=dict(
+                type='data',
+                symmetric=False,
+                array=summary["std"],
+                arrayminus=summary["std"],
+                visible=True
+            ),
+            legendgroup=method
+        ))
 
-        # Save plots
-        safe_gate_name = logic_gate.replace(" ", "_").lower()
-        html_path = os.path.join(output_folder, f"{safe_gate_name}_interactive_plot.html")
-        static_path = os.path.join(output_folder, f"{safe_gate_name}_plot.png")
+    # Add tolerance line (once per logic gate)
+    tolerance = gate_to_tolerance.get(logic_gate, None)
+    if tolerance is not None:
+        max_iter = df_gate["iteration"].max()
+        fig.add_trace(go.Scatter(
+            x=[0, max_iter],
+            y=[tolerance, tolerance],
+            mode="lines",
+            name=f"Tolerance = {tolerance}",
+            line=dict(color="black", dash="dash", width=1.5),
+            hoverinfo="name+y"
+        ))
 
-        fig.write_html(html_path)
-        pio.write_image(fig, static_path, format="png")
+    fig.update_layout(
+        title=f"Interactive Convergence Plot — {logic_gate.upper()}",
+        xaxis_title="Iteration",
+        yaxis_title="Error",
+        hovermode="closest",
+        template="plotly_white",
+        legend_title="Methods",
+        height=700
+    )
 
-        print(f"Plots saved for {logic_gate}:\n  Interactive: {html_path}\n  Static PNG : {static_path}")
+    # Define file names with parent directory name and logic gate
+    output_html = plots_folder / f"{parent_directory_name}_interactive_plot_{logic_gate}.html"
+    output_png = plots_folder / f"{parent_directory_name}_plot_{logic_gate}.png"
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(description="Generate convergence plots from CSV data.")
-    parser.add_argument("root", type=str, help="Root directory containing subdirectories with CSV files")
-    parser.add_argument("-s", "--subdirs", nargs="+", required=True, help="List of subdirectories to include")
-    return parser.parse_args()
+    # Save interactive plot as HTML
+    fig.write_html(output_html)
+    print(f"Saved interactive plot: {output_html}")
 
-def main():
-    args = parse_arguments()
-    folder_paths = [os.path.join(args.root, subdir) for subdir in args.subdirs]
-    convergence_threshold = 0.25
-
-    full_df, max_iteration = load_and_prepare_data(folder_paths, convergence_threshold)
-    generate_and_save_plots(full_df, args.root, convergence_threshold, max_iteration)
-
-if __name__ == "__main__":
-    main()
+    # Save static plot as PNG
+    fig.write_image(output_png)
+    print(f"Saved static plot: {output_png}")
