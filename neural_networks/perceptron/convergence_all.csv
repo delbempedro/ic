@@ -1,0 +1,63 @@
+Logic Gate,Method,Encoding,Max Iterations to Converge
+AND,Exhaustive Grid Search,amplitude-2-inputs,809
+AND,Gradient Descent,amplitude-2-inputs,17
+AND,Random Search,amplitude-2-inputs,23
+AND,Simulated Annealing,amplitude-2-inputs,99
+AND,Genetic Algorithm,amplitude-2-inputs,10
+OR,Exhaustive Grid Search,amplitude-2-inputs,510
+OR,Gradient Descent,amplitude-2-inputs,27
+OR,Random Search,amplitude-2-inputs,30
+OR,Simulated Annealing,amplitude-2-inputs,105
+OR,Genetic Algorithm,amplitude-2-inputs,10
+XOR,Exhaustive Grid Search,amplitude-2-inputs,804
+XOR,Gradient Descent,amplitude-2-inputs,32
+XOR,Random Search,amplitude-2-inputs,28
+XOR,Simulated Annealing,amplitude-2-inputs,110
+XOR,Genetic Algorithm,amplitude-2-inputs,10
+NAND,Exhaustive Grid Search,amplitude-2-inputs,502
+NAND,Gradient Descent,amplitude-2-inputs,24
+NAND,Random Search,amplitude-2-inputs,27
+NAND,Simulated Annealing,amplitude-2-inputs,89
+NAND,Genetic Algorithm,amplitude-2-inputs,10
+NOR,Exhaustive Grid Search,amplitude-2-inputs,508
+NOR,Gradient Descent,amplitude-2-inputs,21
+NOR,Random Search,amplitude-2-inputs,18
+NOR,Simulated Annealing,amplitude-2-inputs,136
+NOR,Genetic Algorithm,amplitude-2-inputs,10
+XNOR,Exhaustive Grid Search,amplitude-2-inputs,802
+XNOR,Gradient Descent,amplitude-2-inputs,33
+XNOR,Random Search,amplitude-2-inputs,40
+XNOR,Simulated Annealing,amplitude-2-inputs,136
+XNOR,Genetic Algorithm,amplitude-2-inputs,10
+AND,Exhaustive Grid Search,phase-2-inputs,642
+AND,Gradient Descent,phase-2-inputs,151
+AND,Random Search,phase-2-inputs,53
+AND,Simulated Annealing,phase-2-inputs,136
+AND,Genetic Algorithm,phase-2-inputs,10
+OR,Exhaustive Grid Search,phase-2-inputs,642
+OR,Gradient Descent,phase-2-inputs,99
+OR,Random Search,phase-2-inputs,102
+OR,Simulated Annealing,phase-2-inputs,136
+OR,Genetic Algorithm,phase-2-inputs,10
+XOR,Exhaustive Grid Search,phase-2-inputs,642
+XOR,Gradient Descent,phase-2-inputs,124
+XOR,Random Search,phase-2-inputs,83
+XOR,Simulated Annealing,phase-2-inputs,136
+XOR,Genetic Algorithm,phase-2-inputs,10
+NAND,Exhaustive Grid Search,phase-2-inputs,642
+NAND,Gradient Descent,phase-2-inputs,97
+NAND,Random Search,phase-2-inputs,87
+NAND,Simulated Annealing,phase-2-inputs,136
+NAND,Genetic Algorithm,phase-2-inputs,10
+NOR,Exhaustive Grid Search,phase-2-inputs,642
+NOR,Gradient Descent,phase-2-inputs,132
+NOR,Random Search,phase-2-inputs,110
+NOR,Simulated Annealing,phase-2-inputs,136
+NOR,Genetic Algorithm,phase-2-inputs,10
+XNOR,Exhaustive Grid Search,phase-2-inputs,642
+XNOR,Gradient Descent,phase-2-inputs,509
+XNOR,Random Search,phase-2-inputs,122
+XNOR,Simulated Annealing,phase-2-inputs,136
+XNOR,Genetic Algorithm,phase-2-inputs,10
+AND,Exhaustive Grid Search,amplitude-3-inputs,10000
+AND,Gradient Descent,amplitude-3-inputs,10000

@@ -7,84 +7,107 @@ Generate a convergence summary table from CSV files in subfolders.
 Usage:
     python analize_convergence.py
 
-The root_folder should contain subfolders named by encoding,
-each containing CSV files with the format:
+The 'results/' directory should contain subfolders named by encoding
+(e.g., 'amplitude-2-inputs', 'phase-2-inputs', etc.), and each encoding folder
+should contain multiple CSV files, one per logic gate and optimization method.
+
+Each CSV file must have the following format (semicolon-separated):
     Logic Gate; Method; Iteration; Error; Run
 
-Output:
-    max_iterations_summary.csv
+This script analyzes each CSV file and computes, for each combination of:
+(logic gate, optimization method, encoding), the **maximum number of iterations**
+needed to converge among all runs. The result is written to:
+
+    convergence_all.csv
 """
+
 import os
 import csv
-import argparse
+
+# Dictionary to map short method names (from filenames) to full names
+METHOD_NAME_MAP = {
+    'cg': 'Exhaustive Grid Search',
+    'genetic': 'Genetic Algorithm',
+    'gradient': 'Gradient Descent',
+    'random': 'Random Search',
+    'simulated': 'Simulated Annealing'
+}
 
 def max_iterations_to_converge(data):
+    """
+    Computes the maximum iteration number reached across all runs.
+    """
     try:
-        max_iter = max(int(row['Iteration']) for row in data)
-        return max_iter
+        return max(int(row['Iteration']) for row in data)
     except Exception as e:
-        print(f"Erro ao calcular max_iterations: {e}")
+        print(f"Error computing max_iterations: {e}")
         return 0
 
 def parse_gate_from_data(data):
+    """
+    Extracts the logic gate name from the first row of the CSV data.
+    """
     if len(data) == 0:
         return None
-    # Assume que o logic gate é o mesmo para todo arquivo
     return data[0].get('Logic Gate', None)
 
 def parse_method_from_filename(filename):
-    # Supondo que o método está no nome do arquivo, entre _ ou -
-    # Exemplo: AND_cg-exhaustive.csv -> cg-exhaustive
-    parts = filename.lower().replace('.csv', '').split('_')
-    if len(parts) >= 2:
-        return parts[1]
-    # Se não encontrar, tenta outro split por hífen
-    parts = filename.lower().replace('.csv', '').split('-')
-    if len(parts) >= 2:
-        return parts[1]
+    """
+    Extracts the optimization method from the filename and returns the full name.
+    """
+    name = filename.lower().replace('.csv', '')
+    for key in METHOD_NAME_MAP:
+        if key in name:
+            return METHOD_NAME_MAP[key]
     return None
 
-def main():
-    parser = argparse.ArgumentParser(description='Analisar convergência dos resultados')
-    parser.add_argument('folder', type=str, help='Pasta com arquivos CSV de resultados (ex: amplitude-2-inputs)')
-    args = parser.parse_args()
-
-    folder = 'results/' + args.folder
-    if not os.path.isdir(folder):
-        print(f"Pasta {folder} não existe.")
-        return
-
-    output_filename = f'convergence_{args.folder}.csv'
+def analyze_all_results(results_dir='results'):
+    """
+    Walks through the results directory and aggregates convergence information
+    from all CSV files into a summary table.
+    """
+    output_filename = 'convergence_all.csv'
 
     with open(output_filename, 'w', newline='') as outfile:
         writer = csv.writer(outfile)
         writer.writerow(['Logic Gate', 'Method', 'Encoding', 'Max Iterations to Converge'])
 
-        for filename in os.listdir(folder):
-            if not filename.endswith('.csv'):
-                continue
-            filepath = os.path.join(folder, filename)
+        # Iterate through all encoding folders
+        for encoding_folder in os.listdir(results_dir):
+            encoding_path = os.path.join(results_dir, encoding_folder)
+            if not os.path.isdir(encoding_path):
+                continue  # Skip non-directory files
 
-            with open(filepath, newline='') as csvfile:
-                reader = csv.DictReader(csvfile, delimiter=';')
-                # Remove espaços extras das chaves do dicionário
-                data = [{k.strip(): v for k, v in row.items()} for row in reader]
+            # Iterate through all CSV files in the encoding folder
+            for filename in os.listdir(encoding_path):
+                if not filename.endswith('.csv'):
+                    continue
 
-            logic_gate = parse_gate_from_data(data)
-            method = parse_method_from_filename(filename)
-            encoding = args.folder  # encoding vem do nome da pasta
+                filepath = os.path.join(encoding_path, filename)
 
-            if logic_gate is None or method is None:
-                print(f"Pulando arquivo {filename}: não conseguiu extrair logic gate ou método.")
-                continue
+                try:
+                    with open(filepath, newline='') as csvfile:
+                        reader = csv.DictReader(csvfile, delimiter=';')
+                        data = [{k.strip(): v.strip() for k, v in row.items()} for row in reader]
 
-            max_iter = max_iterations_to_converge(data)
+                    logic_gate = parse_gate_from_data(data)
+                    method = parse_method_from_filename(filename)
+                    encoding = encoding_folder
 
-            writer.writerow([logic_gate, method, encoding, max_iter])
+                    # Skip if essential information is missing
+                    if logic_gate is None or method is None:
+                        print(f"Skipping file {filename}: missing logic_gate or method.")
+                        continue
 
-    print(f"Arquivo gerado: {output_filename}")
+                    max_iter = max_iterations_to_converge(data)
+
+                    # Write the result for this file
+                    writer.writerow([logic_gate, method, encoding, max_iter])
+
+                except Exception as e:
+                    print(f"Error processing {filepath}: {e}")
+
+    print(f"Output file generated: {output_filename}")
 
 if __name__ == '__main__':
-    main()
-
-
+    analyze_all_results()
