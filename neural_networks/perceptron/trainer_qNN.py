@@ -43,7 +43,6 @@ class trainer_qNN():
         self._save_history = save_history
         self._tolerance = tolerance
         self._logic_gate = logic_gate
-        self._max_iterations_per_parameter = grid_grain**number_of_inputs
         self._type_of_encoding = type_of_encoding
 
         #define type of encoding
@@ -202,7 +201,7 @@ class trainer_qNN():
         learning_rate = learning_rate
 
         #gradient descent
-        for iteration in range(self._max_iterations_per_parameter*len(parameters)):
+        for iteration in range(self._grid_grain**len(parameters)):
 
             #atualize iteration counter
             self._final_number_of_iterations = iteration+1
@@ -256,7 +255,7 @@ class trainer_qNN():
         parameters = random_parameters(type_of_encoding=self._type_of_encoding, number_of_inputs=self._number_of_inputs)
 
         #random search
-        for iteration in range(self._max_iterations_per_parameter*len(parameters)):
+        for iteration in range(self._grid_grain**len(parameters)):
 
             #atualize iteration counter
             self._final_number_of_iterations = iteration+1
@@ -313,7 +312,7 @@ class trainer_qNN():
         alpha = alpha
 
         #simulated annealing
-        for iteration in range(self._max_iterations_per_parameter*len(parameters)):
+        for iteration in range(self._grid_grain**len(parameters)):
 
             #atualize iteration counter
             self._final_number_of_iterations = iteration+1
@@ -378,7 +377,7 @@ class trainer_qNN():
         population = [list(random_parameters(type_of_encoding=self._type_of_encoding, number_of_inputs=self._number_of_inputs)) for _ in range(population_size)]
         
 
-        for generation in range(int(self._max_iterations_per_parameter/population_size*len(population[0]))):
+        for generation in range(int( (self._grid_grain/population_size)**len(population[0]) )):
 
             #atualize iteration counter
             self._final_number_of_iterations = generation+1
