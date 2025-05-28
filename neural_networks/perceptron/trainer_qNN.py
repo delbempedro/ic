@@ -308,11 +308,14 @@ class trainer_qNN():
         temperature = temperature
         final_temperature = final_temperature
 
+        #define maximum number of iterations
+        max_iterations = self._grid_grain**len(parameters)
+
         #define alpha
-        alpha = alpha
+        alpha = (final_temperature/temperature)**(1.0/(max_iterations-1))
 
         #simulated annealing
-        for iteration in range(self._grid_grain**len(parameters)):
+        for iteration in range(max_iterations):
 
             #atualize iteration counter
             self._final_number_of_iterations = iteration+1
@@ -377,7 +380,7 @@ class trainer_qNN():
         population = [list(random_parameters(type_of_encoding=self._type_of_encoding, number_of_inputs=self._number_of_inputs)) for _ in range(population_size)]
         
 
-        for generation in range(int( (self._grid_grain/population_size)**len(population[0]) )):
+        for generation in range(int( (self._grid_grain**len(population[0]))/population_size )):
 
             #atualize iteration counter
             self._final_number_of_iterations = generation+1

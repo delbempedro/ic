@@ -8,8 +8,8 @@ Authors:
 - Pedro C. Delbem <pedrodelbem@usp.br>
 """
 
-import pandas as pd
-import plotly.graph_objects as go
+import pandas as pd # type: ignore
+import plotly.graph_objects as go # type: ignore
 from pathlib import Path
 import re
 
